@@ -25,10 +25,9 @@ with an output FFT. HP/LP filters stay editable when routed to a sidechain and d
 ## Download
 
 **macOS 11 or later, Apple Silicon and Intel:**
-[BlueChannel-1.0.0-macos.pkg](https://github.com/MistaMin/BlueChannel/releases/download/v1.0.0/BlueChannel-1.0.0-macos.pkg)
+[BlueChannel-1.0.0-macos.dmg](https://github.com/MistaMin/BlueChannel/releases/download/v1.0.0/BlueChannel-1.0.0-macos.dmg) · [BlueChannel-1.0.0-macos.pkg](https://github.com/MistaMin/BlueChannel/releases/download/v1.0.0/BlueChannel-1.0.0-macos.pkg)
 
-The installer offers **VST3, Audio Unit, CLAP, LV2 and Standalone**, with the guide, screenshots and licence
-texts. A portable bundle zip, checksums, build manifest and simulator source are on the
+The disk image contains the installer, full documentation, images, and licence texts. The installer offers **VST3, Audio Unit, CLAP, LV2 and Standalone**. A portable bundle zip, checksums, build manifest and simulator source are on the
 [release page](https://github.com/MistaMin/BlueChannel/releases/tag/v1.0.0). Signing and notarisation results
 are recorded there. AAX is not distributed. Windows/Linux source builds and CI packaging are available;
 their HQ library packaging and physical-machine acceptance are not validated for this release.
