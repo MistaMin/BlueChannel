@@ -1,0 +1,7 @@
+# Reference material (third-party schematics, manuals and the reference SPICE model) stays out of the repository.
+/*-model/
+build/
+dist/
+.DS_Store
+*.swp
+__pycache__/
