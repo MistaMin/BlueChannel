@@ -121,13 +121,28 @@ if(BLUECHANNEL_BUILD_CLAP)
     FetchContent_MakeAvailable(clap-juce-extensions)
 endif()
 
+# Knob design: Designs/knobs.csv is baked into the editor. Developer builds also read and autosave the file in
+# place (see Source/UI/DevLayout.h).
+option(BLUECHANNEL_DEV_EDITOR "Developer mode: move and resize knobs in the editor and save Designs/knobs.csv" OFF)
+set(BLUECHANNEL_DESIGN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/Designs/knobs.csv")
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${BLUECHANNEL_DESIGN_FILE}")
+set(BLUECHANNEL_KNOB_DESIGN "")
+if(EXISTS "${BLUECHANNEL_DESIGN_FILE}")
+    file(READ "${BLUECHANNEL_DESIGN_FILE}" BLUECHANNEL_KNOB_DESIGN)
+endif()
+configure_file(Source/UI/EmbeddedDesign.h.in generated/EmbeddedDesign.h @ONLY)
+
 target_sources(BlueChannel PRIVATE
     Source/Plugin/Params.cpp
     Source/Plugin/PluginProcessor.cpp
     Source/Plugin/PluginEditor.cpp
 )
-target_include_directories(BlueChannel PRIVATE Source Source/Plugin Source/UI "${GOODLOOKINUI_ROOT}/adapters/juce")
+target_include_directories(BlueChannel PUBLIC Source Source/Plugin Source/UI "${GOODLOOKINUI_ROOT}/adapters/juce"
+                           "${CMAKE_CURRENT_BINARY_DIR}/generated")
 target_compile_definitions(BlueChannel PUBLIC
+    BLUECHANNEL_DEV_EDITOR=$<BOOL:${BLUECHANNEL_DEV_EDITOR}>
+    GOODLOOKINUI_ENABLE_EDITOR=$<BOOL:${BLUECHANNEL_DEV_EDITOR}>
+    BLUECHANNEL_DESIGN_DIR="${CMAKE_CURRENT_SOURCE_DIR}/Designs"
     JUCE_WEB_BROWSER=0
     JUCE_USE_CURL=0
     JUCE_VST3_CAN_REPLACE_VST2=0

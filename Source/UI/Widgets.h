@@ -35,19 +35,34 @@ public:
     enum class Cap { Yellow, Grey, Black };
 
     Knob(const Theme& t, juce::String caption, Cap c, bool onSection = true)
-        : juce::Slider(juce::Slider::RotaryHorizontalVerticalDrag, juce::Slider::NoTextBox),
-          theme(t), name(std::move(caption)), cap(c), section(onSection)
+        : juce::Slider(juce::Slider::RotaryHorizontalVerticalDrag, juce::Slider::NoTextBox), theme(t), section(onSection)
     {
         setRotaryParameters(-0.8f * juce::MathConstants<float>::pi, 0.8f * juce::MathConstants<float>::pi, true);
         setVelocityBasedMode(false);
         setMouseDragSensitivity(220);
-        setTitle(name);
+        const auto base = analogueTheme();
+        design.label = caption.toStdString();
+        design.style = "FS";
+        design.colour = hexOf(c == Cap::Yellow ? base.knobYellow : c == Cap::Grey ? base.knobGrey : base.knobBlack).toStdString();
+        design.fontSize = 10.0f;
+        setTitle(caption);
     }
+
+    // Look and placement from the design file (Designs/knobs.csv): label, knob style, cap colour, caption size.
+    // Bounds are applied by the panel. The digital skin draws the flat variant of the same style.
+    goodlookinui::Item design;
+    void applyDesign(const goodlookinui::Item& item)
+    {
+        design = item;
+        setTitle(juce::String(item.label));
+        repaint();
+    }
+    bool onSection() const { return section; }
 
     juce::String minLegend, maxLegend;
     std::function<juce::String()> extraLegend;   // optional second legend line (e.g. x3 range)
 
-    juce::String getTooltip() override { return name + ": " + getTextFromValue(getValue()); }
+    juce::String getTooltip() override { return juce::String(design.label) + ": " + getTextFromValue(getValue()); }
     void mouseEnter(const juce::MouseEvent& e) override { juce::Slider::mouseEnter(e); repaint(); }
     void mouseExit(const juce::MouseEvent& e) override { juce::Slider::mouseExit(e); repaint(); }
 
@@ -55,14 +70,14 @@ public:
     {
         auto r = getLocalBounds().toFloat();
         const juce::Colour ink = section ? theme.inkOnSection : theme.inkOnPanel;
-        drawText(g, name, r.removeFromTop(12.0f), 9.5f, ink);
+        const float captionSize = design.fontSize * 0.95f;
+        drawText(g, juce::String(design.label), r.removeFromTop(captionSize + 2.5f), captionSize, ink);
         auto legends = r.removeFromBottom(11.0f);
         const float d = juce::jmin(r.getWidth(), r.getHeight());
         auto knob = juce::Rectangle<float>(d, d).withCentre(r.getCentre());
-        goodlookinui::Item item;
-        item.id = name.toStdString();
-        item.style = theme.knobStyle().toStdString();
-        item.colour = hexOf(cap == Cap::Yellow ? theme.knobYellow : cap == Cap::Grey ? theme.knobGrey : theme.knobBlack).toStdString();
+        goodlookinui::Item item = design;
+        const bool flatStyle = item.style.rfind("flat_", 0) == 0;
+        if (theme.flat && !flatStyle) item.style = "flat_" + item.style;
         const auto backdrop = section ? theme.section : theme.panelTop;
         gl::drawKnob(g, knob, valueToProportionOfLength(getValue()), item, isEnabled(), backdrop);
         const auto dim = section ? theme.inkDim : theme.inkOnPanel.withAlpha(0.75f);
@@ -80,8 +95,6 @@ public:
 
 private:
     const Theme& theme;
-    juce::String name;
-    Cap cap;
     bool section;
 };
 

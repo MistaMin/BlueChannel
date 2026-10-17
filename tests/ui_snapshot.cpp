@@ -4,6 +4,7 @@
 // Renders the editor panel offscreen to PNG (both skins), for layout checks and documentation images.
 // These are component renders: they do not exercise native windows, menus or host scaling.
 // Usage: BlueChannelSnapshot <output dir> [scale]
+//        BlueChannelSnapshot --design <file>      write the current knob design (Designs/knobs.csv format)
 
 #include "PluginEditor.h"
 #include "PluginProcessor.h"
@@ -13,6 +14,16 @@
 int main(int argc, char** argv)
 {
     juce::ScopedJuceInitialiser_GUI gui;
+    if (argc > 2 && juce::String(argv[1]) == "--design")
+    {
+        BlueChannelProcessor proc;
+        BlueChannelPanel panel(proc);
+        const auto file = juce::File::getCurrentWorkingDirectory().getChildFile(argv[2]);
+        file.getParentDirectory().createDirectory();
+        file.replaceWithText(juce::String(panel.designCsv()), false, false, "\n");
+        std::printf("wrote %s\n", file.getFullPathName().toRawUTF8());
+        return 0;
+    }
     const juce::File dir = juce::File::getCurrentWorkingDirectory().getChildFile(argc > 1 ? argv[1] : "snapshots");
     const float scale = argc > 2 ? float(std::atof(argv[2])) : 1.0f;
     dir.createDirectory();
@@ -39,5 +50,19 @@ int main(int argc, char** argv)
         juce::PNGImageFormat().writeImageToStream(img, out);
         std::printf("wrote %s (%d x %d)\n", file.getFullPathName().toRawUTF8(), img.getWidth(), img.getHeight());
     }
+#if BLUECHANNEL_DEV_EDITOR
+    {
+        // Developer mode, for checking the overlay and inspector (component render).
+        BlueChannelProcessor proc;
+        std::unique_ptr<juce::AudioProcessorEditor> ed(proc.createEditor());
+        if (auto* pn = dynamic_cast<BlueChannelPanel*>(ed->getChildComponent(0))) pn->onDevToggle();
+        auto img = ed->createComponentSnapshot(ed->getLocalBounds(), true, 1.0f);
+        const auto file = dir.getChildFile("blue-channel-devmode.png");
+        file.deleteFile();
+        juce::FileOutputStream out(file);
+        juce::PNGImageFormat().writeImageToStream(img, out);
+        std::printf("wrote %s (%d x %d)\n", file.getFullPathName().toRawUTF8(), img.getWidth(), img.getHeight());
+    }
+#endif
     return 0;
 }

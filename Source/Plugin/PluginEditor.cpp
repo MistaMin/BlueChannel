@@ -3,7 +3,11 @@
 
 #include "PluginEditor.h"
 
+#include "DevLayout.h"
+#include "EmbeddedDesign.h"
 #include "Model/ControlMap.h"
+
+#include <sstream>
 
 using namespace bluechannel;
 using namespace bluechannel::ui;
@@ -212,7 +216,63 @@ BlueChannelPanel::BlueChannelPanel(BlueChannelProcessor& p) : proc(p)
     skinKey->onClick = [this] { applySkin(proc.skin() == 1 ? 0 : 1); };
     skinKey->setTooltip("Switch between the hardware look and a flat look (display only)");
 
+#if BLUECHANNEL_DEV_EDITOR
+    auto* devKey = add(std::make_unique<LedKey>(t, "Dev", t.ledAmber, false), R(204, 326, 44, 34));
+    devKey->setClickingTogglesState(true);
+    devKey->setTooltip("Developer mode: move and resize knobs; changes are saved to Designs/knobs.csv");
+    devKey->onClick = [this] { if (onDevToggle) onDevToggle(); };
+#endif
+
+    // The built-in design overrides the coded layout; a developer build prefers the file on disk, so a relaunch
+    // shows the last saved design without rebuilding.
+    applyDesignCsv(bluechannel::design::kKnobs);
+#if BLUECHANNEL_DEV_EDITOR
+    const auto onDisk = juce::File(BLUECHANNEL_DESIGN_DIR).getChildFile("knobs.csv");
+    if (onDisk.existsAsFile()) applyDesignCsv(onDisk.loadFileAsString().toStdString());
+#endif
     tick();
+}
+
+std::vector<goodlookinui::Item> BlueChannelPanel::designItems() const
+{
+    std::vector<goodlookinui::Item> items;
+    for (auto* k : knobs)
+    {
+        auto i = k->design;
+        const auto b = k->getBounds();
+        i.x = float(b.getX()); i.y = float(b.getY()); i.width = float(b.getWidth()); i.height = float(b.getHeight());
+        items.push_back(i);
+    }
+    return items;
+}
+
+std::string BlueChannelPanel::designCsv() const
+{
+    std::ostringstream out;
+    goodlookinui::writeDesign(out, designItems());
+    return out.str();
+}
+
+bool BlueChannelPanel::applyDesignCsv(const std::string& csv)
+{
+    if (csv.empty()) return false;
+    std::vector<goodlookinui::Item> items;
+    try
+    {
+        std::istringstream in(csv);
+        items = goodlookinui::readDesign(in);
+    }
+    catch (...) { return false; }
+    // Items are matched by ID; knobs the file does not mention keep their current design (so an older file still
+    // loads after a knob is added), and items for unknown IDs are ignored.
+    for (auto* k : knobs)
+        for (auto& i : items)
+            if (i.id == k->design.id && i.parameter == k->design.parameter)
+            {
+                k->applyDesign(i);
+                k->setBounds(juce::roundToInt(i.x), juce::roundToInt(i.y), juce::roundToInt(i.width), juce::roundToInt(i.height));
+            }
+    return true;
 }
 
 BlueChannelPanel::~BlueChannelPanel()
@@ -225,6 +285,9 @@ BlueChannelPanel::Knob* BlueChannelPanel::knob(const char* paramId, const juce::
                                                 juce::Rectangle<int> bounds, bool onSection)
 {
     auto* k = add(std::make_unique<Knob>(theme, caption, cap, onSection), bounds);
+    k->design.id = paramId;
+    k->design.parameter = paramId;
+    knobs.push_back(k);
     sliderAtts.add(new SliderAtt(proc.apvts, paramId, *k));
     if (auto* p = proc.apvts.getParameter(paramId))
         k->setDoubleClickReturnValue(true, p->convertFrom0to1(p->getDefaultValue()));
@@ -359,6 +422,10 @@ void BlueChannelPanel::tick()
 BlueChannelEditor::BlueChannelEditor(BlueChannelProcessor& p) : AudioProcessorEditor(p), proc(p), panel(p)
 {
     addAndMakeVisible(panel);
+#if BLUECHANNEL_DEV_EDITOR
+    dev = std::make_unique<DevTools>(panel, *this);
+    panel.onDevToggle = [this] { toggleDeveloperMode(); };
+#endif
     setResizable(true, true);
     const double aspect = double(BlueChannelPanel::kWidth) / double(BlueChannelPanel::kHeight);
     getConstrainer()->setFixedAspectRatio(aspect);
@@ -371,10 +438,40 @@ BlueChannelEditor::BlueChannelEditor(BlueChannelProcessor& p) : AudioProcessorEd
 
 BlueChannelEditor::~BlueChannelEditor() { stopTimer(); }
 
+void BlueChannelEditor::toggleDeveloperMode()
+{
+#if BLUECHANNEL_DEV_EDITOR
+    const bool on = !dev->isActive();
+    dev->setActive(on);
+    const int w = std::max(getWidth(), on ? 1200 : 0);
+    const int panelH = int(std::round(double(w) * BlueChannelPanel::kHeight / BlueChannelPanel::kWidth));
+    if (on)
+    {
+        getConstrainer()->setFixedAspectRatio(0.0);
+        setResizeLimits(1000, 300, BlueChannelPanel::kWidth * 2, BlueChannelPanel::kHeight * 2 + DevTools::kInspectorHeight);
+        setSize(w, panelH + DevTools::kInspectorHeight);
+    }
+    else
+    {
+        setResizeLimits(int(BlueChannelPanel::kWidth * 0.5), int(BlueChannelPanel::kHeight * 0.5), BlueChannelPanel::kWidth * 2,
+                        BlueChannelPanel::kHeight * 2);
+        getConstrainer()->setFixedAspectRatio(double(BlueChannelPanel::kWidth) / double(BlueChannelPanel::kHeight));
+        setSize(getWidth(), panelH);
+    }
+    resized();
+#endif
+}
+
 void BlueChannelEditor::resized()
 {
-    const float s = float(getWidth()) / float(BlueChannelPanel::kWidth);
+    const bool devOn = dev != nullptr && dev->isActive();
+    const int inspector = devOn ? bluechannel::ui::DevTools::kInspectorHeight : 0;
+    const float s = std::min(float(getWidth()) / float(BlueChannelPanel::kWidth),
+                             float(getHeight() - inspector) / float(BlueChannelPanel::kHeight));
     panel.setTransform(juce::AffineTransform::scale(s));
     panel.setBounds(0, 0, BlueChannelPanel::kWidth, BlueChannelPanel::kHeight);
-    proc.apvts.state.setProperty("uiscale", s, nullptr);
+#if BLUECHANNEL_DEV_EDITOR
+    if (devOn) dev->layout(getLocalBounds().removeFromBottom(inspector));
+#endif
+    if (!devOn) proc.apvts.state.setProperty("uiscale", s, nullptr);
 }

@@ -1,0 +1,30 @@
+GoodLookinUI design version 1
+id,parameter,label,style,colour,x,y,width,height,font size
+micgain,micgain,Gain,FS,#26292E,262,32,92,112,10
+linegain,linegain,Gain,FS,#26292E,262,32,92,112,10
+trim,trim,Trim,FS,#D9DCDF,360,42,72,92,10
+lpf,lpf,Low Pass,FS,#F4D81C,566,70,66,88,10
+hpf,hpf,High Pass,FS,#F4D81C,638,70,66,88,10
+lmfgain,lmfgain,LMF,FS,#D9DCDF,724,62,76,100,10
+lmffreq,lmffreq,Freq,FS,#F4D81C,802,66,54,84,10
+lmfq,lmfq,Q,FS,#F4D81C,858,66,52,84,10
+hmfgain,hmfgain,HMF,FS,#D9DCDF,914,62,76,100,10
+hmffreq,hmffreq,Freq,FS,#F4D81C,992,66,54,84,10
+hmfq,hmfq,Q,FS,#F4D81C,1048,66,52,84,10
+lfgain,lfgain,LF,FS,#D9DCDF,1120,62,76,100,10
+lffreq,lffreq,Freq,FS,#F4D81C,1198,66,54,84,10
+hfgain,hfgain,HF,FS,#D9DCDF,1256,62,76,100,10
+hffreq,hffreq,Freq,FS,#F4D81C,1334,66,54,84,10
+ratio,ratio,Ratio,FS,#F4D81C,262,300,64,92,10
+attack,attack,Attack,FS,#F4D81C,330,300,64,92,10
+release,release,Release,FS,#F4D81C,398,300,64,92,10
+makeup,makeup,Makeup,FS,#F4D81C,466,300,64,92,10
+threshold,threshold,Threshold,FS,#F4D81C,534,300,64,92,10
+mix,mix,Mix,FS,#F4D81C,602,300,64,92,10
+range,range,Range,FS,#F4D81C,694,312,70,96,10
+gatethresh,gatethresh,Threshold,FS,#F4D81C,774,312,70,96,10
+hold,hold,Hold,FS,#F4D81C,854,312,70,96,10
+gaterelease,gaterelease,Release,FS,#F4D81C,934,312,70,96,10
+deessfreq,deessfreq,Frequency,FS,#F4D81C,1036,300,80,96,10
+deessthresh,deessthresh,Threshold,FS,#F4D81C,1120,300,80,96,10
+output,output,Output,FS,#D9DCDF,1226,270,96,120,10

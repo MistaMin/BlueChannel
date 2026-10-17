@@ -7,6 +7,8 @@
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
+namespace bluechannel::ui { class DevTools; }
+
 // The panel is laid out at a fixed logical size and scaled as a whole when the window is resized.
 class BlueChannelPanel : public juce::Component
 {
@@ -21,6 +23,13 @@ public:
     void tick();                 // 30 Hz: meters, legends, source-dependent controls
     void applySkin(int skin);
     bluechannel::ui::Theme theme;
+
+    // Knob design (Designs/knobs.csv): one item per knob, keyed by parameter ID, with bounds in panel units.
+    std::vector<goodlookinui::Item> designItems() const;
+    bool applyDesignCsv(const std::string& csv);          // false (and nothing changed) if the CSV does not fit
+    std::string designCsv() const;
+    const std::vector<bluechannel::ui::Knob*>& allKnobs() const { return knobs; }
+    std::function<void()> onDevToggle;                    // developer builds: the Dev key
 
 private:
     using Knob = bluechannel::ui::Knob;
@@ -44,6 +53,7 @@ private:
         return raw;
     }
 
+    std::vector<Knob*> knobs;
     Knob *micGain = nullptr, *lineGain = nullptr, *trim = nullptr, *lpf = nullptr, *hpf = nullptr;
     Knob *lmfFreq = nullptr, *hmfFreq = nullptr, *lfFreq = nullptr, *hfFreq = nullptr, *output = nullptr;
     bluechannel::ui::VuMeter* vu = nullptr;
@@ -68,7 +78,9 @@ public:
 
 private:
     void timerCallback() override { panel.tick(); }
+    void toggleDeveloperMode();
     BlueChannelProcessor& proc;
     BlueChannelPanel panel;
     juce::TooltipWindow tooltips { this, 600 };
+    std::unique_ptr<bluechannel::ui::DevTools> dev;   // developer builds only
 };

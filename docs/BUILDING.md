@@ -24,6 +24,37 @@ Outputs: `build/BlueChannel_artefacts/Release/{VST3,AU,CLAP,LV2,Standalone,AAX}`
 | `BLUECHANNEL_BUILD_AAX` | ON | AAX target when an SDK is found |
 | `BLUECHANNEL_AAX_SDK` | `../aax-sdk-2-8-1` | AAX SDK location (not in the repository) |
 | `BLUECHANNEL_BUILD_PLUGIN` | ON | OFF builds only the JUCE-free engine tests and tools |
+| `BLUECHANNEL_DEV_EDITOR` | OFF | developer mode for placing and sizing knobs (see below) |
+
+## Developer mode: knob placement and size
+
+Knob positions, sizes, labels, knob styles, cap colours and caption sizes live in `Designs/knobs.csv`
+(GoodLookinUI design format, one row per knob, keyed by parameter ID, coordinates in panel units of the
+1560 x 450 panel). The file is baked into every build, so editing it changes release builds too.
+
+```sh
+cmake -S . -B build/devmode -G Ninja -DCMAKE_BUILD_TYPE=Release -DBLUECHANNEL_DEV_EDITOR=ON
+cmake --build build/devmode --target BlueChannel_Standalone   # or any plugin format
+```
+
+Open the editor and press **Dev** (bottom left, next to Bypass). The window grows an inspector:
+
+| Action | Effect |
+|---|---|
+| click a knob | select it (or pick it in the inspector list) |
+| drag | move (2-unit grid; hold Alt for 1) |
+| drag the corner handle | resize (minimum 20 x 20) |
+| arrow keys / Shift+arrows | nudge 1 / 10 units |
+| Cmd/Ctrl+Z | undo the last move, resize or nudge |
+| inspector fields | exact X, Y, W, H, label, style, colour, caption size, mark colour (its own Undo button) |
+
+Every change is written to `Designs/knobs.csv` in the source tree within about a third of a second (only
+when the text changes, atomically), so `git diff Designs/knobs.csv` shows exactly what moved. A developer
+build starts from the file on disk, so a relaunch shows the saved design without rebuilding; any build
+re-embeds it automatically the next time it is built. Press **Dev** again to leave developer mode. Release builds contain none
+of this code. `BlueChannelSnapshot --design <file>` writes the current layout in the same format.
+
+Only knobs are placed this way; keys, lamps and meters keep their coded positions.
 
 ## Platforms
 

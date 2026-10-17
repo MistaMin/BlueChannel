@@ -133,6 +133,47 @@ int main()
         check(finite(buf), "editor open and close around processing");
     }
 
+    // Knob design: round trip, partial and malformed files, and the developer-mode toggle (developer builds).
+    {
+        BlueChannelProcessor p;
+        BlueChannelPanel panel(p);
+        auto csv = panel.designCsv();
+        const auto before = panel.designItems();
+        // Move the LMF gain knob by editing its row.
+        juce::StringArray lines;
+        lines.addLines(juce::String(csv));
+        for (auto& l : lines)
+            if (l.startsWith("lmfgain,"))
+            {
+                auto f = juce::StringArray::fromTokens(l, ",", "");
+                f.set(5, "700"); f.set(7, "90");
+                l = f.joinIntoString(",");
+            }
+        check(panel.applyDesignCsv(lines.joinIntoString("\n").toStdString()), "edited design file applies");
+        bool movedOk = false;
+        for (auto& i : panel.designItems())
+            if (i.id == "lmfgain") movedOk = i.x == 700.0f && i.width == 90.0f;
+        check(movedOk, "design edit moves and resizes the knob");
+        check(!panel.applyDesignCsv("not a design"), "malformed design ignored");
+        check(panel.applyDesignCsv("GoodLookinUI design version 1\nid,parameter,label,style,colour,x,y,width,height,font size\n"
+                                   "trim,trim,Trim,FS,#D9DCDF,400,40,70,90,10\n"),
+              "partial design applies to the knobs it names");
+        std::unique_ptr<juce::AudioProcessorEditor> ed(p.createEditor());
+        const int h0 = ed->getHeight();
+        if (auto* e = dynamic_cast<BlueChannelEditor*>(ed.get()))
+        {
+            juce::ignoreUnused(e);
+#if BLUECHANNEL_DEV_EDITOR
+            if (auto* pn = dynamic_cast<BlueChannelPanel*>(e->getChildComponent(0))) pn->onDevToggle();
+            check(ed->getHeight() > h0, "developer mode adds the inspector below the panel");
+            if (auto* pn = dynamic_cast<BlueChannelPanel*>(e->getChildComponent(0))) pn->onDevToggle();
+            check(std::abs(ed->getHeight() - int(std::round(ed->getWidth() * 450.0 / 1560.0))) <= 2, "leaving developer mode restores the panel aspect");
+#else
+            check(h0 > 0, "release editor has no developer mode");
+#endif
+        }
+    }
+
     // Offline rendering at a different factor is deterministic across repeated bounces.
     {
         BlueChannelProcessor p;
