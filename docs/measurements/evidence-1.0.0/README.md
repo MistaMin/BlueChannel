@@ -7,7 +7,7 @@ developer editor disabled. Release artefact signatures/notarisation are recorded
 - `processor-arm64.log`: final 1248 × 360 startup, old-preview reset and later resize recall.
 - `pluginval.log`: VST3 strictness 7 passed, in-process, GUI tests skipped.
 - `hq-cleanup-repeat.log`: three consecutive component fixtures, including restart and clean simulator teardown.
-- `hq-extended.log`: isolated component instances, block continuation, reset, source changes and dynamics controls.
+- `hq-extended.log`: `MallocScribble=1`, clean teardown, isolated component instances, block continuation, reset, source changes and dynamics controls.
 - `rosetta-stage.log`, `rosetta-model.log`, `rosetta-processor.log`, `rosetta-hq.log`: x86_64 slices under Rosetta.
 
 The three [UI images](../../images/) are component snapshots from this release at 1248 × 360.

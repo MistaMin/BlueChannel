@@ -8,7 +8,7 @@ pluginval at strictness 7, in-process with GUI tests skipped. A host-visible swi
 fix is covered by fractional automation/state-recall cases. Native standalone analogue and Digital
 windows were inspected; documentation images are deterministic 1248 × 360 component captures.
 
-The extended HQ fixture passed with a block-split residual of 1.71003e-7 FS. Its 94.17 s wall time
+The extended HQ fixture passed with a block-split residual of 1.71003e-7 FS. Its 89.46 s wall time (with malloc scribbling enabled)
 includes operating-point restarts and concurrent release work; it is not a render-throughput benchmark.
 The x86_64 stage, model and processor slices also passed under Rosetta. This does not establish
 physical Intel performance. The final HQ lifecycle fixture also passed three consecutive runs,

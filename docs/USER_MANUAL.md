@@ -160,3 +160,10 @@ mic gain detent now uses a software calibration to reach zero; all other gain po
 The output transformer is included in both processing paths. Standard uses an ideal output driver;
 Offline HQ solves the nonlinear core with the finite driver and feedback. Feedback can suppress core
 colour, so the model does not promise obvious transformer distortion on line input.
+
+## Standalone audio setup
+
+Use **Options → Audio/MIDI Settings** to select the input/output device. The standalone wrapper may
+mute its input to avoid speaker feedback; enable input only when your monitoring setup is ready.
+macOS asks for audio-input permission when needed. The permission is for the standalone application's
+live input; DAW plug-ins use the host's audio devices and permissions.

@@ -87,7 +87,11 @@ for entry in "${BUNDLES[@]}"; do
       find "$OUT/stage/$id/$name/Contents" -type f -name '*.dylib' -print0 | while IFS= read -r -d '' f; do
         codesign --force --timestamp --options runtime --sign "$APP_ID" "$f"
       done
-      codesign --force --deep --timestamp --options runtime --sign "$APP_ID" "$OUT/stage/$id/$name"
+      if [ "$id" = "app" ]; then
+        codesign --force --deep --timestamp --options runtime --entitlements "$BUILD/BlueChannel_artefacts/JuceLibraryCode/BlueChannel_Standalone.entitlements" --sign "$APP_ID" "$OUT/stage/$id/$name"
+      else
+        codesign --force --deep --timestamp --options runtime --sign "$APP_ID" "$OUT/stage/$id/$name"
+      fi
       codesign --verify --deep --strict --verbose=2 "$OUT/stage/$id/$name"
     fi
   fi

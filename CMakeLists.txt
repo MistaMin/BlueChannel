@@ -129,6 +129,10 @@ juce_add_plugin(BlueChannel
     AU_MAIN_TYPE             kAudioUnitType_Effect
     AAX_CATEGORY             AAX_ePlugInCategory_Dynamics
     LV2URI                   "urn:opengrid:bluechannel"
+    MICROPHONE_PERMISSION_ENABLED TRUE
+    MICROPHONE_PERMISSION_TEXT "Blue Channel uses audio input to process live sound in the standalone application."
+    HARDENED_RUNTIME_ENABLED TRUE
+    HARDENED_RUNTIME_OPTIONS com.apple.security.device.audio-input
     COPY_PLUGIN_AFTER_BUILD  FALSE
 )
 
