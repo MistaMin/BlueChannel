@@ -89,10 +89,10 @@ BlueChannelPanel::BlueChannelPanel(BlueChannelProcessor& p) : proc(p)
     trim = knob(pid::trim, "Trim", Knob::Cap::Grey, R(360, 42, 72, 92));
     trim->minLegend = "0"; trim->maxLegend = "+20";
     add(std::make_unique<StepSelector>(t, "Select", *st.getParameter(pid::source), juce::StringArray { "Mic", "Line", "Inst" }, um, t.ledRed),
-        R(442, 26, 104, 40));
+        R(442, 24, 104, 44));
     add(std::make_unique<StepSelector>(t, "Imped.", *st.getParameter(pid::impedance),
                                        juce::StringArray { "Low", "Classic", "Med", "High" }, um, t.ledRed),
-        R(442, 74, 104, 52));
+        R(442, 72, 104, 58));
     key(pid::air, "Mic Air", t.ledRed, R(440, 150, 52, 34));
     key(pid::phase, "Phase", t.ledRed, R(494, 150, 52, 34));
     overload = add(std::make_unique<Lamp>(t, "Audio O/L", t.ledRed), R(266, 166, 90, 14));
@@ -139,13 +139,13 @@ BlueChannelPanel::BlueChannelPanel(BlueChannelProcessor& p) : proc(p)
 
     // ---- bottom row ---------------------------------------------------------------------------------
     add(std::make_unique<StepSelector>(t, "Dynamics", *st.getParameter(pid::dynPosition), juce::StringArray { "Post-EQ", "Pre-EQ" }, um, t.ledRed),
-        R(24, 330, 116, 30));
+        R(24, 326, 116, 34));
     key(pid::bypass, "Bypass", t.ledRed, R(150, 326, 52, 34), false);
 
     sections.push_back({ { 252, 230, 420, 208 }, "Compressor" });
     key(pid::compIn, "Comp In", t.ledRed, R(260, 240, 52, 34));
     add(std::make_unique<StepSelector>(t, "Vintage", *st.getParameter(pid::compType), juce::StringArray { "VCA", "Comp", "Lim" }, um, t.ledAmber),
-        R(314, 238, 88, 40));
+        R(314, 235, 88, 44));
     key(pid::compListen, "Listen", t.ledRed, R(404, 240, 52, 34));
     key(pid::compKey, "Ext Key", t.ledGreen, R(458, 240, 52, 34));
     key(pid::autoRelease, "Auto Rel", t.ledRed, R(512, 240, 52, 34));
@@ -202,15 +202,15 @@ BlueChannelPanel::BlueChannelPanel(BlueChannelProcessor& p) : proc(p)
 
     auto* os = add(std::make_unique<StepSelector>(t, "Oversample", *st.getParameter(pid::oversampling),
                                        juce::StringArray { "1x", "2x", "4x", "8x", juce::String::fromUTF8("\\( \xe1\x90\x96)/ 16x") }, um, t.ledRed),
-        R(1400, 240, 150, 62));
+        R(1400, 236, 150, 74));
     os->keyWidth = 58;
     os->resized();
     auto* off = add(std::make_unique<StepSelector>(t, "Offline", *st.getParameter(pid::offlineOversampling),
                                        juce::StringArray { "Same", "1x", "2x", "4x", "8x", juce::String::fromUTF8("\\( \xe1\x90\x96)/ 16x") }, um, t.ledAmber),
-        R(1400, 310, 150, 74));
+        R(1400, 316, 150, 86));
     off->keyWidth = 58;
     off->resized();
-    skinKey = add(std::make_unique<LedKey>(t, "Digital skin", t.ledGreen, false), R(1400, 394, 70, 34));
+    skinKey = add(std::make_unique<LedKey>(t, "Digital skin", t.ledGreen, false), R(1400, 408, 70, 34));
     skinKey->setClickingTogglesState(false);
     skinKey->litOverride = [this] { return proc.skin() == 1; };
     skinKey->onClick = [this] { applySkin(proc.skin() == 1 ? 0 : 1); };

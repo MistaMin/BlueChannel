@@ -140,11 +140,13 @@ public:
     }
     void paint(juce::Graphics& g) override
     {
+        // The lit glow is twice the lamp radius, so the lamp sits 7 px in from the left and at the centre of its
+        // row, leaving room for the glow inside these bounds.
         auto r = getLocalBounds().toFloat();
-        const float rad = 3.6f;
-        const juce::Point<float> c(r.getX() + rad + 1.0f, r.getCentreY());
+        const float rad = 3.2f;
+        const juce::Point<float> c(r.getX() + 7.0f, r.getCentreY());
         gl::meters::drawLamp(g, c, rad, colour.withMultipliedBrightness(0.35f + 0.65f * level), level > 0.05f);
-        drawText(g, label, r.withTrimmedLeft(rad * 2 + 5.0f), 8.0f, section ? theme.inkOnSection : theme.inkOnPanel,
+        drawText(g, label, r.withTrimmedLeft(17.0f), 8.0f, section ? theme.inkOnSection : theme.inkOnPanel,
                  juce::Justification::centredLeft, false);
     }
 
@@ -221,9 +223,11 @@ public:
     int keyWidth = 46;
     void resized() override
     {
+        // The key uses the same 34 px row as the plain keys beside it, so selectors line up with them. Lamp rows
+        // are 14 px so each lamp's glow stays inside its own bounds.
         auto r = getLocalBounds();
-        key.setBounds(r.removeFromLeft(keyWidth));
-        const int h = juce::jmin(12, r.getHeight() / juce::jmax(1, names.size()));
+        key.setBounds(r.removeFromLeft(keyWidth).withSizeKeepingCentre(keyWidth, 34));
+        const int h = juce::jmax(14, r.getHeight() / juce::jmax(1, names.size()));
         for (auto* l : lamps) l->setBounds(r.removeFromTop(h).withTrimmedLeft(2));
     }
 
@@ -294,8 +298,8 @@ public:
         {
             auto cell = r.withX(r.getX() + w * float(i)).withWidth(w);
             const bool on = att >= float(marks[i]);
-            gl::meters::drawLamp(g, { cell.getCentreX(), cell.getY() + 5.0f }, 3.4f, theme.ledGreen, on);
-            drawText(g, "-" + juce::String(marks[i]), cell.withTrimmedTop(10.0f), 7.5f, theme.inkOnSection, juce::Justification::centredTop, false);
+            gl::meters::drawLamp(g, { cell.getCentreX(), cell.getY() + 7.0f }, 3.0f, theme.ledGreen, on);
+            drawText(g, "-" + juce::String(marks[i]), cell.withTrimmedTop(14.0f), 7.5f, theme.inkOnSection, juce::Justification::centredTop, false);
         }
     }
 
