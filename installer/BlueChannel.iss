@@ -27,7 +27,7 @@ WizardStyle=modern
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 PrivilegesRequired=admin
-LicenseFile={#StageDir}\LICENSE
+LicenseFile={#StageDir}\BINARY_LICENSE.txt
 UninstallDisplayName={#AppName}
 
 [Types]
@@ -50,6 +50,13 @@ Source: "{#StageDir}\Licenses\*"; DestDir: "{app}\Licenses"; Components: docs; F
 Source: "{#StageDir}\USER_MANUAL.md"; DestDir: "{app}"; Components: docs; Flags: ignoreversion
 Source: "{#StageDir}\LICENSE"; DestDir: "{app}"; Components: docs; Flags: ignoreversion
 Source: "{#StageDir}\THIRD_PARTY_LICENSES.md"; DestDir: "{app}"; Components: docs; Flags: ignoreversion
+Source: "{#StageDir}\BINARY_LICENSE.txt"; DestDir: "{app}"; Components: docs; Flags: ignoreversion
+Source: "{#StageDir}\NGSPICE_SOURCE_NOTICE.txt"; DestDir: "{app}"; Components: docs; Flags: ignoreversion
+Source: "{#StageDir}\HQ_MODE.md"; DestDir: "{app}"; Components: docs; Flags: ignoreversion
+Source: "{#StageDir}\PARAMETERS.md"; DestDir: "{app}"; Components: docs; Flags: ignoreversion
+Source: "{#StageDir}\RELEASE_1.0.0.md"; DestDir: "{app}"; Components: docs; Flags: ignoreversion
+Source: "{#StageDir}\release-manifest.json"; DestDir: "{app}"; Components: docs; Flags: ignoreversion
+Source: "{#StageDir}\images\*"; DestDir: "{app}\images"; Components: docs; Flags: recursesubdirs ignoreversion
 
 [Icons]
 Name: "{group}\{#AppName}"; Filename: "{app}\Blue Channel.exe"; Components: app

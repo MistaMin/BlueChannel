@@ -7,7 +7,7 @@ near-unity Mic detent (index 1) now uses the unity calibration.
 
 Digital provides compressor-curve handles, an EQ response with draggable bands and HP/LP filters, an
 output FFT, and All Controls for the remaining controls. Sidechain filters stay available when assigned
-outside the audio path. Blue-panel key/selector text is white. Fresh editors start at 1560 × 450.
+outside the audio path. Blue-panel key/selector text is white. Fresh editors start at 1248 × 360.
 
 Offline HQ is the final derp HQ lamp in the analogue Offline selector and a choice in Digital's Offline
 menu. The standalone HQ button and the experimental realtime HQ engine are removed. Host parameter IDs

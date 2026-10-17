@@ -251,22 +251,27 @@ int main()
         }
     }
 
-    // Initial sizing must survive setup callbacks and migrate old small windows exactly once.
+    // Initial sizing must survive setup callbacks and migrate earlier preview windows exactly once.
     {
         BlueChannelProcessor p;
         {
             std::unique_ptr<juce::AudioProcessorEditor> editor(p.createEditor());
-            check(editor->getWidth()==1560 && editor->getHeight()==450,"new editors start at double the previous 780 x 225 size");
+            check(editor->getWidth()==1248 && editor->getHeight()==360,"new editors start at 1248 x 360");
             editor->setSize(1872,540);
         }
         {
             std::unique_ptr<juce::AudioProcessorEditor> editor(p.createEditor());
             check(editor->getWidth()==1872 && editor->getHeight()==540,"reopening retains user sizing without doubling it again");
         }
+        BlueChannelProcessor preview;
+        preview.apvts.state.setProperty("uiscaleversion",2,nullptr);
+        preview.apvts.state.setProperty("uiscale",1.7,nullptr);
+        std::unique_ptr<juce::AudioProcessorEditor> previewEditor(preview.createEditor());
+        check(previewEditor->getWidth()==1248 && previewEditor->getHeight()==360,"enlarged preview windows reset once to 1248 x 360");
         BlueChannelProcessor old;
         old.apvts.state.setProperty("uiscale",0.85,nullptr);
         std::unique_ptr<juce::AudioProcessorEditor> migrated(old.createEditor());
-        check(migrated->getWidth()==2652 && std::abs(migrated->getHeight()-765)<=1,"legacy saved editor sizes migrate to twice their previous dimensions");
+        check(migrated->getWidth()==1248 && migrated->getHeight()==360,"legacy saved editor sizes migrate to the release opening size");
     }
 
     // Layout overrides survive reload and preserve parameter identity when a slider becomes a knob.

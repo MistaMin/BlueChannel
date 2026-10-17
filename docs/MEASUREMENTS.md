@@ -6,7 +6,7 @@ The universal macOS Release build (developer editor disabled, full Offline HQ en
 all four CTest groups: stage netlists, model, processor and component solver. The VST3 passed
 pluginval at strictness 7, in-process with GUI tests skipped. A host-visible switch-normalisation
 fix is covered by fractional automation/state-recall cases. Native standalone analogue and Digital
-windows were inspected; documentation images are deterministic 1560 × 450 component captures.
+windows were inspected; documentation images are deterministic 1248 × 360 component captures.
 
 The extended HQ fixture passed with a block-split residual of 1.71003e-7 FS. Its 94.17 s wall time
 includes operating-point restarts and concurrent release work; it is not a render-throughput benchmark.

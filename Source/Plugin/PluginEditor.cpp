@@ -500,11 +500,10 @@ void BlueChannelPanel::tick()
 
 BlueChannelEditor::BlueChannelEditor(BlueChannelProcessor& p) : AudioProcessorEditor(p), proc(p), panel(p)
 {
-    // Capture the saved scale before resize-limit setup can call resized(). Older editors accidentally
-    // saved the 0.5x minimum during construction. Double existing sizes once, then retain user resizing.
-    const bool legacyScale=int(proc.apvts.state.getProperty("uiscaleversion",1))<2;
-    const double savedScale=double(proc.apvts.state.getProperty("uiscale",legacyScale ? 0.5 : 1.0));
-    const double scale=juce::jlimit(0.5,2.0,savedScale*(legacyScale ? 2.0 : 1.0));
+    // Migrate earlier preview sizes once to the 1.0 opening size. Capture it
+    // before resize-limit setup can call resized(); later user resizing is retained.
+    const bool legacyScale=int(proc.apvts.state.getProperty("uiscaleversion",1))<3;
+    const double scale=legacyScale ? 0.8 : juce::jlimit(0.5,2.0,double(proc.apvts.state.getProperty("uiscale",0.8)));
     addAndMakeVisible(panel);
 #if BLUECHANNEL_DEV_EDITOR
     dev = std::make_unique<DevTools>(panel, *this);
@@ -517,7 +516,7 @@ BlueChannelEditor::BlueChannelEditor(BlueChannelProcessor& p) : AudioProcessorEd
                     BlueChannelPanel::kHeight * 2);
     setSize(juce::roundToInt(BlueChannelPanel::kWidth * scale),juce::roundToInt(BlueChannelPanel::kHeight * scale));
     editorSized=true;
-    proc.apvts.state.setProperty("uiscaleversion",2,nullptr);
+    proc.apvts.state.setProperty("uiscaleversion",3,nullptr);
     resized();
     startTimerHz(30);
 }

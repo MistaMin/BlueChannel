@@ -31,9 +31,10 @@ design edit moves and resizes the knob                           ok
 malformed design ignored                                         ok
 partial design applies to the knobs it names                     ok
 release editor has no developer mode                             ok
-new editors start at double the previous 780 x 225 size          ok
+new editors start at 1248 x 360                                  ok
 reopening retains user sizing without doubling it again          ok
-legacy saved editor sizes migrate to twice their previous dimensions ok
+enlarged preview windows reset once to 1248 x 360                ok
+legacy saved editor sizes migrate to the release opening size    ok
 developer layout includes Digital overview sliders               ok
 developer layout applies a partial override                      ok
 developer layout converts and places a Digital knob              ok

@@ -68,7 +68,7 @@ once; each instance saves its current full layout.
   binaries, runs the tests (and the model test under Rosetta), and packages.
 - **Windows**: Visual Studio 2022 with C++; `installer\build_windows.ps1`. Inno Setup 6 is optional.
 - **Linux** (Debian/Ubuntu package names): `ninja-build libasound2-dev libjack-jackd2-dev libx11-dev
-  libxcomposite-dev libxcursor-dev libxext-dev libxinerama-dev libxrandr-dev libxrender-dev
+  libxcomposite-dev libxi-dev libxcursor-dev libxext-dev libxinerama-dev libxrandr-dev libxrender-dev
   libfreetype6-dev libfontconfig1-dev libgl1-mesa-dev`; `installer/build_linux.sh`. The processor test
   opens an editor, so headless machines need `xvfb-run`.
 
@@ -91,9 +91,9 @@ use and distribute your build. The AAX SDK has its own terms and is not included
 
 ## Initial editor size
 
-New editors start at 1560 x 450 logical screen units, twice the previous effective 780 x 225 startup
-size. Legacy saved editor sizes are doubled once, up to the existing 3120 x 900 limit. Later user
-resizing is preserved across reopen. Developer mode adds the inspector below the panel.
+New editors start at 1248 x 360 logical screen units (80% of the 1560 x 450 layout).
+Earlier preview windows reset to this opening size once. Later user resizing is preserved across
+reopen. Developer mode adds the inspector below the panel.
 
 ## HQ development build
 

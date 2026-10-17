@@ -1,0 +1,73 @@
+fresh processor selects Mic preamp with a 0 dB gain readout      ok
+realtime HQ has been removed from the host parameter registry    ok
+fresh host microphone path renders at unity gain                 ok
+Init program restores Mic at 0 dB                                ok
+HQ defaults off for existing sessions                            ok
+HQ selection survives session reopen                             ok
+factory programs retain HQ processing preference                 ok
+HQ armed playback is identical to Standard                       ok
+HQ never starts the component solve during playback              ok
+Offline selector has one key and seven lamps                     ok
+legacy Offline layout grows to fit its seventh lamp              ok
+seventh Offline lamp arms full HQ                                ok
+Offline key cycles HQ back to Same and disarms it                ok
+host HQ automation selects the extra Offline lamp                ok
+stereo with stereo sidechain supported                           ok
+mono without sidechain supported                                 ok
+mono in / stereo out rejected                                    ok
+fractional host switch values survive state recall               ok
+fractional host switch values survive state recall               ok
+fractional host switch values survive state recall               ok
+fractional host switch values survive state recall               ok
+state round trip restores parameters                             ok
+state round trip restores editor skin                            ok
+missing parameter restores to default                            ok
+malformed state ignored, current state kept                      ok
+finite output for 1, 17, 129, 256 and oversized blocks           ok
+every factory program processes finite audio                     ok
+editor open and close around processing                          ok
+edited design file applies                                       ok
+design edit moves and resizes the knob                           ok
+malformed design ignored                                         ok
+partial design applies to the knobs it names                     ok
+release editor has no developer mode                             ok
+new editors start at 1248 x 360                                  ok
+reopening retains user sizing without doubling it again          ok
+enlarged preview windows reset once to 1248 x 360                ok
+legacy saved editor sizes migrate to the release opening size    ok
+developer layout includes Digital overview sliders               ok
+developer layout applies a partial override                      ok
+developer layout converts and places a Digital knob              ok
+converted knob retains its host parameter attachment             ok
+complete editor layout round trip reloads                        ok
+reloaded layout preserves kind, bounds and knob style            ok
+vertical slider is a valid developer control type                ok
+developer layout converts a knob to a vertical slider            ok
+layout rejects a changed parameter binding                       ok
+malformed editor layout is ignored                               ok
+FFT tap contains the left output at the host sample rate         ok
+FFT tap resets when preparing a new sample rate                  ok
+digital skin has its own visible control layout                  ok
+digital layout exposes every host parameter                      ok
+Digital Offline menu includes the extra HQ choice                ok
+Digital HQ menu choice arms the shared HQ parameter              ok
+Digital factor choice disarms HQ and sets the factor             ok
+Digital Offline menu follows host HQ automation                  ok
+digital slider edits the shared host parameter                   ok
+digital source selector updates gain visibility                  ok
+digital overview exposes EQ spectrum and compressor graph        ok
+compressor curve threshold handle writes the host parameter      ok
+compressor curve ratio handle writes the host parameter          ok
+compressor curve makeup handle writes the host parameter         ok
+EQ filter handle remains editable in compressor sidechain without changing its route ok
+sidechain filters stay active when audio EQ is switched out      ok
+unrouted filters are dimmed in the EQ field                      ok
+audio-routed filters are active in the EQ field                  ok
+digital controls page exposes gate and hides overview            ok
+digital toggle edits the shared host parameter                   ok
+host parameter updates the digital slider                        ok
+return to hardware preserves its design and parameter edits      ok
+restored editor skin refreshes the open panel                    ok
+repeated offline bounces are identical                           ok
+offline render runs at the offline factor (8x)                   ok
+PASSED (0 failures)

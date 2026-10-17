@@ -20,7 +20,7 @@ with an output FFT. HP/LP filters stay editable when routed to a sidechain and d
 - The final **`\( ᐖ)/ HQ`** lamp in **Offline** arms the full component solver. Digital has the same choice
   in its Offline menu on All Controls, with a header indicator. There is no realtime HQ mode.
 - Mono/stereo operation, external key inputs, stereo-linked detectors, routing and listen controls.
-- The editor starts at 1560 × 450 and remembers resizing. The source build offers optional layout editing.
+- The editor starts at 1248 × 360 and remembers resizing. The source build offers optional layout editing.
 
 ## Download
 
