@@ -35,7 +35,7 @@ static int hostStartupCheck()
     return 0;
 }
 
-int main(int argc, char** argv)
+static int runFixture(int argc, char** argv)
 {
     juce::ScopedJuceInitialiser_GUI gui;
     using namespace bluechannel;
@@ -97,4 +97,12 @@ int main(int argc, char** argv)
     if(auto result=hostStartupCheck())return result;
     std::cout<<"HQ solve, isolated instances, continuation, automation and restart passed; seconds="
         <<std::chrono::duration<double>(std::chrono::steady_clock::now()-start).count()<<'\n';
+    return 0;
+}
+
+int main(int argc, char** argv)
+{
+    const int result=runFixture(argc,argv);
+    if(result==0)std::cout<<"HQ fixture and simulator teardown passed\n";
+    return result;
 }

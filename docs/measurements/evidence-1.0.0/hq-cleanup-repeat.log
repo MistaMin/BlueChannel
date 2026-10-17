@@ -1,0 +1,11 @@
+Test project /Volumes/Developer/Developer/Blue Channel/build/release-macos
+    Start 4: hq_component_solver
+    Test #4: hq_component_solver ..............   Passed   22.00 sec
+    Start 4: hq_component_solver
+    Test #4: hq_component_solver ..............   Passed   22.49 sec
+    Start 4: hq_component_solver
+1/1 Test #4: hq_component_solver ..............   Passed   22.12 sec
+
+100% tests passed out of 1
+
+Total Test time (real) =  66.63 sec

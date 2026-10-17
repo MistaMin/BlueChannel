@@ -82,6 +82,22 @@ def main():
                 rel = "JUCE/modules/" + s.split("/modules/", 1)[1]
             put(f, rel)
     put(mods / "juce_graphics/image_formats/jpglib/README", "JUCE/modules/juce_graphics/image_formats/jpglib/README")
+    # The bundled Zix sources carry their ISC notices in file headers rather
+    # than a standalone COPYING file. Preserve those exact notices too.
+    notices = {}
+    lv2 = mods / "juce_audio_processors_headless/format_types/LV2_SDK"
+    for source in sorted(lv2.rglob("*")):
+        if source.is_file() and "zix" in source.parts and source.suffix in (".h", ".c"):
+            text = source.read_text(errors="replace")
+            if text.startswith("/*"):
+                notice = text[:text.index("*/") + 2]
+                if "Copyright" in notice and "Permission" in notice:
+                    notices.setdefault(notice, []).append(source.relative_to(lv2).as_posix())
+    if notices:
+        out = dest / "LV2-SDK/zix/COPYING"
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text("\n\n".join("Files: " + ", ".join(names) + "\n" + notice
+                                    for notice, names in notices.items()) + "\n")
     files = sorted(p.relative_to(dest).as_posix() for p in dest.rglob("*") if p.is_file())
     (dest / "INDEX.txt").write_text("\n".join(files) + "\n")
     print(f"collected {len(files)} license files into {dest}")

@@ -325,6 +325,10 @@ struct Renderer::Impl
         fs=baseRate*factor;
         send("delete all");
         send("destroy all");
+        // Remove the prior circuit before loading another deck. ngspice 47's
+        // source-history list is shared by loaded circuit records; retaining
+        // old records makes quit free that list more than once after restarts.
+        if (initialised) send("remcirc");
         failed = false; failure.clear();
         position=0; previousTime=0; previous={}; lastInput={}; lastKey={};
         for(auto& row:lastPhysicalInput) std::fill(std::begin(row),std::end(row),0);

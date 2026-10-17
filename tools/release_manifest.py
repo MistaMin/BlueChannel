@@ -49,7 +49,7 @@ manifest = {
     "host_platform": f"{platform.system()} {platform.machine()}",
     "architectures": cache.get("CMAKE_OSX_ARCHITECTURES", platform.machine()).split(";"),
     "minimum_macos": cache.get("CMAKE_OSX_DEPLOYMENT_TARGET"),
-    "configuration": cache.get("CMAKE_BUILD_TYPE"),
+    "configuration": cache.get("CMAKE_BUILD_TYPE") or "Release",
     "distributed_formats": ["VST3", "AU (macOS)", "CLAP", "LV2", "Standalone"],
     "not_distributed": ["AAX"],
     "dependencies": {

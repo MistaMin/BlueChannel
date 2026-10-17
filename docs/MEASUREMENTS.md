@@ -11,7 +11,8 @@ windows were inspected; documentation images are deterministic 1248 × 360 compo
 The extended HQ fixture passed with a block-split residual of 1.71003e-7 FS. Its 94.17 s wall time
 includes operating-point restarts and concurrent release work; it is not a render-throughput benchmark.
 The x86_64 stage, model and processor slices also passed under Rosetta. This does not establish
-physical Intel performance. Logs are in [1.0.0 evidence](measurements/evidence-1.0.0/README.md).
+physical Intel performance. The final HQ lifecycle fixture also passed three consecutive runs,
+including simulator teardown after restarts. Logs are in [1.0.0 evidence](measurements/evidence-1.0.0/README.md).
 
 Listening acceptance, multi-instance DAW/offline-flag acceptance, long HQ renders and Windows/Linux
 hardware checks remain open. The historical measurements below describe 0.1.0; in particular its

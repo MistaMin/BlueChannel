@@ -1,3 +1,4 @@
 peak=0.0196315 block_residual=2.16575e-07
 input source restart check
-HQ solve, isolated instances, continuation, automation and restart passed; seconds=44.5335
+HQ solve, isolated instances, continuation, automation and restart passed; seconds=47.9113
+HQ fixture and simulator teardown passed
