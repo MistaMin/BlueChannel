@@ -4,6 +4,7 @@
 #include "PluginEditor.h"
 
 #include "DevLayout.h"
+#include "DigitalPanel.h"
 #include "EmbeddedDesign.h"
 #include "Model/ControlMap.h"
 
@@ -84,7 +85,7 @@ BlueChannelPanel::BlueChannelPanel(BlueChannelProcessor& p) : proc(p)
     sections.push_back({ { 252, 12, 300, 210 }, "Input" });
     micGain = knob(pid::micGain, "Gain", Knob::Cap::Black, R(262, 32, 92, 112));
     lineGain = knob(pid::lineGain, "Gain", Knob::Cap::Black, R(262, 32, 92, 112));
-    micGain->minLegend = "-14"; micGain->maxLegend = "+54";
+    micGain->minLegend = "-8"; micGain->maxLegend = "+60";
     lineGain->minLegend = "-18"; lineGain->maxLegend = "+18";
     trim = knob(pid::trim, "Trim", Knob::Cap::Grey, R(360, 42, 72, 92));
     trim->minLegend = "0"; trim->maxLegend = "+20";
@@ -138,7 +139,7 @@ BlueChannelPanel::BlueChannelPanel(BlueChannelProcessor& p) : proc(p)
     keyLamp = add(std::make_unique<Lamp>(t, "Key input", t.ledGreen, false), R(1474, 122, 74, 14));
 
     // ---- bottom row ---------------------------------------------------------------------------------
-    add(std::make_unique<StepSelector>(t, "Dynamics", *st.getParameter(pid::dynPosition), juce::StringArray { "Post-EQ", "Pre-EQ" }, um, t.ledRed),
+    add(std::make_unique<StepSelector>(t, "Dynamics", *st.getParameter(pid::dynPosition), juce::StringArray { "Post-EQ", "Pre-EQ" }, um, t.ledRed, false),
         R(24, 326, 116, 34));
     key(pid::bypass, "Bypass", t.ledRed, R(150, 326, 52, 34), false);
 
@@ -201,20 +202,22 @@ BlueChannelPanel::BlueChannelPanel(BlueChannelProcessor& p) : proc(p)
     key(pid::mute, "Mute", t.ledRed, R(1328, 290, 52, 34));
 
     auto* os = add(std::make_unique<StepSelector>(t, "Oversample", *st.getParameter(pid::oversampling),
-                                       juce::StringArray { "1x", "2x", "4x", "8x", juce::String::fromUTF8("\\( \xe1\x90\x96)/ 16x") }, um, t.ledRed),
+                                       juce::StringArray { "1x", "2x", "4x", "8x", juce::String::fromUTF8("\\( \xe1\x90\x96)/ 16x") }, um, t.ledRed, false),
         R(1400, 236, 150, 74));
     os->keyWidth = 58;
     os->resized();
     auto* off = add(std::make_unique<StepSelector>(t, "Offline", *st.getParameter(pid::offlineOversampling),
-                                       juce::StringArray { "Same", "1x", "2x", "4x", "8x", juce::String::fromUTF8("\\( \xe1\x90\x96)/ 16x") }, um, t.ledAmber),
-        R(1400, 316, 150, 86));
+                                       juce::StringArray { "Same", "1x", "2x", "4x", "8x", juce::String::fromUTF8("\\( \xe1\x90\x96)/ 16x"),
+                                           juce::String::fromUTF8("\\( \xe1\x90\x96)/ HQ") }, um, t.ledAmber, false, st.getParameter(pid::hq)),
+        R(1400, 316, 150, 98));
+    off->setComponentID("offline-selector");
     off->keyWidth = 58;
     off->resized();
-    skinKey = add(std::make_unique<LedKey>(t, "Digital skin", t.ledGreen, false), R(1400, 408, 70, 34));
+    skinKey = add(std::make_unique<LedKey>(t, "Digital skin", t.ledGreen, false), R(1400, 408, 58, 34));
     skinKey->setClickingTogglesState(false);
     skinKey->litOverride = [this] { return proc.skin() == 1; };
     skinKey->onClick = [this] { applySkin(proc.skin() == 1 ? 0 : 1); };
-    skinKey->setTooltip("Switch between the hardware look and a flat look (display only)");
+    skinKey->setTooltip("Switch between the analogue panel and the graphical Digital interface (display only)");
 
 #if BLUECHANNEL_DEV_EDITOR
     auto* devKey = add(std::make_unique<LedKey>(t, "Dev", t.ledAmber, false), R(204, 326, 44, 34));
@@ -230,6 +233,17 @@ BlueChannelPanel::BlueChannelPanel(BlueChannelProcessor& p) : proc(p)
     const auto onDisk = juce::File(BLUECHANNEL_DESIGN_DIR).getChildFile("knobs.csv");
     if (onDisk.existsAsFile()) applyDesignCsv(onDisk.loadFileAsString().toStdString());
 #endif
+    digital = std::make_unique<DigitalPanel>(proc);
+    addChildComponent(*digital);
+    digital->setBounds(0, 0, kWidth, kHeight);
+    digital->onAnalogue = [this] { applySkin(0); };
+    digital->onDevToggle = [this] { if(onDevToggle) onDevToggle(); };
+    applyEditorLayoutJson(bluechannel::design::kEditorLayout);
+#if BLUECHANNEL_DEV_EDITOR
+    const auto layoutFile=juce::File(BLUECHANNEL_DESIGN_DIR).getChildFile("editor-layout.json");
+    if(layoutFile.existsAsFile()) applyEditorLayoutJson(layoutFile.loadFileAsString());
+#endif
+    applySkin(proc.skin());
     tick();
 }
 
@@ -275,6 +289,63 @@ bool BlueChannelPanel::applyDesignCsv(const std::string& csv)
     return true;
 }
 
+std::vector<LayoutTarget> BlueChannelPanel::layoutTargets() const
+{
+    std::vector<LayoutTarget> result;
+    int index=0;
+    for(auto* component : owned)
+    {
+        if(auto* k=dynamic_cast<Knob*>(component))
+            result.push_back({component,"analogue.knob."+juce::String(k->design.id),juce::String(k->design.parameter)});
+        else
+            result.push_back({component,"analogue.control."+juce::String(index),component->getComponentID()});
+        // Keep later developer-layout IDs stable after removing the standalone HQ key.
+        if(component==skinKey)++index;
+        ++index;
+    }
+    if(digital)
+    {
+        auto targets=digital->layoutTargets();
+        result.insert(result.end(),targets.begin(),targets.end());
+    }
+    return result;
+}
+
+juce::String BlueChannelPanel::editorLayoutJson() const
+{
+    juce::Array<juce::var> entries;
+    for(const auto& target : layoutTargets()) entries.add(layoutDescription(target));
+    auto* root=new juce::DynamicObject;
+    root->setProperty("version",1);root->setProperty("controls",entries);
+    return juce::JSON::toString(juce::var(root));
+}
+
+bool BlueChannelPanel::applyEditorLayoutJson(const juce::String& json)
+{
+    const auto root=juce::JSON::parse(json);
+    if(int(root["version"])!=1 || !root["controls"].isArray()) return false;
+    const auto targets=layoutTargets();
+    std::set<juce::String> ids;
+    for(const auto& entry : *root["controls"].getArray())
+    {
+        if(!ids.insert(entry["id"].toString()).second) return false;
+        for(const auto& target : targets)
+            if(target.id==entry["id"].toString() && !validLayoutEntry(target,entry)) return false;
+    }
+    for(const auto& entry : *root["controls"].getArray())
+        for(const auto& target : targets)
+            if(target.id==entry["id"].toString()) applyLayoutEntry(target,entry);
+    repaint();
+    return true;
+}
+
+int BlueChannelPanel::editorPage() const {return proc.skin()==0 ? 0 : digital->showingControls() ? 2 : 1;}
+
+void BlueChannelPanel::showDigitalPage(bool allControls)
+{
+    applySkin(1);digital->showControls(allControls);tick();
+}
+
 BlueChannelPanel::~BlueChannelPanel()
 {
     sliderAtts.clear();
@@ -307,8 +378,10 @@ void BlueChannelPanel::applySkin(int skin)
 {
     proc.setSkin(skin);
     theme = skin == 1 ? digitalTheme() : analogueTheme();
+    for (auto* c : owned) { c->setVisible(skin == 0); c->repaint(); }
+    digital->setVisible(skin == 1);
+    tick();
     repaint();
-    for (auto* c : owned) c->repaint();
 }
 
 void BlueChannelPanel::paint(juce::Graphics& g)
@@ -350,6 +423,7 @@ void BlueChannelPanel::paint(juce::Graphics& g)
     drawText(g, "analogue-modelled channel strip", { 23, 268, 222, 14 }, 9.5f, theme.inkOnPanel.withAlpha(0.8f),
              juce::Justification::centredLeft, false);
     drawMark(g, { 24, 392, 24, 24 }, theme.inkOnPanel);
+    drawText(g, proc.hqStatusText(), { 24, 288, 220, 24 }, 10.0f, theme.inkOnPanel);
     drawText(g, "OpenGrid", { 54, 392, 120, 24 }, 15.0f, theme.inkOnPanel, juce::Justification::centredLeft);
     drawText(g, juce::String("v") + BLUECHANNEL_VERSION, { 150, 396, 90, 18 }, 8.5f, theme.inkOnPanel.withAlpha(0.6f),
              juce::Justification::centredRight, false);
@@ -363,11 +437,12 @@ void BlueChannelPanel::resized() {}
 
 void BlueChannelPanel::tick()
 {
+    if ((proc.skin() == 1) != digital->isVisible()) { applySkin(proc.skin()); return; }
     auto& tm = proc.telemetry();
     auto& st = proc.apvts;
     const int source = juce::roundToInt(st.getRawParameterValue(pid::source)->load());
-    micGain->setVisible(source == 0);
-    lineGain->setVisible(source != 0);
+    micGain->setVisible(proc.skin() == 0 && source == 0);
+    lineGain->setVisible(proc.skin() == 0 && source != 0);
     lineGain->setEnabled(source == 1);
     trim->extraLegend = source == 2 ? std::function<juce::String()>([] { return juce::String("inst +7..+40"); }) : nullptr;
 
@@ -410,17 +485,26 @@ void BlueChannelPanel::tick()
     vu->setVu(vuValue);
     static_cast<PropertySelector*>(vuSource)->refresh();
     static_cast<PropertySelector*>(vuCal)->refresh();
-    gateLeds->set(tm.gateGr.exchange(0.0f));
-    deessActive->set(tm.deessLed.exchange(0.0f) / 1.5f);
+    const float gateGr = tm.gateGr.exchange(0.0f);
+    const float deess = tm.deessLed.exchange(0.0f) / 1.5f;
+    gateLeds->set(gateGr);
+    deessActive->set(deess);
     if (tm.overload.exchange(false)) overloadHold = 1.0f;
     overload->set(overloadHold);
     overloadHold = std::max(0.0f, overloadHold - 0.05f);
     keyLamp->set(proc.sidechainConnected() ? 1.0f : 0.0f);
+    digital->update(inPk, outPk, compGr, gateGr, deess, overloadHold > 0, proc.sidechainConnected(), vuValue);
     skinKey->repaint();
+    repaint(24,288,220,24);
 }
 
 BlueChannelEditor::BlueChannelEditor(BlueChannelProcessor& p) : AudioProcessorEditor(p), proc(p), panel(p)
 {
+    // Capture the saved scale before resize-limit setup can call resized(). Older editors accidentally
+    // saved the 0.5x minimum during construction. Double existing sizes once, then retain user resizing.
+    const bool legacyScale=int(proc.apvts.state.getProperty("uiscaleversion",1))<2;
+    const double savedScale=double(proc.apvts.state.getProperty("uiscale",legacyScale ? 0.5 : 1.0));
+    const double scale=juce::jlimit(0.5,2.0,savedScale*(legacyScale ? 2.0 : 1.0));
     addAndMakeVisible(panel);
 #if BLUECHANNEL_DEV_EDITOR
     dev = std::make_unique<DevTools>(panel, *this);
@@ -431,8 +515,10 @@ BlueChannelEditor::BlueChannelEditor(BlueChannelProcessor& p) : AudioProcessorEd
     getConstrainer()->setFixedAspectRatio(aspect);
     setResizeLimits(int(BlueChannelPanel::kWidth * 0.5), int(BlueChannelPanel::kHeight * 0.5), BlueChannelPanel::kWidth * 2,
                     BlueChannelPanel::kHeight * 2);
-    const double scale = double(proc.apvts.state.getProperty("uiscale", 0.85));
-    setSize(int(BlueChannelPanel::kWidth * scale), int(BlueChannelPanel::kHeight * scale));
+    setSize(juce::roundToInt(BlueChannelPanel::kWidth * scale),juce::roundToInt(BlueChannelPanel::kHeight * scale));
+    editorSized=true;
+    proc.apvts.state.setProperty("uiscaleversion",2,nullptr);
+    resized();
     startTimerHz(30);
 }
 
@@ -443,12 +529,12 @@ void BlueChannelEditor::toggleDeveloperMode()
 #if BLUECHANNEL_DEV_EDITOR
     const bool on = !dev->isActive();
     dev->setActive(on);
-    const int w = std::max(getWidth(), on ? 1200 : 0);
+    const int w = std::max(getWidth(), on ? 1280 : 0);
     const int panelH = int(std::round(double(w) * BlueChannelPanel::kHeight / BlueChannelPanel::kWidth));
     if (on)
     {
         getConstrainer()->setFixedAspectRatio(0.0);
-        setResizeLimits(1000, 300, BlueChannelPanel::kWidth * 2, BlueChannelPanel::kHeight * 2 + DevTools::kInspectorHeight);
+        setResizeLimits(1280, 450, BlueChannelPanel::kWidth * 2, BlueChannelPanel::kHeight * 2 + DevTools::kInspectorHeight);
         setSize(w, panelH + DevTools::kInspectorHeight);
     }
     else
@@ -473,5 +559,5 @@ void BlueChannelEditor::resized()
 #if BLUECHANNEL_DEV_EDITOR
     if (devOn) dev->layout(getLocalBounds().removeFromBottom(inspector));
 #endif
-    if (!devOn) proc.apvts.state.setProperty("uiscale", s, nullptr);
+    if (!devOn && editorSized) proc.apvts.state.setProperty("uiscale", s, nullptr);
 }

@@ -76,15 +76,35 @@ bool BlueChannelProcessor::isBusesLayoutSupported(const BusesLayout& layouts) co
 void BlueChannelProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
     sampleRate_ = sampleRate;
+    spectrumRate.store(sampleRate, std::memory_order_relaxed);
+    for (auto& sample : spectrum) sample.store(0.0f, std::memory_order_relaxed);
+    spectrumWrite.store(0, std::memory_order_release);
     maxBlock_ = std::max(1, samplesPerBlock);
     const int channels = std::clamp(getMainBusNumInputChannels(), 1, 2);
     channelsActive = channels;
     engine.setOversampling(reader.playbackStages(), reader.offlineStages());
     engine.prepare(sampleRate, maxBlock_, channels);   // allocates every bank; engine stays real-time safe after this
+    hqRenderer.prepare(sampleRate, maxBlock_, channels);
+    for (auto& b : hqAudio) b.assign(size_t(maxBlock_), 0);
+    for (auto& b : hqKey) b.assign(size_t(maxBlock_), 0);
+    previousHQ = previousOffline = false;
     setLatencySamples(engine.latencySamples());
 }
 
-void BlueChannelProcessor::reset() { engine.reset(); }
+void BlueChannelProcessor::reset() { engine.reset(); hqRenderer.restart(); }
+
+juce::String BlueChannelProcessor::hqStatusText() const
+{
+    using H = bluechannel::hq::Renderer;
+    switch (hqStatus.load(std::memory_order_relaxed))
+    {
+        case H::Armed: return "Standard / full HQ on export";
+        case H::Solving: return "HQ: component solve";
+        case H::Failed: return "HQ failed: render muted";
+        case H::Unavailable: return "Offline HQ unavailable";
+        default: return "Standard";
+    }
+}
 
 template <typename Sample>
 void BlueChannelProcessor::process(juce::AudioBuffer<Sample>& buffer)
@@ -109,14 +129,45 @@ void BlueChannelProcessor::process(juce::AudioBuffer<Sample>& buffer)
     engine.setOversampling(reader.playbackStages(), reader.offlineStages());
     Sample* io[2] = { main.getWritePointer(0), channels > 1 ? main.getWritePointer(1) : nullptr };
 
+    const bool offline = isNonRealtime();
+    const bool wantHQ = reader.hqEnabled();
+    if (wantHQ != previousHQ || (offline && !previousOffline)) hqRenderer.restart();
+    previousHQ = wantHQ;
+    previousOffline = offline;
+    const bool solve = wantHQ && offline;
+    hqStatus.store(wantHQ ? (bluechannel::hq::Renderer::compiled() ? bluechannel::hq::Renderer::Armed : bluechannel::hq::Renderer::Unavailable)
+                         : bluechannel::hq::Renderer::Idle, std::memory_order_relaxed);
+
     // Hosts may call with more frames than announced: process in prepared-size chunks.
     for (int start = 0; start < n; start += maxBlock_)
     {
         const int len = std::min(maxBlock_, n - start);
         Sample* chunk[2] = { io[0] + start, io[1] ? io[1] + start : nullptr };
         const Sample* keys[2] = { keyPtrs[0] ? keyPtrs[0] + start : nullptr, keyPtrs[1] ? keyPtrs[1] + start : nullptr };
-        engine.process<Sample>(chunk, channels, len, keyChannels ? keys : nullptr, keyChannels, controls, isNonRealtime());
+        if (solve)
+        {
+            double* audio[2] = { hqAudio[0].data(), hqAudio[1].data() };
+            const double* hkeys[2] = { hqKey[0].data(), hqKey[1].data() };
+            for (int ch=0; ch<channels; ++ch)
+                for (int i=0; i<len; ++i)
+                {
+                    audio[ch][i] = double(chunk[ch][i]);
+                    hqKey[size_t(ch)][size_t(i)] = keyChannels ? double(keys[keyChannels>1 ? ch:0][i]) : 0;
+                }
+            const int stages = reader.offlineStages() < 0 ? reader.playbackStages() : reader.offlineStages();
+            if (bluechannel::hq::Renderer::compiled()) hqStatus.store(bluechannel::hq::Renderer::Solving,std::memory_order_relaxed);
+            const bool ok = hqRenderer.render(audio, len, hkeys, keyChannels, controls, 1<<stages, engine.telemetry);
+            hqStatus.store(ok ? bluechannel::hq::Renderer::Solving :
+                (bluechannel::hq::Renderer::compiled() ? bluechannel::hq::Renderer::Failed : bluechannel::hq::Renderer::Unavailable), std::memory_order_relaxed);
+            for (int ch=0; ch<channels; ++ch)
+                for (int i=0; i<len; ++i) chunk[ch][i] = ok ? Sample(audio[ch][i]) : Sample(0);
+        }
+        else engine.process<Sample>(chunk, channels, len, keyChannels ? keys : nullptr, keyChannels, controls, offline);
     }
+    unsigned write = spectrumWrite.load(std::memory_order_relaxed);
+    for (int i = 0; i < n; ++i)
+        spectrum[write++ & (kSpectrumSize - 1)].store(float(io[0][i]), std::memory_order_relaxed);
+    spectrumWrite.store(write, std::memory_order_release);
     for (int ch = channels; ch < getTotalNumOutputChannels(); ++ch) buffer.clear(ch, 0, n);
 }
 
@@ -141,7 +192,7 @@ void BlueChannelProcessor::setCurrentProgram(int index)
         if (auto* r = dynamic_cast<juce::RangedAudioParameter*>(p))
         {
             const auto pid = r->getParameterID();
-            if (pid == id::oversampling || pid == id::offlineOversampling) continue;
+            if (pid == id::oversampling || pid == id::offlineOversampling || pid == id::hq) continue;
             r->setValueNotifyingHost(r->getDefaultValue());
         }
     for (auto& [name, value] : programs()[size_t(index)].values)

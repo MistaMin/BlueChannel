@@ -1,0 +1,8 @@
+Standalone/Blue Channel.app: signature passed
+AU/Blue Channel.component: signature passed
+VST3/Blue Channel.vst3: signature passed
+CLAP/Blue Channel.clap: signature passed
+LV2/Blue Channel.lv2/libBlue Channel.so: signature passed
+LV2/Blue Channel.lv2/libngspice.dylib: signature passed
+5 simulator libraries / 5 licence notices; no private source deck.
+Ad-hoc signed, native macOS arm64; not notarised.

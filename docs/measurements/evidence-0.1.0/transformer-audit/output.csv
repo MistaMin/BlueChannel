@@ -1,0 +1,10 @@
+stage,freq_hz,connector_equivalent_dbu,gain_db,core_enabled_vs_zero_current_rms_v,bit_identical
+output,20,4,6.012164,0,yes
+output,20,16,6.012164,0,yes
+output,20,22,6.012164,0,yes
+output,50,4,6.013416,0,yes
+output,50,16,6.013416,0,yes
+output,50,22,6.013416,0,yes
+output,1000,4,6.013653,0,yes
+output,1000,16,6.013653,0,yes
+output,1000,22,6.013653,0,yes

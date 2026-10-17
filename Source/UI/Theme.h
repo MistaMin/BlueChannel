@@ -30,7 +30,7 @@ inline Theme analogueTheme()
     t.panelBottom = juce::Colour(0xff2d3c94);
     t.section = juce::Colour(0xffb9bdc4);
     t.sectionEdge = juce::Colour(0xff8a8f99);
-    t.inkOnPanel = juce::Colour(0xfff1f3fb);
+    t.inkOnPanel = juce::Colours::white;
     t.inkOnSection = juce::Colour(0xff1d2230);
     t.inkDim = juce::Colour(0xff5d6372);
     t.knobYellow = juce::Colour(0xfff4d81c);

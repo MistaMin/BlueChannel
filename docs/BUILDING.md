@@ -1,8 +1,8 @@
 # Building
 
 Requirements on every platform: CMake 3.22+, a C++20 compiler, Git, Python 3 (packaging tools only).
-GoodLookinUI is a git submodule: clone with `--recurse-submodules` or run
-`git submodule update --init --recursive`. JUCE 9.0.3 and clap-juce-extensions are fetched by CMake.
+GoodLookinUI runtime headers are vendored; no submodule initialisation is needed.
+JUCE 9.0.3 and clap-juce-extensions are fetched by CMake.
 
 ```sh
 cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
@@ -24,37 +24,43 @@ Outputs: `build/BlueChannel_artefacts/Release/{VST3,AU,CLAP,LV2,Standalone,AAX}`
 | `BLUECHANNEL_BUILD_AAX` | ON | AAX target when an SDK is found |
 | `BLUECHANNEL_AAX_SDK` | `../aax-sdk-2-8-1` | AAX SDK location (not in the repository) |
 | `BLUECHANNEL_BUILD_PLUGIN` | ON | OFF builds only the JUCE-free engine tests and tools |
+| `BLUECHANNEL_HQ` | OFF | full offline component solver; see [HQ mode](HQ_MODE.md) |
 | `BLUECHANNEL_DEV_EDITOR` | OFF | developer mode for placing and sizing knobs (see below) |
 
-## Developer mode: knob placement and size
-
-Knob positions, sizes, labels, knob styles, cap colours and caption sizes live in `Designs/knobs.csv`
-(GoodLookinUI design format, one row per knob, keyed by parameter ID, coordinates in panel units of the
-1560 x 450 panel). The file is baked into every build, so editing it changes release builds too.
+## Developer mode: full editor layout
 
 ```sh
 cmake -S . -B build/devmode -G Ninja -DCMAKE_BUILD_TYPE=Release -DBLUECHANNEL_DEV_EDITOR=ON
-cmake --build build/devmode --target BlueChannel_Standalone   # or any plugin format
+cmake --build build/devmode --target BlueChannel_Standalone BlueChannel_VST3 BlueChannel_AU BlueChannel_CLAP BlueChannel_LV2
 ```
 
-Open the editor and press **Dev** (bottom left, next to Bypass). The window grows an inspector:
+Press **Dev** on the analogue panel or **DEV** in the Digital toolbar. The window opens an inspector
+below the panel. Its **Page** selector switches between Analogue, Digital / Overview and Digital /
+All Controls. Only controls visible on that page appear in the control selector.
 
-| Action | Effect |
-|---|---|
-| click a knob | select it (or pick it in the inspector list) |
-| drag | move (2-unit grid; hold Alt for 1) |
-| drag the corner handle | resize (minimum 20 x 20) |
-| arrow keys / Shift+arrows | nudge 1 / 10 units |
-| Cmd/Ctrl+Z | undo the last move, resize or nudge |
-| inspector fields | exact X, Y, W, H, label, style, colour, caption size, mark colour (its own Undo button) |
+- Click a control to select it, or pick it in **Control**. Drag it to move; drag its lower-right corner
+  to resize. Hold Alt for a 1-unit grid instead of 2 units.
+- Arrow keys nudge by 1; Shift+arrows by 10. Cmd/Ctrl+Z and **Undo** restore the previous edit.
+- **Type** switches continuous controls between a knob, horizontal slider and vertical slider. The
+  parameter binding, range and automation identity stay the same. Resize the control to suit its type.
+- **Knob Style**, the colour wheel, label and font fields edit presentation. X/Y/Width/Height give exact
+  logical panel coordinates. Labels, keys, selectors and graph panels can also be moved and resized.
+  Painted section backgrounds and headings are fixed.
+- Enable **Use controls** to play with the controls while keeping the inspector open; disable it to
+  resume placing controls. **Close Dev** returns to the normal editor.
 
-Every change is written to `Designs/knobs.csv` in the source tree within about a third of a second (only
-when the text changes, atomically), so `git diff Designs/knobs.csv` shows exactly what moved. A developer
-build starts from the file on disk, so a relaunch shows the saved design without rebuilding; any build
-re-embeds it automatically the next time it is built. Press **Dev** again to leave developer mode. Release builds contain none
-of this code. `BlueChannelSnapshot --design <file>` writes the current layout in the same format.
+Changes autosave to `Designs/editor-layout.json` in this repository after about 350 ms and flush when
+leaving developer mode or closing the editor. The status line reports success or failure. Each skin and
+Digital page has its own entries. Parameter values are not saved in this layout file.
 
-Only knobs are placed this way; keys, lamps and meters keep their coded positions.
+Developer builds reload that file on launch. CMake also embeds it in every build, so the next release
+build uses the saved layout. `Designs/knobs.csv` remains the underlying analogue knob design; the JSON
+layout applies afterward and takes precedence. The default JSON contains no overrides. Back up or
+restore that file to preserve or revert a layout. Do not edit the same layout in multiple instances at
+once; each instance saves its current full layout.
+
+`BlueChannelSnapshot --layout <file>` exports the complete layout to JSON;
+`BlueChannelSnapshot --design <file>` exports only the legacy analogue knob CSV.
 
 ## Platforms
 
@@ -82,3 +88,14 @@ use and distribute your build. The AAX SDK has its own terms and is not included
 | `BlueChannelBench [seconds]` | CPU benchmark |
 | `BlueChannelSnapshot <dir> [scale]` | render the editor to PNG (both skins) |
 | `tools/make_references.sh`, `tools/characterize.py` | ngspice references and device sweeps (need the reference deck via `BLUE_REFERENCE_CIR`) |
+
+## Initial editor size
+
+New editors start at 1560 x 450 logical screen units, twice the previous effective 780 x 225 startup
+size. Legacy saved editor sizes are doubled once, up to the existing 3120 x 900 limit. Later user
+resizing is preserved across reopen. Developer mode adds the inspector below the panel.
+
+## HQ development build
+
+The optional offline component solver is configured separately from the GUI developer tools. See
+[HQ mode](HQ_MODE.md) for the public numerical model, simulator dependency and runtime packaging.

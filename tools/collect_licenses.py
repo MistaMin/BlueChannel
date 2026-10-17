@@ -28,8 +28,8 @@ def main():
     root = Path(__file__).resolve().parents[1]
     build, dest, platform = Path(sys.argv[1]).resolve(), Path(sys.argv[2]).resolve(), sys.argv[3]
     c = cache(build)
-    juce = Path(c.get("FETCHCONTENT_SOURCE_DIR_JUCE") or build / "_deps/juce-src")
-    clap = Path(c.get("FETCHCONTENT_SOURCE_DIR_CLAP-JUCE-EXTENSIONS") or build / "_deps/clap-juce-extensions-src")
+    juce = Path(c.get("FETCHCONTENT_SOURCE_DIR_JUCE") or c.get("BLUECHANNEL_JUCE_SOURCE") or build / "_deps/juce-src")
+    clap = Path(c.get("FETCHCONTENT_SOURCE_DIR_CLAP-JUCE-EXTENSIONS") or c.get("BLUECHANNEL_CLAP_EXT_SOURCE") or build / "_deps/clap-juce-extensions-src")
     if dest.exists():
         shutil.rmtree(dest)
 
@@ -40,6 +40,10 @@ def main():
 
     put(root / "LICENSE", "Blue Channel/LICENSE")
     put(root / "THIRD_PARTY_LICENSES.md", "Blue Channel/THIRD_PARTY_LICENSES.md")
+    put(root / "BINARY_LICENSE.txt", "Blue Channel/BINARY_LICENSE.txt")
+    put(root / "NGSPICE_SOURCE_NOTICE.txt", "Blue Channel/NGSPICE_SOURCE_NOTICE.txt")
+    if c.get("BLUECHANNEL_HQ", "OFF").upper() in ("ON", "YES", "TRUE", "1"):
+        put(Path(c["BLUECHANNEL_HQ_NOTICES"]), "ngspice/COPYING")
     put(root / "third_party/GoodLookinUI/LICENSE", "GoodLookinUI/LICENSE")
     put(juce / "LICENSE.md", "JUCE/LICENSE.md")
     put(clap / "LICENSE.md", "CLAP/clap-juce-extensions-LICENSE.md")
@@ -77,6 +81,7 @@ def main():
             else:
                 rel = "JUCE/modules/" + s.split("/modules/", 1)[1]
             put(f, rel)
+    put(mods / "juce_graphics/image_formats/jpglib/README", "JUCE/modules/juce_graphics/image_formats/jpglib/README")
     files = sorted(p.relative_to(dest).as_posix() for p in dest.rglob("*") if p.is_file())
     (dest / "INDEX.txt").write_text("\n".join(files) + "\n")
     print(f"collected {len(files)} license files into {dest}")

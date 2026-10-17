@@ -4,6 +4,7 @@
 
 #include "Model/Engine.h"
 #include "Params.h"
+#include "HQRenderer.h"
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
@@ -47,8 +48,18 @@ public:
     void setVuHighCal(bool b) { apvts.state.setProperty("vucal", b, nullptr); }
 
     bluechannel::model::Telemetry& telemetry() { return engine.telemetry; }
+    std::atomic<int> hqStatus { bluechannel::hq::Renderer::Idle };
+    juce::String hqStatusText() const;
+    const char* hqLastError() const { return hqRenderer.error(); } // inspect only after rendering has stopped
     int activeChannels() const { return channelsActive.load(std::memory_order_relaxed); }
     bool sidechainConnected() const { return sidechainActive.load(std::memory_order_relaxed); }
+
+    // Output-left analyser tap. The UI reads atomics without blocking the callback.
+    static constexpr unsigned kSpectrumSize = 8192;
+    static_assert(std::atomic<float>::is_always_lock_free);
+    std::array<std::atomic<float>, kSpectrumSize> spectrum {};
+    std::atomic<unsigned> spectrumWrite { 0 };
+    std::atomic<double> spectrumRate { 48000.0 };
 
     juce::UndoManager undo;
     juce::AudioProcessorValueTreeState apvts;
@@ -60,6 +71,9 @@ private:
     bluechannel::params::Reader reader;
     bluechannel::model::Engine engine;
     bluechannel::model::Controls controls;
+    bluechannel::hq::Renderer hqRenderer;
+    std::array<std::vector<double>, 2> hqAudio, hqKey;
+    bool previousHQ = false, previousOffline = false;
     std::atomic<int> channelsActive { 2 };
     std::atomic<bool> sidechainActive { false };
     int currentProgram = 0;

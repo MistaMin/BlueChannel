@@ -30,7 +30,7 @@ int main(int argc, char** argv)
                 Engine e;
                 e.prepare(fs, block, 2);
                 e.setOversampling(stages, -1);
-                Controls c;
+                Controls c; c.source = Source::Line;
                 if (cs.full)
                 {
                     c.filterRoute = c.shelfRoute = c.paramRoute = EqRoute::In;

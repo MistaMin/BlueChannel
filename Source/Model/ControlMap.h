@@ -61,6 +61,12 @@ template <int N> inline double maxOf(const double (&t)[N]) { return *std::max_el
 // Input
 inline int micCircuitPosition(int uiIndex) { return 11 - std::clamp(uiIndex, 0, 11); }   // UI ascending
 inline double micGainDb(int uiIndex) { return kMicGainDb[micCircuitPosition(uiIndex)]; }
+// Software unity detent: retain the twelve switch indices; replace the old near-unity (-2 dB) label.
+// Nominal whole-channel calibration at 1 kHz, Classic impedance and 150-ohm source, trim/output at zero.
+inline constexpr int kMicUnityIndex = 1;
+inline constexpr double kMicUnityCorrectionDb = 2.754406;
+inline double micUnityCorrectionDb(int uiIndex) { return uiIndex == kMicUnityIndex ? kMicUnityCorrectionDb : 0.0; }
+inline double micUnityScale(int uiIndex) { return std::pow(10.0, micUnityCorrectionDb(uiIndex) / 20.0); }
 inline double lineGainDb(int uiIndex) { return kLineGainDb[std::clamp(uiIndex, 0, 6)]; }
 inline double trimPot(double db) { return positionFor(kTrimDb, db); }
 inline double trimMaxDb() { return kTrimDb[kPotSteps - 1]; }

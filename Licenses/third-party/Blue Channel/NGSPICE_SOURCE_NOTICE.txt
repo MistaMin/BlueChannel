@@ -1,0 +1,27 @@
+Shared simulator corresponding source — ngspice 47
+
+HQ-enabled official builds dynamically load the shared ngspice 47 library.
+Its BSD/MIT/LGPL terms and copyright notices are in Licenses/third-party/ngspice/COPYING.
+These rights are not restricted by the binary freeware terms.
+
+The release includes BlueChannel-1.0.0-ngspice-source.tar.gz, containing the
+unmodified upstream ngspice-47.tar.gz and tools/build_hq_simulator_macos.sh.
+Upstream archive SHA-256:
+894e649651f1838a14095e5a5439e7d3aa63e87ede14d283173fda4fcdef675f
+Source URL:
+https://downloads.sourceforge.net/project/ngspice/ng-spice-rework/47/ngspice-47.tar.gz
+Release source:
+https://github.com/MistaMin/BlueChannel/releases/tag/v1.0.0
+
+Build options: shared library, CIDER and XSPICE core enabled; OSDI, KLU,
+OpenMP and readline disabled. The default sparse solver is used. Optional
+external code-model modules, including GPL table modules, are not shipped
+or loaded. No upstream source
+patches are applied. The library install ID is set to @rpath/libngspice.0.dylib
+and it is code-signed as part of the release. Both arm64 and x86_64 are built.
+
+You may rebuild or replace this library under its own licence terms. The
+library is beside each macOS plugin/app executable (inside Contents/MacOS),
+or beside the LV2 binary. Each HQ instance loads a private temporary copy.
+Modified bundles may need to be re-signed locally to satisfy platform code
+validation; this does not limit the licence permissions to modify or debug.

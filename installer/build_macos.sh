@@ -10,19 +10,27 @@
 # BLUE_APP_ID / BLUE_INSTALLER_ID. Notarization uses the keychain profile in BLUE_NOTARY_PROFILE (default
 # AC_NOTARY). Run SIGN=1 from your own Terminal: codesign and notarytool may need the keychain prompt.
 # Optional: JUCE_SOURCE / CLAP_EXT_SOURCE point at local checkouts instead of downloading.
-# AAX is built when the SDK is present but is never packaged (check at the end).
+# AAX is disabled and never packaged.
 set -euo pipefail
 export COPYFILE_DISABLE=1
 cd "$(dirname "$0")/.."
 VERSION=$(tr -d '[:space:]' < VERSION)
 BUILD=${BUILD:-build/release-macos}
-OUT=${OUT:-dist/macos}
+OUT=${OUT:-dist/release-$VERSION/macos}
 ART="$BUILD/BlueChannel_artefacts/Release"
 APP_ID=${BLUE_APP_ID:-"Developer ID Application: Marcos Deida (ZQYU67JUBH)"}
 INST_ID=${BLUE_INSTALLER_ID:-"Developer ID Installer: Marcos Deida (ZQYU67JUBH)"}
 NOTARY_PROFILE=${BLUE_NOTARY_PROFILE:-AC_NOTARY}
 
-args=(-G Ninja -DCMAKE_BUILD_TYPE=Release -DBLUECHANNEL_UNIVERSAL=ON)
+args=(-G Ninja -DCMAKE_BUILD_TYPE=Release -DBLUECHANNEL_UNIVERSAL=ON -DBLUECHANNEL_DEV_EDITOR=OFF -DBLUECHANNEL_BUILD_AAX=OFF)
+if [ "${HQ:-1}" = "1" ]; then
+  SIM="$PWD/build/deps/ngspice-universal"
+  [ -f "$SIM/lib/libngspice.dylib" ] || tools/build_hq_simulator_macos.sh
+  args+=(-DBLUECHANNEL_HQ=ON "-DBLUECHANNEL_NGSPICE_INCLUDE=$SIM/include"
+         "-DBLUECHANNEL_NGSPICE_LIBRARY=$SIM/lib/libngspice.dylib" "-DBLUECHANNEL_HQ_NOTICES=$SIM/COPYING")
+else
+  args+=(-DBLUECHANNEL_HQ=OFF)
+fi
 [ -n "${JUCE_SOURCE:-}" ] && args+=("-DBLUECHANNEL_JUCE_SOURCE=$JUCE_SOURCE")
 [ -n "${CLAP_EXT_SOURCE:-}" ] && args+=("-DBLUECHANNEL_CLAP_EXT_SOURCE=$CLAP_EXT_SOURCE")
 cmake -S . -B "$BUILD" "${args[@]}"
@@ -33,15 +41,18 @@ if arch -x86_64 /usr/bin/true 2>/dev/null; then
   arch -x86_64 "$BUILD/BlueChannelModelTest"
 fi
 python3 tools/release_manifest.py "$BUILD"
+case "$OUT" in dist/*|"$PWD"/dist/*) ;; *) echo "OUT must be inside this repository's dist folder" >&2; exit 1;; esac
 
 rm -rf "$OUT"
 mkdir -p "$OUT/stage" "$OUT/pkgs"
 RES="$OUT/stage/resources/Blue Channel"
 mkdir -p "$RES/Manual"
-python3 tools/collect_licenses.py "$BUILD" "$RES/Licenses" mac
-cp LICENSE THIRD_PARTY_LICENSES.md "$RES/"
-cp docs/USER_MANUAL.md "$RES/Manual/"
-cp docs/images/*.png "$RES/Manual/" 2>/dev/null || true
+python3 tools/collect_licenses.py "$BUILD" "$RES/Licenses/third-party" mac
+cp LICENSE BINARY_LICENSE.txt THIRD_PARTY_LICENSES.md NGSPICE_SOURCE_NOTICE.txt "$RES/"
+cp LICENSE BINARY_LICENSE.txt THIRD_PARTY_LICENSES.md NGSPICE_SOURCE_NOTICE.txt "$RES/Licenses/"
+cp docs/USER_MANUAL.md docs/HQ_MODE.md docs/PARAMETERS.md docs/RELEASE_1.0.0.md "$RES/Manual/"
+mkdir -p "$RES/Manual/images"
+cp docs/images/*.png "$RES/Manual/images/"
 cp "$BUILD/release-manifest.json" "$RES/Manual/"
 
 declare -a BUNDLES=(
@@ -59,6 +70,12 @@ for entry in "${BUNDLES[@]}"; do
   ditto --norsrc --noextattr --noacl "$ART/$rel" "$OUT/stage/$id/$name"
   xattr -cr "$OUT/stage/$id/$name" 2>/dev/null || true
   find "$OUT/stage/$id" -name '._*' -delete
+  if [ "$id" = "lv2" ]; then
+    LICENSE_DEST="$OUT/stage/$id/$name/Licenses"
+  else
+    LICENSE_DEST="$OUT/stage/$id/$name/Contents/Resources/Licenses"
+  fi
+  ditto "$RES/Licenses" "$LICENSE_DEST"
   lipo -info "$(find "$OUT/stage/$id/$name" -type f -perm -111 \( -path '*/MacOS/*' -o -name '*.so' \) | head -n 1)"
   if [ "${SIGN:-0}" = "1" ]; then
     if [ "$id" = "lv2" ]; then
@@ -67,6 +84,9 @@ for entry in "${BUNDLES[@]}"; do
         codesign --verify --strict --verbose=2 "$f"
       done
     else
+      find "$OUT/stage/$id/$name/Contents" -type f -name '*.dylib' -print0 | while IFS= read -r -d '' f; do
+        codesign --force --timestamp --options runtime --sign "$APP_ID" "$f"
+      done
       codesign --force --deep --timestamp --options runtime --sign "$APP_ID" "$OUT/stage/$id/$name"
       codesign --verify --deep --strict --verbose=2 "$OUT/stage/$id/$name"
     fi
@@ -77,10 +97,21 @@ done
 pkgbuild --root "$OUT/stage/resources" --install-location "/Library/Application Support" \
          --identifier "com.opengrid.bluechannel.resources" --version "$VERSION" "$OUT/pkgs/BlueChannel-resources.pkg" >/dev/null
 
+mkdir -p "$OUT/installer-resources"
+python3 - "$OUT/installer-resources/license.html" <<'PYHTML'
+import html,sys
+from pathlib import Path
+body='<h1>Blue Channel — licence terms</h1><p>Project source: MIT. Official binaries: freeware, built under the publisher’s commercial JUCE licence. JUCE 9 alternatively offers AGPLv3 terms for independent builders. Component licence rights remain intact.</p>'
+for name,title in [('BINARY_LICENSE.txt','Official binary freeware licence'),('LICENSE','Project source licence')]:
+    body+='<h2>'+title+'</h2><pre>'+html.escape(Path(name).read_text())+'</pre>'
+Path(sys.argv[1]).write_text('<!doctype html><html><meta charset="utf-8"><style>body{font:13px -apple-system,sans-serif;color:#202737;padding:16px}pre{font:12px -apple-system,sans-serif;white-space:pre-wrap}</style>'+body+'</html>')
+PYHTML
+
 cat > "$OUT/distribution.xml" <<XML
 <?xml version="1.0" encoding="utf-8"?>
 <installer-gui-script minSpecVersion="1">
   <title>Blue Channel $VERSION</title>
+  <license file="license.html" mime-type="text/html"/>
   <options customize="always" require-scripts="false" hostArchitectures="arm64,x86_64"/>
   <choices-outline>
     <line choice="vst3"/><line choice="au"/><line choice="clap"/><line choice="lv2"/><line choice="app"/><line choice="resources"/>
@@ -100,7 +131,7 @@ cat > "$OUT/distribution.xml" <<XML
 </installer-gui-script>
 XML
 PKG="$OUT/BlueChannel-$VERSION-macos-unsigned.pkg"
-productbuild --distribution "$OUT/distribution.xml" --package-path "$OUT/pkgs" "$PKG" >/dev/null
+productbuild --distribution "$OUT/distribution.xml" --package-path "$OUT/pkgs" --resources "$OUT/installer-resources" "$PKG" >/dev/null
 FINAL="$PKG"
 if [ "${SIGN:-0}" = "1" ]; then
   FINAL="$OUT/BlueChannel-$VERSION-macos.pkg"

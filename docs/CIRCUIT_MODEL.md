@@ -49,7 +49,7 @@ a 15 kHz pole) are kept everywhere. A 2 Hz DC blocker at the input stands in for
 | De-esser | tuned band-pass and inverter | optical cell and summing network (exact algebra) |
 | Soft limiter | complementary 3-band split | optical cells and summer (exact algebra) |
 | Output level | buffer, loaded fader, x2.19 amplifier | rail clip |
-| Output stage | drive amp, follower, 1:2:1 transformer with tertiary feedback | core distortion (estimate) |
+| Output stage | drive amp, follower, 1:2:1 transformer with tertiary feedback | estimated core-current term; terminal effect currently cancels under ideal feedback |
 
 Op-amp swing is 2 V from each rail of the reference supply's settled operating point (+16.07 V / -14.77 V),
 so clipping is asymmetric. It is applied at each stage output, not at every internal op-amp.
@@ -60,7 +60,17 @@ The netlist's magnetising inductance is linear. The non-linear excess of the mag
 at the core node, computed from the flux of the previous sample: `i = (flux / Lm) |flux / ref|^1.4`. The
 exponent and reference flux are fitted to the part's published distortion (0.2 % at 50 Hz, 0 dBu and 1 % at
 +10 dBu with a 200 ohm source); the fit gives 0.200 % and 0.99 %. The output transformer uses the same form
-with an estimated reference (its winding data is not published); its tertiary feedback suppresses most of it.
+with an estimated reference (its winding data is not published). An isolated audit on 2026-10-17 found
+that its output is bit-identical with core-current injection enabled and disabled at 20 Hz, 50 Hz and
+1 kHz, at connector-equivalent levels of +4, +16 and +22 dBu. The ideal tertiary-feedback loop fixes the
+core voltage and the drive stage does not limit its correction, so this term currently contributes no
+terminal distortion in those tests. Output-transformer saturation is therefore an open modelling gap,
+not an established feature. See `measurements/evidence-0.1.0/transformer-audit/`.
+
+The line input is the balanced electronic receiver in `kLineInput`, followed by `kLineGain`. It bypasses
+the microphone transformer, and its implemented nonlinearity is rail clipping. All three source paths
+pass through the output stage. The microphone core model uses a leaky flux accumulator and a single-valued
+nonlinear current law; it is not a full hysteresis model.
 
 ### Microphone amplifier bandwidth
 
@@ -141,3 +151,13 @@ analogue detectors (replaced by the digital side-chains in `docs/DYNAMICS.md`).
 
 Regenerate the references with `BLUE_REFERENCE_CIR=<deck> tools/make_references.sh`; regenerate the
 calibration tables with `BlueChannelCalibrate > Source/Model/Calibration.h`.
+
+## Nominal microphone unity detent
+
+Mic gain index 1 now adds a software level calibration after the mic circuit, +2.754406 dB, rather
+than relabelling the old non-unity level. This makes the whole Standard channel nominally unity at
+1 kHz with the default 150-ohm source/Classic impedance, trim/output zero. Offline HQ applies the same
+post-circuit level correction through a fixed linear controlled-voltage stage in its routing graph;
+a Mic gain-switch change restarts its operating point. The transcribed component ladder itself is
+unchanged; this is a product calibration, not a newly claimed hardware resistor value. Other switch
+positions are unchanged. Changing source impedance, Air, EQ or frequency can change the gain.

@@ -126,7 +126,7 @@ int main(int argc, char** argv)
     Engine e;
     e.prepare(fs, 512, 1);
     e.setOversampling(1, -1);
-    Controls c;   // line input, 0 dB, everything out
+    Controls c; c.source = Source::Line;   // line input, 0 dB, everything out
 
     // 1. Unity path: -18 dBFS at 1 kHz through line input / trim / fader / output transformer.
     {
@@ -139,6 +139,15 @@ int main(int argc, char** argv)
         double corr = 0;
         for (int i = int(y.size()) - 960; i < int(y.size()); ++i) corr += y[size_t(i)] * std::sin(2.0 * M_PI * 1000.0 * i / fs);
         check(corr > 0, "overall polarity non-inverting", corr);
+    }
+
+    // Fresh frontend defaults select the actual mic circuit at a calibrated unity detent.
+    {
+        Engine fresh; fresh.prepare(fs,512,1); Controls defaults;
+        auto y=runSine(fresh,defaults,1000.0,0.01,0.5,fs);
+        const double gain=db(analyse(y,1000.0,fs,20).h1/0.01);
+        check(defaults.source==Source::Mic && std::abs(gain)<0.05,
+              "fresh microphone path is unity at 1 kHz (dB)",gain);
     }
 
     // 2. Transformer core fit (mic stage alone).

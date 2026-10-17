@@ -3,4 +3,5 @@
 namespace bluechannel::design
 {
 inline constexpr const char* kKnobs = R"BLUEDESIGN(@BLUECHANNEL_KNOB_DESIGN@)BLUEDESIGN";
+inline constexpr const char* kEditorLayout = R"BLUELAYOUT(@BLUECHANNEL_EDITOR_LAYOUT@)BLUELAYOUT";
 }

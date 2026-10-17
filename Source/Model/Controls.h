@@ -6,6 +6,8 @@
 // engine never reads host parameter objects. Ranges are documented with the parameter registry
 // (Source/Plugin/Params.cpp, docs/PARAMETERS.md).
 
+#include "ControlMap.h"
+
 namespace bluechannel::model
 {
 enum class Source { Mic = 0, Line = 1, Instrument = 2 };
@@ -16,8 +18,8 @@ enum class DynPosition { PostEq = 0, PreEq = 1 };
 struct Controls
 {
     // Input
-    Source source = Source::Line;
-    int micGain = 8;            // 0..11, ascending gain (-14 .. +54 dB)
+    Source source = Source::Mic;
+    int micGain = controlmap::kMicUnityIndex;            // 0..11; index 1 is the calibrated 0 dB unity detent
     int lineGain = 3;           // 0..6, ascending gain (-18 .. +18 dB)
     double trimDb = 0.0;        // 0 .. 20.8 dB (mic/line); the same pot sets instrument gain
     bool phase = false;

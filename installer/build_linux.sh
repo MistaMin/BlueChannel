@@ -12,7 +12,7 @@ BUILD=${BUILD:-build/release-linux}
 OUT=${OUT:-dist/linux}
 ART="$BUILD/BlueChannel_artefacts/Release"
 
-args=(-G Ninja -DCMAKE_BUILD_TYPE=Release)
+args=(-G Ninja -DCMAKE_BUILD_TYPE=Release -DBLUECHANNEL_HQ=OFF -DBLUECHANNEL_BUILD_AAX=OFF)
 [ -n "${JUCE_SOURCE:-}" ] && args+=("-DBLUECHANNEL_JUCE_SOURCE=$JUCE_SOURCE")
 [ -n "${CLAP_EXT_SOURCE:-}" ] && args+=("-DBLUECHANNEL_CLAP_EXT_SOURCE=$CLAP_EXT_SOURCE")
 cmake -S . -B "$BUILD" "${args[@]}"
@@ -25,8 +25,10 @@ rm -rf "$OUT"
 mkdir -p "$OUT/$NAME"
 cp -R "$ART/VST3/Blue Channel.vst3" "$ART/CLAP/Blue Channel.clap" "$ART/LV2/Blue Channel.lv2" "$OUT/$NAME/"
 cp "$ART/Standalone/Blue Channel" "$OUT/$NAME/blue-channel"
-python3 tools/collect_licenses.py "$BUILD" "$OUT/$NAME/Licenses" linux
-cp LICENSE THIRD_PARTY_LICENSES.md docs/USER_MANUAL.md "$BUILD/release-manifest.json" "$OUT/$NAME/"
+python3 tools/collect_licenses.py "$BUILD" "$OUT/$NAME/Licenses/third-party" linux
+cp LICENSE BINARY_LICENSE.txt THIRD_PARTY_LICENSES.md NGSPICE_SOURCE_NOTICE.txt docs/USER_MANUAL.md docs/HQ_MODE.md docs/PARAMETERS.md docs/RELEASE_1.0.0.md "$BUILD/release-manifest.json" "$OUT/$NAME/"
+mkdir -p "$OUT/$NAME/images"
+cp docs/images/*.png "$OUT/$NAME/images/"
 cat > "$OUT/$NAME/INSTALL.txt" <<TXT
 Blue Channel $VERSION for Linux ($ARCH)
 

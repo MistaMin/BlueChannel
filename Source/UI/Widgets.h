@@ -68,6 +68,7 @@ public:
 
     void paint(juce::Graphics& g) override
     {
+        if (!isRotary()) { juce::Slider::paint(g); return; }
         auto r = getLocalBounds().toFloat();
         const juce::Colour ink = section ? theme.inkOnSection : theme.inkOnPanel;
         const float captionSize = design.fontSize * 0.95f;
@@ -108,6 +109,7 @@ public:
         setClickingTogglesState(true);
         setTitle(text);
     }
+    juce::Colour designColour() const { return ledColour; }
     std::function<bool()> litOverride;   // lamp state when it is not the toggle state
 
     void paintButton(juce::Graphics& g, bool over, bool down) override
@@ -115,9 +117,10 @@ public:
         auto r = getLocalBounds().toFloat();
         auto key = juce::Rectangle<float>(20.0f, 12.0f).withCentre({ r.getCentreX(), r.getY() + 8.0f });
         const bool lit = litOverride ? litOverride() : getToggleState();
-        gl::hardware::drawLedKey(g, key, ledColour, lit, down);
+        const auto cap=getProperties().contains("layout.colour") ? juce::Colour::fromString("ff"+getProperties()["layout.colour"].toString().substring(1)) : ledColour;
+        gl::hardware::drawLedKey(g, key, cap, lit, down);
         if (over) { g.setColour(juce::Colour(0x22ffffff)); g.fillRoundedRectangle(key.expanded(2.5f), 3.0f); }
-        drawText(g, getButtonText(), r.withTrimmedTop(16.0f), 8.5f, section ? theme.inkOnSection : theme.inkOnPanel,
+        drawText(g, getButtonText(), r.withTrimmedTop(16.0f),float(getProperties().getWithDefault("layout.font",8.5f)), section ? theme.inkOnSection : theme.inkOnPanel,
                  juce::Justification::centredTop);
     }
 
@@ -128,11 +131,13 @@ private:
 };
 
 // Indicator lamp with an optional legend to its right.
-class Lamp : public juce::Component
+class Lamp : public juce::Component, public juce::SettableTooltipClient
 {
 public:
     Lamp(const Theme& t, juce::String text, juce::Colour c, bool onSection = true)
         : theme(t), label(std::move(text)), colour(c), section(onSection) { setInterceptsMouseClicks(false, false); }
+    juce::String designLabel() const { return label; }
+    juce::Colour designColour() const { return colour; }
     void set(float brightness)
     {
         brightness = juce::jlimit(0.0f, 1.0f, brightness);
@@ -145,8 +150,9 @@ public:
         auto r = getLocalBounds().toFloat();
         const float rad = 3.2f;
         const juce::Point<float> c(r.getX() + 7.0f, r.getCentreY());
-        gl::meters::drawLamp(g, c, rad, colour.withMultipliedBrightness(0.35f + 0.65f * level), level > 0.05f);
-        drawText(g, label, r.withTrimmedLeft(17.0f), 8.0f, section ? theme.inkOnSection : theme.inkOnPanel,
+        const auto tint=getProperties().contains("layout.colour") ? juce::Colour::fromString("ff"+getProperties()["layout.colour"].toString().substring(1)) : colour;
+        gl::meters::drawLamp(g, c, rad, tint.withMultipliedBrightness(0.35f + 0.65f * level), level > 0.05f);
+        drawText(g,getProperties().getWithDefault("layout.label",label).toString(), r.withTrimmedLeft(17.0f),float(getProperties().getWithDefault("layout.font",8.0f)), section ? theme.inkOnSection : theme.inkOnPanel,
                  juce::Justification::centredLeft, false);
     }
 
@@ -204,25 +210,42 @@ class StepSelector : public juce::Component
 {
 public:
     StepSelector(const Theme& t, juce::String text, juce::RangedAudioParameter& p, juce::StringArray options,
-                 juce::UndoManager* um, juce::Colour led)
-        : key(t, text, led), names(std::move(options)),
+                 juce::UndoManager* um, juce::Colour led, bool onSection = true, juce::RangedAudioParameter* extraChoice = nullptr)
+        : key(t, text, led, onSection), names(std::move(options)),
           attachment(p, [this](float v) { value = juce::roundToInt(v); refreshLamps(); }, um)
     {
         key.setClickingTogglesState(false);
         key.litOverride = [] { return false; };
-        key.onClick = [this] { attachment.setValueAsCompleteGesture(float((value + 1) % names.size())); };
+        key.onClick = [this] {
+            const int next=(selectedOption()+1)%names.size();
+            if(extraAttachment)
+            {
+                if(next==names.size()-1){extraAttachment->setValueAsCompleteGesture(1);return;}
+                extraAttachment->setValueAsCompleteGesture(0);
+            }
+            attachment.setValueAsCompleteGesture(float(next));
+        };
         addAndMakeVisible(key);
         for (auto& n : names)
         {
-            lamps.add(new Lamp(t, n, led));
+            lamps.add(new Lamp(t, n, led, onSection));
             addAndMakeVisible(lamps.getLast());
+        }
+        if(extraChoice)
+        {
+            extraAttachment=std::make_unique<juce::ParameterAttachment>(*extraChoice,
+                [this](float v){extraSelected=v>.5f;refreshLamps();},um);
+            extraAttachment->sendInitialUpdate();
         }
         attachment.sendInitialUpdate();
     }
+    int selectedOption() const {return extraSelected ? names.size()-1 : value;}
     std::function<juce::String(int)> tooltipFor;
     int keyWidth = 46;
     void resized() override
     {
+        // Old saved layouts had six rows; migrate their height so the new HQ lamp cannot be clipped.
+        if(extraAttachment && getHeight()<lamps.size()*14){setSize(getWidth(),lamps.size()*14);return;}
         // The key uses the same 34 px row as the plain keys beside it, so selectors line up with them. Lamp rows
         // are 14 px so each lamp's glow stays inside its own bounds.
         auto r = getLocalBounds();
@@ -237,10 +260,12 @@ private:
     juce::OwnedArray<Lamp> lamps;
     juce::ParameterAttachment attachment;
     int value = 0;
+    bool extraSelected=false;
+    std::unique_ptr<juce::ParameterAttachment> extraAttachment;
     void refreshLamps()
     {
-        for (int i = 0; i < lamps.size(); ++i) lamps[i]->set(i == value ? 1.0f : 0.0f);
-        key.setTooltip(names[value]);
+        for (int i = 0; i < lamps.size(); ++i) lamps[i]->set(i == selectedOption() ? 1.0f : 0.0f);
+        key.setTooltip(names[selectedOption()]);
     }
 };
 

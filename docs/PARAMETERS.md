@@ -18,8 +18,8 @@ Order below is host order. Choice values are stored as indices.
 
 | ID | Name | Range / choices | Default |
 |---|---|---|---|
-| source | Input | Mic, Line, Inst | Line |
-| micgain | Mic Gain | 12 positions: -8, -2, +5, +11, +17, +23, +29, +35, +41, +48, +54, +60 dB input to output | +11 dB (index 3) |
+| source | Input | Mic, Line, Inst | Mic |
+| micgain | Mic Gain | 12 positions: -8, 0, +5, +11, +17, +23, +29, +35, +41, +48, +54, +60 dB input to output | 0 dB (index 1) |
 | linegain | Line Gain | -18, -12, -6, 0, +6, +12, +18 dB | 0 dB |
 | trim | Trim | 0 to 20.81 dB (instrument gain follows the same pot) | 0 |
 | phase | Phase | off / on | off |
@@ -93,3 +93,22 @@ a changed range changes the meaning of saved automation.
 | Reset (host) | DSP histories only |
 
 Factory programs: Init, Vocal, Drum Bus, Bass DI, Gated Toms, Mix Polish.
+
+## HQ mode
+
+Appended host parameter `hq` (Offline HQ): boolean, default off. The full component solve is used only
+in host non-realtime exports; playback remains Standard. Factory programs preserve this preference.
+The experimental `rthq` parameter and native solver have been removed. Earlier parameter IDs/order
+remain unchanged. See [HQ mode](HQ_MODE.md).
+
+The existing microphone switch's index 1 is now a calibrated 0 dB detent instead of the old approximately
+-2 dB detent. Its nominal software correction is +2.754406 dB after the mic circuit, calibrated with a
+150-ohm source and Classic impedance at 1 kHz. Other mic switch indices keep their previous values.
+Fresh instances and Init select Mic/index 1, trim 0 and output 0. Saved source/gain selections still
+restore, but an earlier saved mic index 1 now uses the new unity calibration.
+
+
+The GUI combines these controls: the final Offline lamp/menu choice, `\( ᐖ)/ HQ`, sets `hq` on without
+changing `offlineos`. Selecting a normal Offline choice sets `hq` off and updates `offlineos`. No host
+parameter indices or choice counts have changed; the seventh GUI state is a presentation of the two
+existing parameters. The Digital header HQ lamp is an indicator, not a separate toggle.

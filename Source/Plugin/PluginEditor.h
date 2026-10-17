@@ -4,10 +4,11 @@
 
 #include "PluginProcessor.h"
 #include "Widgets.h"
+#include "EditorLayout.h"
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
-namespace bluechannel::ui { class DevTools; }
+namespace bluechannel::ui { class DevTools; class DigitalPanel; }
 
 // The panel is laid out at a fixed logical size and scaled as a whole when the window is resized.
 class BlueChannelPanel : public juce::Component
@@ -28,6 +29,11 @@ public:
     std::vector<goodlookinui::Item> designItems() const;
     bool applyDesignCsv(const std::string& csv);          // false (and nothing changed) if the CSV does not fit
     std::string designCsv() const;
+    std::vector<bluechannel::ui::LayoutTarget> layoutTargets() const;
+    juce::String editorLayoutJson() const;
+    bool applyEditorLayoutJson(const juce::String&);
+    void showDigitalPage(bool allControls);
+    int editorPage() const;
     const std::vector<bluechannel::ui::Knob*>& allKnobs() const { return knobs; }
     std::function<void()> onDevToggle;                    // developer builds: the Dev key
 
@@ -63,6 +69,7 @@ private:
     juce::Component *vuSource = nullptr, *vuCal = nullptr;
     LedKey* skinKey = nullptr;
     float overloadHold = 0.0f;
+    std::unique_ptr<bluechannel::ui::DigitalPanel> digital;
 
     struct Section { juce::Rectangle<float> r; juce::String title; };
     std::vector<Section> sections;
@@ -80,6 +87,7 @@ private:
     void timerCallback() override { panel.tick(); }
     void toggleDeveloperMode();
     BlueChannelProcessor& proc;
+    bool editorSized = false;
     BlueChannelPanel panel;
     juce::TooltipWindow tooltips { this, 600 };
     std::unique_ptr<bluechannel::ui::DevTools> dev;   // developer builds only

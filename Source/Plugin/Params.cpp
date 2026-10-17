@@ -12,7 +12,15 @@ namespace bluechannel::params
 namespace cm = model::controlmap;
 using APF = juce::AudioParameterFloat;
 using APC = juce::AudioParameterChoice;
-using APB = juce::AudioParameterBool;
+// Hosts may send fractional normalised values even to switches. Report their
+// effective boolean value so a state round trip has the same host-visible value.
+class SwitchParameter final : public juce::AudioParameterBool
+{
+public:
+    using juce::AudioParameterBool::AudioParameterBool;
+    float getValue() const override { return get() ? 1.0f : 0.0f; }
+};
+using APB = SwitchParameter;
 using Attr = juce::AudioParameterFloatAttributes;
 
 juce::String hzText(double hz)
@@ -40,7 +48,7 @@ static juce::NormalisableRange<float> logRange(double lo, double hi)
 // receiver loss that the Output control's 0 dB already compensates (see ControlMap::outputOffsetDb).
 juce::String micGainLabel(int index)
 {
-    const double g = cm::micGainDb(index) - model::calibration::kLineInputDb;
+    const double g = index == cm::kMicUnityIndex ? 0.0 : cm::micGainDb(index) - model::calibration::kLineInputDb;
     return (g > 0.05 ? "+" : "") + juce::String(g, 0) + " dB";
 }
 juce::String lineGainLabel(int index)
@@ -74,11 +82,11 @@ juce::AudioProcessorValueTreeState::ParameterLayout createLayout()
     const juce::StringArray routes { "Out", "In", "Comp key", "Gate key" };
 
     // Input
-    add(std::make_unique<APC>(pid(id::source), "Input", juce::StringArray { "Mic", "Line", "Inst" }, 1));
+    add(std::make_unique<APC>(pid(id::source), "Input", juce::StringArray { "Mic", "Line", "Inst" }, 0));
     juce::StringArray mic, line;
     for (int i = 0; i < 12; ++i) mic.add(micGainLabel(i));
     for (int i = 0; i < 7; ++i) line.add(lineGainLabel(i));
-    add(std::make_unique<APC>(pid(id::micGain), "Mic Gain", mic, 3));
+    add(std::make_unique<APC>(pid(id::micGain), "Mic Gain", mic, model::controlmap::kMicUnityIndex));
     add(std::make_unique<APC>(pid(id::lineGain), "Line Gain", line, 3));
     add(std::make_unique<APF>(pid(id::trim), "Trim", juce::NormalisableRange<float>(0.0f, float(cm::trimMaxDb()), 0.01f), 0.0f, dbAttr()));
     add(std::make_unique<APB>(pid(id::phase), "Phase", false));
@@ -161,6 +169,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout createLayout()
     add(std::make_unique<APC>(pid(id::oversampling), "Oversampling", juce::StringArray { "1x", "2x", "4x", "8x", "16x Derp mode" }, 1));
     add(std::make_unique<APC>(pid(id::offlineOversampling), "Offline Oversampling",
                               juce::StringArray { "Same as playback", "1x", "2x", "4x", "8x", "16x Derp mode" }, 0));
+    add(std::make_unique<APB>(pid(id::hq), "HQ Mode (Offline)", false));
     return layout;
 }
 
@@ -175,7 +184,7 @@ Reader::Reader(juce::AudioProcessorValueTreeState& state) : apvts(state)
                           id::expand, id::gateThreshold, id::range, id::hold, id::gateRelease, id::fastAttack, id::hysteresis,
                           id::gateKey, id::gateListen, id::deessIn, id::deessThreshold, id::deessFreq, id::deessListen,
                           id::dynPosition, id::bypass, id::output, id::softLimit, id::mute, id::link, id::oversampling,
-                          id::offlineOversampling };
+                          id::offlineOversampling, id::hq };
     for (auto* n : all)
     {
         auto* v = state.getRawParameterValue(n);
@@ -260,6 +269,9 @@ void Reader::read(model::Controls& c) const
     c.mute = b(id::mute);
     c.link = b(id::link);
 }
+
+
+bool Reader::hqEnabled() const { return get(id::hq)->load(std::memory_order_relaxed) > .5f; }
 
 int Reader::playbackStages() const { return juce::roundToInt(get(id::oversampling)->load()); }
 int Reader::offlineStages() const { return juce::roundToInt(get(id::offlineOversampling)->load()) - 1; }

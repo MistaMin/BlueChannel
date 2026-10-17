@@ -70,6 +70,7 @@ public:
     void configure(int uiGain, double sourceOhms, int impedance, bool air)
     {
         const int pos = controlmap::micCircuitPosition(uiGain);
+        unityScale = controlmap::micUnityScale(uiGain);
         dk.setParam(pGain, pos);
         dk.setParam(pRsrc, sourceOhms);
         dk.setParam(pZ, controlmap::impedanceScale(impedance));
@@ -88,13 +89,14 @@ public:
         double y[2];
         dk.process(u, y);
         core.advance(y[1]);
-        return railClip(bandwidth.lowPass(y[0]));
+        return railClip(bandwidth.lowPass(y[0]) * unityScale);
     }
     DkStage dk;
 
 private:
     CoreFlux core;
     OnePole bandwidth;
+    double unityScale = 1.0;
     double sampleRate = 96000.0;
     int pGain = -1, pRsrc = -1, pZ = -1, pAir = -1;
 };

@@ -83,6 +83,7 @@ inline constexpr const char* link = "link";
 // Processing
 inline constexpr const char* oversampling = "oversampling";
 inline constexpr const char* offlineOversampling = "offlineos";
+inline constexpr const char* hq = "hq"; // appended: offline component solve
 } // namespace id
 
 juce::AudioProcessorValueTreeState::ParameterLayout createLayout();
@@ -93,6 +94,7 @@ class Reader
 public:
     explicit Reader(juce::AudioProcessorValueTreeState& state);
     void read(model::Controls& c) const;
+    bool hqEnabled() const;
     int playbackStages() const;
     int offlineStages() const;   // -1 = same as playback
 

@@ -1,0 +1,13 @@
+Test project /Volumes/Developer/Developer/Blue Channel/build/release-macos
+    Start 1: stage_netlists
+1/4 Test #1: stage_netlists ...................   Passed    0.62 sec
+    Start 2: model
+2/4 Test #2: model ............................   Passed    0.41 sec
+    Start 3: processor
+3/4 Test #3: processor ........................   Passed    1.74 sec
+    Start 4: hq_component_solver
+4/4 Test #4: hq_component_solver ..............   Passed   22.69 sec
+
+100% tests passed out of 4
+
+Total Test time (real) =  25.54 sec

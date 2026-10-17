@@ -1,4 +1,4 @@
-# Blue Channel user guide
+# Blue Channel 1.0 user guide
 
 Blue Channel is an analogue-modelled channel strip: a transformer microphone preamp with line and instrument
 inputs, high- and low-pass filters, shelving and parametric EQ, a VCA compressor with two optical "vintage"
@@ -7,8 +7,16 @@ the circuit at all times; there is no clean digital mode.
 
 ![Analogue skin](images/blue-channel-analogue.png)
 
-*Editor, analogue skin (component render). The Digital skin key switches to a flat look; it changes
+*Editor, analogue skin (component render). The Digital skin key opens a dedicated digital layout with a draggable compressor curve, EQ graph over a live output-left FFT spectrum, and an All Controls page for the full parameter set; it changes
 nothing in the sound.*
+
+![Digital overview](images/blue-channel-digital.png)
+
+*Digital overview: compressor handles, EQ response, output FFT and sidechain filter curve.*
+
+![All digital controls](images/blue-channel-digital-controls.png)
+
+*All Controls: the complete parameter set. The Overview and All Controls tabs stay visible on both pages.*
 
 ## Signal flow
 
@@ -120,3 +128,35 @@ renders offline; *Same* uses the playback setting. Blue Channel reports no laten
 ## Programs
 
 Init, Vocal, Drum Bus, Bass DI, Gated Toms, Mix Polish. Programs set the sound controls only.
+
+### Digital graph controls
+
+Drag the compressor's threshold, ratio and makeup handles to edit the same parameters as the
+main panel. The curve shows the detector's static target, including its fixed knee; it does not
+show attack/release history or the gain cell's distortion.
+
+Drag an EQ band's node horizontally for frequency and vertically for gain. Scroll over a mid
+band to change Q. Shelf frequencies follow their discrete switch positions and selected range.
+HP and LP handles move horizontally. The white curve shows the small-signal analogue EQ
+response in the audio path; the FFT behind it shows the left output channel from -100 to 0 dBFS.
+An out-of-path band's handle is dimmed. Filters assigned to a compressor or gate sidechain
+remain editable and show an amber dashed response with their destination; they do not
+contribute to the white audio curve. Range switches and routing remain independent of dragging.
+
+Use **All Controls** for all parameters, including gate, de-esser, blend, listening and oversampling,
+and **Overview** to return to the graphs. **Analogue** returns to the main panel.
+
+## HQ mode (development builds)
+
+Select the final **\( ᐖ)/ HQ** lamp in the analogue **Offline** selector to arm the full component solver
+for non-realtime export. Digital has the same HQ choice in its Offline menu on All Controls, with a
+header indicator lamp. Selecting a normal Offline factor disarms HQ. Playback
+uses Standard. Full HQ can be vastly slower than real time; try a short selection first. A failed solve
+mutes export and marks it failed. See [HQ mode](HQ_MODE.md) for scope and limits.
+
+New instances and Init select the Mic preamp at **0 dB**, with trim and output at zero. This is nominal
+unity at 1 kHz with the default Classic input impedance and assumed 150-ohm source. The old near-unity
+mic gain detent now uses a software calibration to reach zero; all other gain positions remain available.
+The output transformer is included in both processing paths. Standard uses an ideal output driver;
+Offline HQ solves the nonlinear core with the finite driver and feedback. Feedback can suppress core
+colour, so the model does not promise obvious transformer distortion on line input.

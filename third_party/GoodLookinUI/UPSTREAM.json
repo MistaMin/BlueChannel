@@ -1,0 +1,6 @@
+{
+  "repository": "https://github.com/MistaMin/GoodLookinUI",
+  "revision": "79cd578e89dc82d795798b1925e8be9bb30f6149",
+  "licence": "MIT",
+  "adaptation": "Runtime headers only; one hardware-referencing comment neutralised. Public examples, tests and documentation are omitted."
+}

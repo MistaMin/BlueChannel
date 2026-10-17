@@ -1,0 +1,5 @@
+peak=0.0196316 block_residual=1.71003e-07
+input source restart check
+dynamics control check
+microphone source check
+HQ solve, isolated instances, continuation, automation and restart passed; seconds=92.3105

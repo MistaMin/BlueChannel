@@ -25,8 +25,6 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive
 
       - name: Linux dependencies
         if: matrix.name == 'linux'
@@ -38,7 +36,7 @@ jobs:
 
       - name: macOS dependencies
         if: matrix.name == 'macos'
-        run: brew install ninja
+        run: brew install ninja bison flex
 
       - name: Build, test and package (macOS)
         if: matrix.name == 'macos'

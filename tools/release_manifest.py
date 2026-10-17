@@ -34,11 +34,11 @@ def compiler():
         return cache.get("CMAKE_CXX_COMPILER_ID", "unknown") + " " + cache.get("CMAKE_CXX_COMPILER_VERSION", "")
 
 
-juce = Path(cache.get("FETCHCONTENT_SOURCE_DIR_JUCE") or build / "_deps/juce-src")
-clap = Path(cache.get("FETCHCONTENT_SOURCE_DIR_CLAP-JUCE-EXTENSIONS") or build / "_deps/clap-juce-extensions-src")
+juce = Path(cache.get("FETCHCONTENT_SOURCE_DIR_JUCE") or cache.get("BLUECHANNEL_JUCE_SOURCE") or build / "_deps/juce-src")
+clap = Path(cache.get("FETCHCONTENT_SOURCE_DIR_CLAP-JUCE-EXTENSIONS") or cache.get("BLUECHANNEL_CLAP_EXT_SOURCE") or build / "_deps/clap-juce-extensions-src")
 files = [root / "CMakeLists.txt", root / "VERSION"]
 files += sorted((root / "Source").rglob("*.h")) + sorted((root / "Source").rglob("*.cpp"))
-dirty = subprocess.run(["git", "-C", str(root), "status", "--porcelain", "--", "Source", "CMakeLists.txt", "VERSION"],
+dirty = subprocess.run(["git", "-C", str(root), "status", "--porcelain"],
                        capture_output=True, text=True).stdout.strip()
 manifest = {
     "product": "Blue Channel",
@@ -54,12 +54,15 @@ manifest = {
     "not_distributed": ["AAX"],
     "dependencies": {
         "JUCE": revision(juce),
-        "GoodLookinUI": revision(root / "third_party/GoodLookinUI"),
+        "GoodLookinUI": json.loads((root / "third_party/GoodLookinUI/UPSTREAM.json").read_text())["revision"],
         "clap-juce-extensions": revision(clap),
         "CLAP": revision(clap / "clap-libs/clap"),
         "clap-helpers": revision(clap / "clap-libs/clap-helpers"),
     },
     "compiler": compiler(),
+    "hq_enabled": cache.get("BLUECHANNEL_HQ", "OFF").upper() in ("ON", "YES", "TRUE", "1"),
+    "developer_editor": cache.get("BLUECHANNEL_DEV_EDITOR", "OFF").upper() in ("ON", "YES", "TRUE", "1"),
+    "licensing": {"project_source": "MIT", "official_binaries": "Freeware under publisher commercial JUCE licence"},
     "source_sha256": {p.relative_to(root).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest() for p in files},
 }
 (build / "release-manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")

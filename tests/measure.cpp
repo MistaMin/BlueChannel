@@ -22,7 +22,7 @@ using namespace bluechannel::model;
 static std::map<std::string, Controls> cases()
 {
     std::map<std::string, Controls> m;
-    Controls c;
+    Controls c; c.source = Source::Line;
     m["flat"] = c;
     Controls f = c; f.filterRoute = EqRoute::In; f.hpfHz = 100; f.lpfHz = 8000; m["filters-100-8k"] = f;
     Controls s = c; s.shelfRoute = EqRoute::In; s.lfDb = 12; s.hfDb = -12; s.lfFreq = 2; s.hfFreq = 2; m["shelves-+12-12"] = s;
@@ -85,7 +85,7 @@ int main(int argc, char** argv)
     }
     if (!std::strcmp(argv[1], "thd") && argc > 2)
     {
-        Controls c;
+        Controls c; c.source = Source::Line;
         c.source = !std::strcmp(argv[2], "mic") ? Source::Mic : !std::strcmp(argv[2], "inst") ? Source::Instrument : Source::Line;
         c.micGain = 0;
         std::printf("input_dbfs,freq_hz,gain_db,thd_percent\n");

@@ -1,4 +1,23 @@
-# Measurements and evidence (0.1.0)
+# Measurements and evidence
+
+## 1.0.0 release validation
+
+The universal macOS Release build (developer editor disabled, full Offline HQ enabled) passed
+all four CTest groups: stage netlists, model, processor and component solver. The VST3 passed
+pluginval at strictness 7, in-process with GUI tests skipped. A host-visible switch-normalisation
+fix is covered by fractional automation/state-recall cases. Native standalone analogue and Digital
+windows were inspected; documentation images are deterministic 1560 × 450 component captures.
+
+The extended HQ fixture passed with a block-split residual of 1.71003e-7 FS. Its 94.17 s wall time
+includes operating-point restarts and concurrent release work; it is not a render-throughput benchmark.
+The x86_64 stage, model and processor slices also passed under Rosetta. This does not establish
+physical Intel performance. Logs are in [1.0.0 evidence](measurements/evidence-1.0.0/README.md).
+
+Listening acceptance, multi-instance DAW/offline-flag acceptance, long HQ renders and Windows/Linux
+hardware checks remain open. The historical measurements below describe 0.1.0; in particular its
+lowest-Mic-detent measurements are not the new calibrated 0 dB startup detent.
+
+## Historical 0.1.0 evidence
 
 Raw outputs are in `docs/measurements/evidence-0.1.0` (stage, model and processor tests, benchmark),
 `docs/measurements/characterisation` (ngspice device sweeps) and `docs/measurements/engine` (engine
@@ -41,6 +60,15 @@ reference).
 - Instrument stage: 13 gain points; distortion term from 5 trim positions x 6 levels.
 - Panel calibration (`Source/Model/Calibration.h`): measured from the netlists, so legends state what the
   circuit does. High-pass corner = 934318 / (R + 620), low-pass = 14639100 / (R + 620).
+
+## Output transformer audit (2026-10-17)
+
+The output stage was compared sample-for-sample against the same network with its nonlinear core-current
+input held at zero: 96 kHz, two seconds per case, 20/50/1000 Hz, connector-equivalent +4/+16/+22 dBu.
+All nine cases were bit-identical. The current ideal tertiary-feedback/driver model cancels the effect
+of that current on terminal voltage. Output-transformer saturation remains an open modelling gap.
+The line source bypasses the microphone transformer; low line-path THD does not verify output-core fidelity.
+Raw results and the reproducible audit are in `measurements/evidence-0.1.0/transformer-audit/`.
 
 ## Engine checks (`BlueChannelModelTest`)
 
@@ -94,3 +122,27 @@ Source: tests/model_test.cpp, tests/processor_test.cpp / result: pass / limits: 
 Claim: sound acceptance / owner: sound / status: open - needs level-matched program-material listening
 Claim: DAW behaviour / owner: host integration / status: open - instance count, automation, offline flag
 ```
+
+## Experimental HQ component solver (2026-10-17)
+
+A separate offline HQ path now resolves the component audio circuits, including finite amplifier macros,
+semiconductors, optical cells and implicit transformer cores. Standard remains the default; the signed
+0.1.0 installer has not changed. Scope and numerical limits are in [HQ mode](HQ_MODE.md).
+
+The initial extended component fixture passed isolation, block continuation, repeat reset, input-source
+restarts and dynamics-control exercise. Its block-split residual was 2.3128e-7 FS and its wall time was
+98.96 s. This short fixture includes multiple operating-point starts and is not a sustained render-speed
+benchmark. Listening, DAW bounce acceptance, tolerance sweeps and long-render memory testing remain open.
+The output-only audit's sub-microvolt residual includes numerical/interpolation error and must not be
+reported as isolated transformer-core distortion. See [HQ evidence](measurements/evidence-0.1.0/hq-mode/README.md).
+
+
+## Offline-only HQ and unity Mic startup (2026-10-17)
+
+The owner withdrew native realtime HQ; its host control, GUI and DSP have been removed. Earlier
+realtime evidence is archived privately and does not describe
+the current build. Offline HQ remains the full component solver; Standard handles playback.
+
+Fresh instances/Init now select the Mic circuit at the calibrated 0 dB detent, trim/output zero. The
+nominal calibration is at 1 kHz with a 150-ohm source, Classic impedance and air off. Blue-panel keys
+and selector legends use white text. See [current validation](measurements/evidence-0.1.0/hq-unity/README.md).
