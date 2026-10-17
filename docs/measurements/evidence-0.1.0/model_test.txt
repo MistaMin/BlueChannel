@@ -1,0 +1,21 @@
+# 2026-10-17T10:42Z
+unity gain at 1 kHz (dB)                                        -0.0073  ok
+THD at -18 dBFS line path (fraction)                             0.0000  ok
+overall polarity non-inverting                                  51.4067  ok
+input transformer THD 50 Hz 0 dBu (target 0.2 %)                 0.2001  ok
+input transformer THD 50 Hz +10 dBu (target 1 %)                 0.9935  ok
+LMF +12 dB at 200 Hz (dB)                                       12.2219  ok
+HPF 200 Hz: 50 Hz attenuated (dB)                              -40.0042  ok
+VCA compressor gain at 26 dB over threshold (dB)               -18.8379  ok
+de-esser band inverted at centre                             -2159.2834  ok
+de-esser reduces a loud 5 kHz tone (dB)                        -11.4868  ok
+soft limiter steady-state peak at +6 dBFS input (dBFS)          -2.8808  ok
+block size 1 matches 512 (max diff)                              0.0000  ok
+block size 17 matches 512 (max diff)                             0.0000  ok
+block size 64 matches 512 (max diff)                             0.0000  ok
+allocations + frees inside process()                             0.0000  ok
+finite output after +20 dBFS burst                               1.0000  ok
+silence after burst decays (peak, last 0.1 s)                    0.0003  ok
+repeated offline renders identical (max diff)                    0.0000  ok
+netlist numbers under comma-decimal locale                    5100.0000  ok
+PASSED (0 failures)

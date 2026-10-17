@@ -1,0 +1,14 @@
+# 2026-10-17T10:42Z
+stereo with stereo sidechain supported                           ok
+mono without sidechain supported                                 ok
+mono in / stereo out rejected                                    ok
+state round trip restores parameters                             ok
+state round trip restores editor skin                            ok
+missing parameter restores to default                            ok
+malformed state ignored, current state kept                      ok
+finite output for 1, 17, 129, 256 and oversized blocks           ok
+every factory program processes finite audio                     ok
+editor open and close around processing                          ok
+repeated offline bounces are identical                           ok
+offline render runs at the offline factor (8x)                   ok
+PASSED (0 failures)

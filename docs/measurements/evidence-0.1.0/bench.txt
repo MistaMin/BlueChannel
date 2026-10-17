@@ -1,0 +1,22 @@
+# 2026-10-17T10:42Z Apple M1 Max 15.7.5 clang -O3 (bench built from tests/bench.cpp), stereo, 64-frame blocks, 10 s per case
+case                         rate  block    factor  cpu %core     p99 ms     max ms   budget
+line, everything out        48000     64        1x       1.1%     0.0159     0.0428   1.333ms
+line, everything out        48000     64        2x       2.5%     0.0350     0.0806   1.333ms
+line, everything out        48000     64        4x       4.9%     0.0693     0.1158   1.333ms
+line, everything out        48000     64        8x      10.1%     0.1512     5.7639   1.333ms
+line, everything out        48000     64       16x      19.3%     0.2715     0.3232   1.333ms
+line, everything out        96000     64        1x       2.3%     0.0158     0.0367   0.667ms
+line, everything out        96000     64        2x       4.7%     0.0331     0.0843   0.667ms
+line, everything out        96000     64        4x       9.6%     0.0680     0.1065   0.667ms
+line, everything out        96000     64        8x      18.8%     0.1360     0.1993   0.667ms
+line, everything out        96000     64       16x      36.9%     0.2641     0.3746   0.667ms
+all sections in             48000     64        1x       4.9%     0.0690     0.1180   1.333ms
+all sections in             48000     64        2x      10.1%     0.1425     0.2114   1.333ms
+all sections in             48000     64        4x      20.0%     0.2850     0.3976   1.333ms
+all sections in             48000     64        8x      40.3%     0.5693     1.1230   1.333ms
+all sections in             48000     64       16x      80.4%     1.1374     1.2743   1.333ms
+all sections in             96000     64        1x       9.9%     0.0726     0.1605   0.667ms
+all sections in             96000     64        2x      20.1%     0.1442     0.2242   0.667ms
+all sections in             96000     64        4x      40.3%     0.2820     0.3673   0.667ms
+all sections in             96000     64        8x      80.4%     0.5674     1.8120   0.667ms
+all sections in             96000     64       16x     160.8%     1.1168     1.3089   0.667ms
