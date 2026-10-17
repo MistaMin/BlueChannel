@@ -11,3 +11,4 @@ and private-reference exclusion/auditing. See docs/RELEASE_1.0.0.md for scope an
 - Open the editor at 1248 × 360, resetting enlarged preview windows once and retaining later resizing.
 - Remove previous full-HQ circuit records before restart to avoid duplicate source-history cleanup at shutdown.
 - Include the standalone macOS audio-input usage description and hardened-runtime entitlement.
+- Correct the overload test's final partial buffer and add Linux engine AddressSanitizer checks.

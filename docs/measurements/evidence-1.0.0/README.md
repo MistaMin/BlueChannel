@@ -17,3 +17,7 @@ Listening, target DAW acceptance, long-render memory and physical Windows/Linux/
 
 The final lifecycle fix removes the previous ngspice circuit before loading a new one. This avoids
 duplicate source-history cleanup at shutdown after restarts. The shared simulator source is unmodified.
+
+`model-asan.log` records the corrected overload fixture under AddressSanitizer. Its final silence
+block uses the remaining frame count. The original fixture overran its caller-owned buffer on Linux.
+The model and processor runtime code is unchanged by this test correction.

@@ -11,6 +11,18 @@ on:
   workflow_dispatch:
 
 jobs:
+  engine-sanitizer:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build engine tests with AddressSanitizer
+        run: |
+          cmake -S . -B build/asan -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBLUECHANNEL_BUILD_PLUGIN=OFF \
+            -DCMAKE_CXX_FLAGS="-fsanitize=address -fno-omit-frame-pointer"
+          cmake --build build/asan --target BlueChannelStageTest BlueChannelModelTest --parallel 2
+      - name: Run engine tests with AddressSanitizer
+        run: ctest --test-dir build/asan --output-on-failure
+
   build:
     strategy:
       fail-fast: false

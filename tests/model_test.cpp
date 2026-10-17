@@ -263,7 +263,11 @@ int main(int argc, char** argv)
         auto y = runSine(e, o, 60.0, 10.0, 0.3, fs);
         std::vector<double> z(size_t(3 * fs), 0.0);   // the output coupling network clears clipping DC in ~2 s
         double* io[1] = { z.data() };
-        for (int s = 0; s < int(z.size()); s += 256) { io[0] = z.data() + s; e.process<double>(io, 1, 256, nullptr, 0, o, false); }
+        for (int s = 0; s < int(z.size()); s += 256)
+        {
+            io[0] = z.data() + s;
+            e.process<double>(io, 1, std::min(256, int(z.size()) - s), nullptr, 0, o, false);
+        }
         bool finite = true;
         for (double v : y) finite = finite && std::isfinite(v);
         for (double v : z) finite = finite && std::isfinite(v);
