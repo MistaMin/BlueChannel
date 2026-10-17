@@ -62,15 +62,9 @@ hardware source documents are needed. Universal macOS HQ builds use
 
 ## Licence
 
-OpenGrid's own source is [MIT licensed](LICENSE). The official complete binaries are **freeware**, free
-to use for personal or commercial audio production, built under the publisher's commercial JUCE licence.
-End users do not need a JUCE developer licence to use these downloads. See [binary terms](BINARY_LICENSE.txt).
+Blue Channel source code is [MIT licensed](LICENSE); copyright (c) 2026 OpenGrid / Marcos Deida. The official complete binaries are distributed as **freeware** under the publisher's commercial JUCE licence, free of charge for personal or commercial audio production. End users do not need a JUCE developer licence to install or use these downloads. See [official binary terms](BINARY_LICENSE.txt).
 
-JUCE 9 offers **AGPLv3 or commercial licensing**; it is not covered by this project's MIT licence.
-Independent builders must comply with the JUCE licence applicable to their build and distribution;
-the publisher's licence is not transferred. The vendored [GoodLookinUI](third_party/GoodLookinUI) runtime
-headers retain their MIT licence. Other components retain their respective terms, including the shared
-simulator's BSD/MIT/LGPL rights. See [Third-party licences](THIRD_PARTY_LICENSES.md) and the included texts.
+**Licensing disclaimer:** JUCE is available under open-source terms (GPLv3 / AGPLv3) or a commercial JUCE licence; it is NOT covered by this project's MIT licence. If you build or redistribute binaries from this source code, you must comply with your own JUCE licence terms (GPL/AGPL or commercial) — the publisher's commercial licence does not transfer to third-party builds. The vendored [GoodLookinUI](third_party/GoodLookinUI) runtime headers retain their MIT licence. Other components retain their respective terms, including the shared simulator's BSD, MIT and LGPL rights. See [Third-party licences](THIRD_PARTY_LICENSES.md) and the included texts.
 
 Original third-party hardware documents, drawings, OCR and research renders are not distributed.
 [Source provenance](SOURCE_PROVENANCE.md) records the separation between private inputs and public code.
