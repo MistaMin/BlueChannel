@@ -24,13 +24,13 @@ with an output FFT. HP/LP filters stay editable when routed to a sidechain and d
 
 ## Download
 
-**macOS 11 or later, Apple Silicon and Intel:**
-[BlueChannel-1.0.0-macos.dmg](https://github.com/MistaMin/BlueChannel/releases/download/v1.0.0/BlueChannel-1.0.0-macos.dmg) · [BlueChannel-1.0.0-macos.pkg](https://github.com/MistaMin/BlueChannel/releases/download/v1.0.0/BlueChannel-1.0.0-macos.pkg)
+- **macOS 11 or later (Apple Silicon and Intel):** [BlueChannel-1.0.0-macos.dmg](https://github.com/MistaMin/BlueChannel/releases/download/v1.0.0/BlueChannel-1.0.0-macos.dmg) · [BlueChannel-1.0.0-macos.pkg](https://github.com/MistaMin/BlueChannel/releases/download/v1.0.0/BlueChannel-1.0.0-macos.pkg)
+- **Windows 10 or later (x64):** [BlueChannel-1.0.0-windows-x64-setup.exe](https://github.com/MistaMin/BlueChannel/releases/download/v1.0.0/BlueChannel-1.0.0-windows-x64-setup.exe) · [BlueChannel-1.0.0-windows-x64.zip](https://github.com/MistaMin/BlueChannel/releases/download/v1.0.0/BlueChannel-1.0.0-windows-x64.zip)
+- **Linux (x86_64):** [BlueChannel-1.0.0-linux-x86_64.tar.gz](https://github.com/MistaMin/BlueChannel/releases/download/v1.0.0/BlueChannel-1.0.0-linux-x86_64.tar.gz) · [SHA-256](https://github.com/MistaMin/BlueChannel/releases/download/v1.0.0/BlueChannel-1.0.0-linux-x86_64.sha256) (extract and copy `VST3/`, `CLAP/` and `LV2/` into `~/.vst3`, `~/.clap` and `~/.lv2`)
 
-The disk image contains the installer, full documentation, images, and licence texts. The installer offers **VST3, Audio Unit, CLAP, LV2 and Standalone**. A portable bundle zip, checksums, build manifest and simulator source are on the
+The macOS disk image contains the installer, full documentation, images, and licence texts. The packages offer **VST3, Audio Unit (macOS), CLAP, LV2 and Standalone**. Portable bundles, checksums, build manifests and simulator source are on the
 [release page](https://github.com/MistaMin/BlueChannel/releases/tag/v1.0.0). Signing and notarisation results
-are recorded there. AAX is not distributed. Windows/Linux source builds and CI packaging are available;
-their HQ library packaging and physical-machine acceptance are not validated for this release.
+are recorded there. AAX is not distributed. Windows/Linux builds ship with Standard processing (`HQ=OFF` by default).
 
 ## User guide
 
