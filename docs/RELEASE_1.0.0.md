@@ -35,8 +35,8 @@ Full HQ is experimental, very slow and retains growing transient probe history. 
 is one hour. Source and Mic gain-switch changes restart its operating point. Failed HQ exports mute
 rather than substitute Standard audio. Hosts must report non-realtime processing to engage full HQ.
 Listening acceptance, multi-instance DAW validation, long-render memory testing and Windows/Linux
-hardware checks remain pending. See [HQ mode](HQ_MODE.md) and [Measurements](MEASUREMENTS.md).
+hardware checks remain pending. See [HQ mode](https://github.com/MistaMin/BlueChannel/blob/main/docs/HQ_MODE.md) and [Measurements](https://github.com/MistaMin/BlueChannel/blob/main/docs/MEASUREMENTS.md).
 
-![Analogue interface](images/blue-channel-analogue.png)
-![Digital overview](images/blue-channel-digital.png)
-![Digital full controls](images/blue-channel-digital-controls.png)
+![Analogue interface](https://raw.githubusercontent.com/MistaMin/BlueChannel/main/docs/images/blue-channel-analogue.png)
+![Digital overview](https://raw.githubusercontent.com/MistaMin/BlueChannel/main/docs/images/blue-channel-digital.png)
+![Digital full controls](https://raw.githubusercontent.com/MistaMin/BlueChannel/main/docs/images/blue-channel-digital-controls.png)
