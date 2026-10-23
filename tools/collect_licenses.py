@@ -49,6 +49,9 @@ def main():
     put(clap / "LICENSE.md", "CLAP/clap-juce-extensions-LICENSE.md")
     put(clap / "clap-libs/clap/LICENSE", "CLAP/clap-LICENSE")
     put(clap / "clap-libs/clap-helpers/LICENSE", "CLAP/clap-helpers-LICENSE")
+    aax = Path(c.get("BLUECHANNEL_AAX_SDK") or root / "../aax-sdk-2-8-1")
+    if (aax / "LICENSE.txt").exists():
+        put(aax / "LICENSE.txt", "AAX-SDK/LICENSE.txt")
 
     mods = juce / "modules"
     roots = [

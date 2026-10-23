@@ -28,9 +28,9 @@ with an output FFT. HP/LP filters stay editable when routed to a sidechain and d
 - **Windows 10 or later (x64 & ARM64):** [BlueChannel-1.0.0-windows-x64-setup.exe](https://github.com/MistaMin/BlueChannel/releases/download/v1.0.0/BlueChannel-1.0.0-windows-x64-setup.exe) · [x64 zip](https://github.com/MistaMin/BlueChannel/releases/download/v1.0.0/BlueChannel-1.0.0-windows-x64.zip) · [ARM64 zip](https://github.com/MistaMin/BlueChannel/releases/download/v1.0.0/BlueChannel-1.0.0-windows-arm64.zip) ([ARM64 SHA-256](https://github.com/MistaMin/BlueChannel/releases/download/v1.0.0/BlueChannel-1.0.0-windows-arm64.sha256))
 - **Linux (x86_64 & aarch64):** [BlueChannel-1.0.0-linux-x86_64.tar.gz](https://github.com/MistaMin/BlueChannel/releases/download/v1.0.0/BlueChannel-1.0.0-linux-x86_64.tar.gz) ([x86_64 SHA-256](https://github.com/MistaMin/BlueChannel/releases/download/v1.0.0/BlueChannel-1.0.0-linux-x86_64.sha256)) · [BlueChannel-1.0.0-linux-aarch64.tar.gz](https://github.com/MistaMin/BlueChannel/releases/download/v1.0.0/BlueChannel-1.0.0-linux-aarch64.tar.gz) ([aarch64 SHA-256](https://github.com/MistaMin/BlueChannel/releases/download/v1.0.0/BlueChannel-1.0.0-linux-aarch64.sha256)) (extract and copy `VST3/`, `CLAP/` and `LV2/` into `~/.vst3`, `~/.clap` and `~/.lv2`)
 
-The macOS disk image contains the installer, full documentation, images, and licence texts. The packages offer **VST3, Audio Unit (macOS), CLAP, LV2 and Standalone**. Portable bundles, checksums, build manifests and simulator source are on the
+The macOS disk image contains the installer, full documentation, images, and licence texts. The packages offer **VST3, Audio Unit (macOS), CLAP, LV2, AAX (macOS) and Standalone**. AAX is digitally signed with PACE Eden for Pro Tools compatibility. Portable bundles, checksums, build manifests and simulator source are on the
 [release page](https://github.com/MistaMin/BlueChannel/releases/tag/v1.0.0). Signing and notarisation results
-are recorded there. AAX is not distributed. Windows/Linux builds ship with Standard processing (`HQ=OFF` by default).
+are recorded there. Windows and Linux CI packages ship with Standard processing (`HQ=OFF` by default).
 
 ## User guide
 

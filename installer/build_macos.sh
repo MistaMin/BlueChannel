@@ -10,7 +10,7 @@
 # BLUE_APP_ID / BLUE_INSTALLER_ID. Notarization uses the keychain profile in BLUE_NOTARY_PROFILE (default
 # AC_NOTARY). Run SIGN=1 from your own Terminal: codesign and notarytool may need the keychain prompt.
 # Optional: JUCE_SOURCE / CLAP_EXT_SOURCE point at local checkouts instead of downloading.
-# AAX is disabled and never packaged.
+# AAX is built when BLUE_AAX_SDK is present or at ../aax-sdk-2-8-1.
 set -euo pipefail
 export COPYFILE_DISABLE=1
 cd "$(dirname "$0")/.."
@@ -21,8 +21,14 @@ ART="$BUILD/BlueChannel_artefacts/Release"
 APP_ID=${BLUE_APP_ID:-"Developer ID Application: Marcos Deida (ZQYU67JUBH)"}
 INST_ID=${BLUE_INSTALLER_ID:-"Developer ID Installer: Marcos Deida (ZQYU67JUBH)"}
 NOTARY_PROFILE=${BLUE_NOTARY_PROFILE:-AC_NOTARY}
+AAX_SDK=${BLUE_AAX_SDK:-"$PWD/../aax-sdk-2-8-1"}
 
-args=(-G Ninja -DCMAKE_BUILD_TYPE=Release -DBLUECHANNEL_UNIVERSAL=ON -DBLUECHANNEL_DEV_EDITOR=OFF -DBLUECHANNEL_BUILD_AAX=OFF)
+args=(-G Ninja -DCMAKE_BUILD_TYPE=Release -DBLUECHANNEL_UNIVERSAL=ON -DBLUECHANNEL_DEV_EDITOR=OFF)
+if [ "${BUILD_AAX:-1}" = "1" ] && [ -d "$AAX_SDK/Interfaces" ]; then
+  args+=(-DBLUECHANNEL_BUILD_AAX=ON "-DBLUECHANNEL_AAX_SDK=$AAX_SDK")
+else
+  args+=(-DBLUECHANNEL_BUILD_AAX=OFF)
+fi
 if [ "${HQ:-1}" = "1" ]; then
   SIM="$PWD/build/deps/ngspice-universal"
   [ -f "$SIM/lib/libngspice.dylib" ] || tools/build_hq_simulator_macos.sh
@@ -62,6 +68,9 @@ declare -a BUNDLES=(
   "LV2/Blue Channel.lv2|/Library/Audio/Plug-Ins/LV2|lv2"
   "Standalone/Blue Channel.app|/Applications|app"
 )
+if [ -d "$ART/AAX/Blue Channel.aaxplugin" ]; then
+  BUNDLES+=("AAX/Blue Channel.aaxplugin|/Library/Application Support/Avid/Audio/Plug-Ins|aax")
+fi
 for entry in "${BUNDLES[@]}"; do
   IFS='|' read -r rel dest id <<<"$entry"
   name=$(basename "$rel")
@@ -94,6 +103,19 @@ for entry in "${BUNDLES[@]}"; do
       fi
       codesign --verify --deep --strict --verbose=2 "$OUT/stage/$id/$name"
     fi
+    if [ "$id" = "aax" ]; then
+      PACE_WRAPTOOL=${BLUE_WRAPTOOL:-/Applications/PACEAntiPiracy/Eden/Fusion/Current/bin/wraptool}
+      PACE_ACCOUNT=${BLUE_PACE_ACCOUNT:-}
+      AAX_WCGUID=${BLUE_AAX_WCGUID:-}
+      if [ -z "$AAX_WCGUID" ] || [ -z "$PACE_ACCOUNT" ]; then
+        echo "Error: BLUE_AAX_WCGUID and BLUE_PACE_ACCOUNT must be set in the environment when signing AAX." >&2
+        exit 1
+      fi
+      "$PACE_WRAPTOOL" sign --verbose --account "$PACE_ACCOUNT" \
+        --wcguid "$AAX_WCGUID" --signid "$APP_ID" \
+        --in "$OUT/stage/$id/$name" --out "$OUT/stage/$id/$name" --autoinstall on
+      "$PACE_WRAPTOOL" verify --verbose --in "$OUT/stage/$id/$name"
+    fi
   fi
   pkgbuild --root "$OUT/stage/$id" --install-location "$dest" --identifier "com.opengrid.bluechannel.$id" \
            --version "$VERSION" "$OUT/pkgs/BlueChannel-$id.pkg" >/dev/null
@@ -111,6 +133,9 @@ for name,title in [('BINARY_LICENSE.txt','Official binary freeware licence'),('L
 Path(sys.argv[1]).write_text('<!doctype html><html><meta charset="utf-8"><style>body{font:13px -apple-system,sans-serif;color:#202737;padding:16px}pre{font:12px -apple-system,sans-serif;white-space:pre-wrap}</style>'+body+'</html>')
 PYHTML
 
+HAS_AAX=0
+[ -f "$OUT/pkgs/BlueChannel-aax.pkg" ] && HAS_AAX=1
+
 cat > "$OUT/distribution.xml" <<XML
 <?xml version="1.0" encoding="utf-8"?>
 <installer-gui-script minSpecVersion="1">
@@ -118,18 +143,22 @@ cat > "$OUT/distribution.xml" <<XML
   <license file="license.html" mime-type="text/html"/>
   <options customize="always" require-scripts="false" hostArchitectures="arm64,x86_64"/>
   <choices-outline>
-    <line choice="vst3"/><line choice="au"/><line choice="clap"/><line choice="lv2"/><line choice="app"/><line choice="resources"/>
+    <line choice="vst3"/><line choice="au"/><line choice="clap"/><line choice="lv2"/>$([ $HAS_AAX -eq 1 ] && echo '
+    <line choice="aax"/>')
+    <line choice="app"/><line choice="resources"/>
   </choices-outline>
   <choice id="vst3" title="VST3"><pkg-ref id="com.opengrid.bluechannel.vst3"/></choice>
   <choice id="au" title="Audio Unit"><pkg-ref id="com.opengrid.bluechannel.au"/></choice>
   <choice id="clap" title="CLAP"><pkg-ref id="com.opengrid.bluechannel.clap"/></choice>
-  <choice id="lv2" title="LV2"><pkg-ref id="com.opengrid.bluechannel.lv2"/></choice>
+  <choice id="lv2" title="LV2"><pkg-ref id="com.opengrid.bluechannel.lv2"/></choice>$([ $HAS_AAX -eq 1 ] && echo '
+  <choice id="aax" title="AAX"><pkg-ref id="com.opengrid.bluechannel.aax"/></choice>')
   <choice id="app" title="Standalone application"><pkg-ref id="com.opengrid.bluechannel.app"/></choice>
   <choice id="resources" title="User guide and license texts" selected="true" visible="false"><pkg-ref id="com.opengrid.bluechannel.resources"/></choice>
   <pkg-ref id="com.opengrid.bluechannel.vst3">BlueChannel-vst3.pkg</pkg-ref>
   <pkg-ref id="com.opengrid.bluechannel.au">BlueChannel-au.pkg</pkg-ref>
   <pkg-ref id="com.opengrid.bluechannel.clap">BlueChannel-clap.pkg</pkg-ref>
-  <pkg-ref id="com.opengrid.bluechannel.lv2">BlueChannel-lv2.pkg</pkg-ref>
+  <pkg-ref id="com.opengrid.bluechannel.lv2">BlueChannel-lv2.pkg</pkg-ref>$([ $HAS_AAX -eq 1 ] && echo '
+  <pkg-ref id="com.opengrid.bluechannel.aax">BlueChannel-aax.pkg</pkg-ref>')
   <pkg-ref id="com.opengrid.bluechannel.app">BlueChannel-app.pkg</pkg-ref>
   <pkg-ref id="com.opengrid.bluechannel.resources">BlueChannel-resources.pkg</pkg-ref>
 </installer-gui-script>
@@ -155,14 +184,16 @@ fi
 
 # Portable zip of the bundles (for users who install by hand).
 ZIP="$OUT/BlueChannel-$VERSION-macos-bundles.zip"
-(cd "$OUT/stage" && zip -qry "../$(basename "$ZIP")" vst3 au clap lv2 app resources)
+ZIP_BUNDLES=(vst3 au clap lv2 app resources)
+[ $HAS_AAX -eq 1 ] && ZIP_BUNDLES+=(aax)
+(cd "$OUT/stage" && zip -qry "../$(basename "$ZIP")" "${ZIP_BUNDLES[@]}")
 
-# Distribution checks: no AAX, and no real AppleDouble files in the staged trees. (pkgbuild records extended
-# attributes such as com.apple.provenance as ._ entries in its payload; Installer restores those as
-# attributes, not files, so they are not checked here.)
+# Distribution checks: real AppleDouble files and expected AAX presence.
 if find "$OUT/stage" -name '._*' | grep -q .; then echo "AppleDouble files in the stage" >&2; exit 1; fi
-if pkgutil --payload-files "$FINAL" 2>/dev/null | grep -qi '\.aaxplugin'; then echo "AAX found in package" >&2; exit 1; fi
-if unzip -l "$ZIP" | grep -qi '\.aaxplugin'; then echo "AAX found in zip" >&2; exit 1; fi
+if [ $HAS_AAX -eq 1 ]; then
+  if [ ! -f "$OUT/pkgs/BlueChannel-aax.pkg" ]; then echo "AAX package missing" >&2; exit 1; fi
+  if ! unzip -l "$ZIP" | grep -qi '\.aaxplugin'; then echo "AAX missing from zip" >&2; exit 1; fi
+fi
 
 # Checksums last: stapling changes bytes.
 (cd "$OUT" && shasum -a 256 "$(basename "$FINAL")" "$(basename "$ZIP")" > "BlueChannel-$VERSION-macos.sha256")

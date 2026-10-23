@@ -56,6 +56,7 @@ INSTALLATION:
    - Audio Unit:  /Library/Audio/Plug-Ins/Components/Blue Channel.component
    - CLAP:        /Library/Audio/Plug-Ins/CLAP/Blue Channel.clap
    - LV2:         /Library/Audio/Plug-Ins/LV2/Blue Channel.lv2
+   - AAX:         /Library/Application Support/Avid/Audio/Plug-Ins/Blue Channel.aaxplugin
    - Standalone:  /Applications/Blue Channel.app
 4. Restart your DAW and rescan plugins.
 

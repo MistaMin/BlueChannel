@@ -19,10 +19,10 @@ and tertiary feedback, with an ideal driver that suppresses the core injection a
 solves the nonlinear core with the finite output driver. Components and optical/device laws remain
 engineering estimates, not measured hardware. Digital detectors remain the product's sidechain design.
 
-The macOS package is universal (arm64/x86_64), with VST3, AU, CLAP, LV2 and Standalone plus user guide,
+The macOS package is universal (arm64/x86_64), with VST3, AU, CLAP, LV2, AAX and Standalone plus user guide,
 UI screenshots and applicable licence texts. Code and installer signatures, notarisation results and
-checksums are recorded with the release artifacts. No AAX format is distributed. Windows/Linux CI builds
-use Standard processing; their full-HQ packaging and physical-machine testing remain open.
+checksums are recorded with the release artifacts. AAX is digitally signed with PACE Eden for Pro Tools
+compatibility. Windows and Linux CI packages are provided on the release page.
 
 Project source is MIT; official complete binaries are freeware under the publisher's commercial JUCE
 licence. JUCE's independent open-source alternative is AGPLv3. End users need no developer licence for
