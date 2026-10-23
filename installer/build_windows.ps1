@@ -12,7 +12,7 @@ $Out = "dist\windows"
 $Art = "$Build\BlueChannel_artefacts\Release"
 
 if (-not (Test-Path "$Art\Standalone\Blue Channel.exe")) {
-    $cfg = @("-S", ".", "-B", $Build, "-G", "Visual Studio 18 2026", "-A", "x64", "-DBLUECHANNEL_HQ=OFF", "-DBLUECHANNEL_BUILD_AAX=OFF")
+    $cfg = @("-S", ".", "-B", $Build, "-G", "Visual Studio 17 2022", "-A", "x64", "-DBLUECHANNEL_HQ=OFF", "-DBLUECHANNEL_BUILD_AAX=OFF")
     if ($env:JUCE_SOURCE) { $cfg += "-DBLUECHANNEL_JUCE_SOURCE=$($env:JUCE_SOURCE)" }
     if ($env:CLAP_EXT_SOURCE) { $cfg += "-DBLUECHANNEL_CLAP_EXT_SOURCE=$($env:CLAP_EXT_SOURCE)" }
     cmake @cfg
