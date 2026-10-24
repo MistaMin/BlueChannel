@@ -50,8 +50,20 @@ manifest = {
     "architectures": cache.get("CMAKE_OSX_ARCHITECTURES", platform.machine()).split(";"),
     "minimum_macos": cache.get("CMAKE_OSX_DEPLOYMENT_TARGET"),
     "configuration": cache.get("CMAKE_BUILD_TYPE") or "Release",
-    "distributed_formats": ["VST3", "AU (macOS)", "CLAP", "LV2", "Standalone"],
-    "not_distributed": ["AAX"],
+    "distributed_formats": ["VST3", "AU (macOS)", "CLAP", "LV2", "Standalone"] + (
+        ["AAX (macOS, PACE signed freeware)"]
+        if (platform.system() == "Darwin" and (
+            (build / "BlueChannel_artefacts/Release/AAX").exists() or
+            cache.get("BLUECHANNEL_BUILD_AAX", "OFF").upper() in ("ON", "YES", "TRUE", "1")
+        ))
+        else []
+    ),
+    "not_distributed": [] if (
+        platform.system() == "Darwin" and (
+            (build / "BlueChannel_artefacts/Release/AAX").exists() or
+            cache.get("BLUECHANNEL_BUILD_AAX", "OFF").upper() in ("ON", "YES", "TRUE", "1")
+        )
+    ) else ["AAX"],
     "dependencies": {
         "JUCE": revision(juce),
         "GoodLookinUI": json.loads((root / "third_party/GoodLookinUI/UPSTREAM.json").read_text())["revision"],

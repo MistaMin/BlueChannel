@@ -14,8 +14,9 @@ images and extraction tools are private and excluded. Public builds need no hard
 See SOURCE_PROVENANCE.md and tools/audit_release.py. Never add private engineering inputs to Git or
 release payloads. Dependency notices must remain in every distribution.
 
-The macOS release pipeline builds universal VST3, AU, CLAP, LV2 and Standalone, signs the code and
-installer, and records notarisation results with the artifacts. It excludes AAX. Windows/Linux CI
-builds are Standard-only until their HQ library packaging is validated. Do not imply physical-machine
+The macOS release pipeline builds universal VST3, AU, CLAP, LV2, AAX and Standalone, signs the code
+(including PACE Eden signing for AAX) and installer, and records notarisation results with the artifacts.
+Official AAX binaries are included as freeware. Windows/Linux CI builds are Standard-only without AAX until
+their HQ library packaging is validated. Do not imply physical-machine
 or listening acceptance from an automated build. Owner listening, multi-instance DAW checks and
 Windows/Linux hardware validation remain open; see MEASUREMENTS.md.

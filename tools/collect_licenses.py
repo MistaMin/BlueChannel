@@ -7,8 +7,9 @@ Usage: collect_licenses.py <build dir> <destination dir> <mac|win|linux>
 
 Reads the JUCE and clap-juce-extensions locations from the build's CMakeCache.txt (falling back to the
 FetchContent default paths), copies the license texts from those exact revisions, and writes INDEX.txt.
-The Audio Unit SDK notices are included on macOS only. The AAX SDK is never included: AAX builds are not
-distributed (docs/RELEASE.md).
+The Audio Unit SDK notices are included on macOS only. The AAX SDK is an external proprietary
+dependency under the Avid AAX Developer Agreement; official AAX binaries are digitally signed with
+PACE Eden and distributed as freeware (docs/RELEASE.md).
 """
 import shutil
 import sys
