@@ -78,7 +78,8 @@ find "$STAGE" -name '._*' -delete 2>/dev/null || true
 find "$STAGE" -name '.DS_Store' -delete 2>/dev/null || true
 
 echo "==> Creating disk image"
-hdiutil create -volname "Blue Channel $VERSION" -srcfolder "$STAGE" -ov -format UDZO "$DMG"
+STAGE_MB=$(du -sm "$STAGE" | cut -f1)
+hdiutil create -volname "Blue Channel $VERSION" -srcfolder "$STAGE" -size "$((STAGE_MB + 80))m" -ov -format UDZO "$DMG"
 
 echo "==> Signing DMG with Developer ID"
 codesign --force --timestamp --sign "$APP_ID" "$DMG"
