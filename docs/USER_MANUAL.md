@@ -167,3 +167,9 @@ Use **Options → Audio/MIDI Settings** to select the input/output device. The s
 mute its input to avoid speaker feedback; enable input only when your monitoring setup is ready.
 macOS asks for audio-input permission when needed. The permission is for the standalone application's
 live input; DAW plug-ins use the host's audio devices and permissions.
+
+## Formats and licensing
+
+- **Supported formats:** VST3, Audio Unit (macOS), CLAP, LV2, AAX (macOS), and Standalone.
+- **Licensing:** Blue Channel source code is MIT licensed. All official plugin binaries, including the macOS AAX plugin, are distributed as **freeware** under the publisher's commercial JUCE licence, free of charge for personal or commercial audio production.
+- **Third-party attribution:** The AAX plugin is digitally signed with PACE Eden for Pro Tools compatibility. Official installers and disk image packages include all applicable third-party license notices in the `Licenses` directory. See [BINARY_LICENSE.txt](../BINARY_LICENSE.txt) and [THIRD_PARTY_LICENSES.md](../THIRD_PARTY_LICENSES.md).
