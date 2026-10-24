@@ -122,6 +122,8 @@ juce_add_plugin(BlueChannel
     NEEDS_MIDI_OUTPUT        FALSE
     PLUGIN_MANUFACTURER_CODE OpGr
     PLUGIN_CODE              BlCh
+    ICON_BIG                 "${CMAKE_CURRENT_SOURCE_DIR}/assets/blue-channel-app-icon.png"
+    ICON_SMALL               "${CMAKE_CURRENT_SOURCE_DIR}/assets/blue-channel-app-icon.png"
     FORMATS                  ${BLUECHANNEL_FORMATS}
     PRODUCT_NAME             "Blue Channel"
     DESCRIPTION              "Analogue-modelled channel strip"

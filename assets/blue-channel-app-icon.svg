@@ -1,0 +1,138 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <!-- Background Gradient: Deep Brushed Navy / Cobalt -->
+    <linearGradient id="bg" x1="120" y1="80" x2="900" y2="940" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#143254"/>
+      <stop offset="0.45" stop-color="#0a1a2e"/>
+      <stop offset="1" stop-color="#050d18"/>
+    </linearGradient>
+
+    <!-- Radial Cyan/Blue Ambient Halo -->
+    <radialGradient id="halo" cx="0" cy="0" r="1" gradientTransform="matrix(0 520 -520 0 512 490)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38bdf8" stop-opacity=".22"/>
+      <stop offset=".45" stop-color="#0284c7" stop-opacity=".08"/>
+      <stop offset="1" stop-color="#0369a1" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Outer Knob Bevel Gradient -->
+    <linearGradient id="knob-ring" x1="260" y1="240" x2="760" y2="760" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#e2e8f0"/>
+      <stop offset="0.25" stop-color="#94a3b8"/>
+      <stop offset="0.5" stop-color="#475569"/>
+      <stop offset="0.75" stop-color="#cbd5e1"/>
+      <stop offset="1" stop-color="#1e293b"/>
+    </linearGradient>
+
+    <!-- Knob Face Gradient: Deep Anodized Blue -->
+    <radialGradient id="knob-face" cx="0" cy="0" r="1" gradientTransform="matrix(0 230 -230 0 512 490)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2563eb"/>
+      <stop offset="0.4" stop-color="#1d4ed8"/>
+      <stop offset="0.8" stop-color="#1e3a8a"/>
+      <stop offset="1" stop-color="#0f172a"/>
+    </radialGradient>
+
+    <!-- Knob Cap Gradient -->
+    <linearGradient id="knob-cap" x1="360" y1="340" x2="660" y2="640" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38bdf8" stop-opacity=".8"/>
+      <stop offset="0.5" stop-color="#1e40af"/>
+      <stop offset="1" stop-color="#0c1e3d"/>
+    </linearGradient>
+
+    <!-- Lamp / LED Glow Gradient -->
+    <radialGradient id="lamp-glow" cx="0" cy="0" r="1" gradientTransform="matrix(0 60 -60 0 512 200)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7dd3fc"/>
+      <stop offset="0.4" stop-color="#0284c7" stop-opacity=".8"/>
+      <stop offset="1" stop-color="#0369a1" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Filters -->
+    <filter id="soft-glow" x="200" y="180" width="624" height="624" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="36"/>
+    </filter>
+    <filter id="lamp-filter" x="432" y="120" width="160" height="160" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="16"/>
+    </filter>
+    <filter id="shadow" x="220" y="210" width="584" height="600" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="16" stdDeviation="24" flood-color="#000000" flood-opacity="0.6"/>
+    </filter>
+
+    <!-- macOS App Squircle Clip -->
+    <clipPath id="squircle"><rect x="32" y="32" width="960" height="960" rx="222"/></clipPath>
+  </defs>
+
+  <g clip-path="url(#squircle)">
+    <!-- Main Background -->
+    <rect width="1024" height="1024" fill="url(#bg)"/>
+    <rect width="1024" height="1024" fill="url(#halo)"/>
+
+    <!-- Subtle Audio Waveform / EQ Curve Grid -->
+    <path d="M120 720h140l45-32 35 64 50-96 42 80 44-54h110l35-24h150l40 38 45-20h68"
+          fill="none" stroke="#38bdf8" stroke-opacity=".22" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M120 720h140l45-32 35 64 50-96 42 80 44-54h110l35-24h150l40 38 45-20h68"
+          fill="none" stroke="#93c5fd" stroke-opacity=".35" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Soft Center Ambient Light -->
+    <circle cx="512" cy="490" r="260" fill="#0284c7" fill-opacity=".15" filter="url(#soft-glow)"/>
+
+    <!-- Elegant Squircle Border Highlight -->
+    <rect x="33" y="33" width="958" height="958" rx="221" fill="none" stroke="#ffffff" stroke-opacity=".12" stroke-width="2"/>
+
+    <!-- Surrounding Calibration Arc / Ticks -->
+    <!-- Arc Track -->
+    <path d="M280 650 A 280 280 0 1 1 744 650" fill="none" stroke="#334155" stroke-width="6" stroke-linecap="round"/>
+    <path d="M280 650 A 280 280 0 0 1 370 300" fill="none" stroke="#38bdf8" stroke-opacity=".6" stroke-width="6" stroke-linecap="round"/>
+
+    <!-- Radial Tick Marks around Knob (12 calibrated positions) -->
+    <g stroke="#94a3b8" stroke-width="4" stroke-linecap="round" stroke-opacity=".75">
+      <!-- 7 o'clock to 5 o'clock -->
+      <line x1="285" y1="655" x2="260" y2="675" stroke="#38bdf8" stroke-width="6" stroke-opacity=".9"/>
+      <line x1="242" y1="565" x2="215" y2="575" stroke="#38bdf8" stroke-width="6" stroke-opacity=".9"/>
+      <line x1="230" y1="465" x2="200" y2="465" stroke="#38bdf8" stroke-width="6" stroke-opacity=".9"/>
+      <line x1="250" y1="365" x2="225" y2="350" stroke="#38bdf8" stroke-width="6" stroke-opacity=".9"/>
+      <line x1="300" y1="280" x2="280" y2="260"/>
+      <line x1="380" y1="220" x2="370" y2="195"/>
+      <line x1="512" y1="190" x2="512" y2="165" stroke="#e2e8f0" stroke-width="6" stroke-opacity=".95"/>
+      <line x1="644" y1="220" x2="654" y2="195"/>
+      <line x1="724" y1="280" x2="744" y2="260"/>
+      <line x1="774" y1="365" x2="799" y2="350"/>
+      <line x1="794" y1="465" x2="824" y2="465"/>
+      <line x1="782" y1="565" x2="809" y2="575"/>
+      <line x1="739" y1="655" x2="764" y2="675"/>
+    </g>
+
+    <!-- Main Central Dial Shadow & Outer Bezel -->
+    <circle cx="512" cy="490" r="230" fill="#000000" filter="url(#shadow)"/>
+    <circle cx="512" cy="490" r="230" fill="url(#knob-ring)"/>
+
+    <!-- Subtle Knurling on Bezel Rim -->
+    <circle cx="512" cy="490" r="218" fill="#1e293b"/>
+    <circle cx="512" cy="490" r="214" fill="url(#knob-face)"/>
+
+    <!-- Concentric Brushed Metal Rings -->
+    <circle cx="512" cy="490" r="175" fill="none" stroke="#38bdf8" stroke-opacity=".15" stroke-width="2"/>
+    <circle cx="512" cy="490" r="140" fill="none" stroke="#ffffff" stroke-opacity=".08" stroke-width="2"/>
+    <circle cx="512" cy="490" r="105" fill="none" stroke="#38bdf8" stroke-opacity=".12" stroke-width="1.5"/>
+
+    <!-- Center Raised Cap -->
+    <circle cx="512" cy="490" r="85" fill="url(#knob-cap)" stroke="#60a5fa" stroke-opacity=".3" stroke-width="3"/>
+
+    <!-- Knob Pointer Line (pointing calibrated to ~10 o'clock unity position) -->
+    <line x1="512" y1="490" x2="355" y2="355" stroke="#ffffff" stroke-width="10" stroke-linecap="round"/>
+    <line x1="512" y1="490" x2="355" y2="355" stroke="#7dd3fc" stroke-width="6" stroke-linecap="round"/>
+
+    <!-- Pointer Glow Pip -->
+    <circle cx="355" cy="355" r="9" fill="#ffffff"/>
+    <circle cx="355" cy="355" r="16" fill="#38bdf8" fill-opacity=".6" filter="url(#soft-glow)"/>
+
+    <!-- Top HQ Status Lamp / Jewel LED -->
+    <circle cx="512" cy="115" r="32" fill="url(#lamp-glow)" filter="url(#lamp-filter)"/>
+    <circle cx="512" cy="115" r="18" fill="#0284c7" stroke="#e0f2fe" stroke-width="3"/>
+    <circle cx="512" cy="115" r="10" fill="#bae6fd"/>
+
+    <!-- Bottom Typography: BLUE CHANNEL -->
+    <text x="512" y="855" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif"
+          font-size="44" font-weight="700" letter-spacing="8" fill="#f8fafc" text-anchor="middle">BLUE CHANNEL</text>
+    <text x="512" y="895" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif"
+          font-size="22" font-weight="500" letter-spacing="6" fill="#38bdf8" text-anchor="middle" fill-opacity=".85">OPENGRID</text>
+  </g>
+</svg>

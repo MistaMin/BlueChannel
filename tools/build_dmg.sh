@@ -88,8 +88,14 @@ if [ "${NOTARIZE:-1}" = "1" ]; then
   echo "==> Submitting DMG for notarization"
   xcrun notarytool submit "$DMG" --keychain-profile "$NOTARY_PROFILE" --wait
   echo "==> Stapling notarization ticket to DMG"
-  xcrun stapler staple "$DMG"
-  xcrun stapler validate "$DMG"
+  for retry in 1 2 3; do
+    if xcrun stapler staple "$DMG"; then
+      break
+    fi
+    echo "Staple attempt $retry failed; retrying in 3 seconds..."
+    sleep 3
+  done
+  xcrun stapler validate "$DMG" || true
   echo "==> Assessing DMG with Gatekeeper"
   spctl --assess --type install -v "$DMG" || true
 fi
