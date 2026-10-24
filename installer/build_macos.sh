@@ -105,8 +105,8 @@ for entry in "${BUNDLES[@]}"; do
     fi
     if [ "$id" = "aax" ]; then
       PACE_WRAPTOOL=${BLUE_WRAPTOOL:-/Applications/PACEAntiPiracy/Eden/Fusion/Current/bin/wraptool}
-      PACE_ACCOUNT=${BLUE_PACE_ACCOUNT:-}
-      AAX_WCGUID=${BLUE_AAX_WCGUID:-}
+      PACE_ACCOUNT=${BLUE_PACE_ACCOUNT:-"mistamin"}
+      AAX_WCGUID=${BLUE_AAX_WCGUID:-"8692A2A0-CF31-11F1-898A-00505692C25A"}
       if [ -z "$AAX_WCGUID" ] || [ -z "$PACE_ACCOUNT" ]; then
         echo "Error: BLUE_AAX_WCGUID and BLUE_PACE_ACCOUNT must be set in the environment when signing AAX." >&2
         exit 1
@@ -199,3 +199,8 @@ fi
 (cd "$OUT" && shasum -a 256 "$(basename "$FINAL")" "$(basename "$ZIP")" > "BlueChannel-$VERSION-macos.sha256")
 cat "$OUT/BlueChannel-$VERSION-macos.sha256"
 echo "done: $FINAL"
+
+if [ "${SIGN:-0}" = "1" ]; then
+  echo "==> Building and notarizing DMG"
+  tools/build_dmg.sh
+fi

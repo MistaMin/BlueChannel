@@ -7,7 +7,7 @@ export COPYFILE_DISABLE=1
 
 cd "$(dirname "$0")/.."
 VERSION=$(tr -d '[:space:]' < VERSION)
-OUT="dist/release-$VERSION/macos"
+OUT=${OUT:-"dist/release-$VERSION/macos"}
 PKG="$OUT/BlueChannel-$VERSION-macos.pkg"
 DMG="$OUT/BlueChannel-$VERSION-macos.dmg"
 STAGE="$OUT/dmg-stage"
