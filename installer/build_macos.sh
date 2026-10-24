@@ -189,10 +189,10 @@ ZIP_BUNDLES=(vst3 au clap lv2 app resources)
 (cd "$OUT/stage" && zip -qry "../$(basename "$ZIP")" "${ZIP_BUNDLES[@]}")
 
 # Distribution checks: real AppleDouble files and expected AAX presence.
-if find "$OUT/stage" -name '._*' | grep -q .; then echo "AppleDouble files in the stage" >&2; exit 1; fi
+if find "$OUT/stage" -name '._*' | grep . >/dev/null; then echo "AppleDouble files in the stage" >&2; exit 1; fi
 if [ $HAS_AAX -eq 1 ]; then
   if [ ! -f "$OUT/pkgs/BlueChannel-aax.pkg" ]; then echo "AAX package missing" >&2; exit 1; fi
-  if ! unzip -l "$ZIP" | grep -qi '\.aaxplugin'; then echo "AAX missing from zip" >&2; exit 1; fi
+  if ! unzip -l "$ZIP" | grep -i '\.aaxplugin' >/dev/null; then echo "AAX missing from zip" >&2; exit 1; fi
 fi
 
 # Checksums last: stapling changes bytes.
