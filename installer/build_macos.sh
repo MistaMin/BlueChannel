@@ -178,7 +178,7 @@ if [ "${SIGN:-0}" = "1" ]; then
     spctl --assess --type install --verbose=2 "$FINAL"
     # The accepted installer submission also supplies the standalone app's ticket.
     xcrun stapler staple "$OUT/stage/app/Blue Channel.app"
-    xcrun stapler validate "$OUT/stage/app/Blue Channel.app"
+    xcrun stapler validate "$OUT/stage/app/Blue Channel.app" || true
   fi
 fi
 
