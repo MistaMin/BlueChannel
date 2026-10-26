@@ -1,9 +1,10 @@
 #!/bin/bash
 # SPDX-License-Identifier: MIT
-# Build, test and package Blue Channel for macOS (universal arm64 + x86_64).
+# Build, test and package Blue Channel for macOS (universal arm64 + x86_64) as a bundle archive for
+# the OpenGrid Plugin Manager. No PKG, DMG or standalone app is made.
 #
-#   installer/build_macos.sh                        unsigned package and zip (local testing)
-#   SIGN=1 installer/build_macos.sh                 sign bundles and package, notarize and staple
+#   installer/build_macos.sh                        unsigned archive (local testing)
+#   SIGN=1 installer/build_macos.sh                 sign bundles, notarize the archive
 #   SIGN=1 NOTARIZE=0 installer/build_macos.sh      sign locally, do not submit for notarization
 #
 # Identities default to the OpenGrid Developer ID used for earlier releases; override with
@@ -19,8 +20,10 @@ BUILD=${BUILD:-build/release-macos}
 OUT=${OUT:-dist/release-$VERSION/macos}
 ART="$BUILD/BlueChannel_artefacts/Release"
 APP_ID=${BLUE_APP_ID:-"Developer ID Application: Marcos Deida (ZQYU67JUBH)"}
-INST_ID=${BLUE_INSTALLER_ID:-"Developer ID Installer: Marcos Deida (ZQYU67JUBH)"}
 NOTARY_PROFILE=${BLUE_NOTARY_PROFILE:-AC_NOTARY}
+AAX_WCGUID=${BLUE_AAX_WCGUID:-"8692A2A0-CF31-11F1-898A-00505692C25A"}
+PACE_WRAPTOOL=${BLUE_WRAPTOOL:-/Applications/PACEAntiPiracy/Eden/Fusion/Current/bin/wraptool}
+PACE_ACCOUNT=${BLUE_PACE_ACCOUNT:-mistamin}
 AAX_SDK=${BLUE_AAX_SDK:-"$PWD/../aax-sdk-2-8-1"}
 
 args=(-G Ninja -DCMAKE_BUILD_TYPE=Release -DBLUECHANNEL_UNIVERSAL=ON -DBLUECHANNEL_DEV_EDITOR=OFF)
@@ -50,157 +53,41 @@ python3 tools/release_manifest.py "$BUILD"
 case "$OUT" in dist/*|"$PWD"/dist/*) ;; *) echo "OUT must be inside this repository's dist folder" >&2; exit 1;; esac
 
 rm -rf "$OUT"
-mkdir -p "$OUT/stage" "$OUT/pkgs"
-RES="$OUT/stage/resources/Blue Channel"
-mkdir -p "$RES/Manual"
+RES="$OUT/resources"
+mkdir -p "$RES/Licenses" "$RES/Manual/images"
 python3 tools/collect_licenses.py "$BUILD" "$RES/Licenses/third-party" mac
-cp LICENSE BINARY_LICENSE.txt THIRD_PARTY_LICENSES.md NGSPICE_SOURCE_NOTICE.txt "$RES/"
 cp LICENSE BINARY_LICENSE.txt THIRD_PARTY_LICENSES.md NGSPICE_SOURCE_NOTICE.txt "$RES/Licenses/"
 cp docs/USER_MANUAL.md docs/HQ_MODE.md docs/PARAMETERS.md docs/RELEASE_1.0.0.md "$RES/Manual/"
-mkdir -p "$RES/Manual/images"
 cp docs/images/*.png "$RES/Manual/images/"
 cp "$BUILD/release-manifest.json" "$RES/Manual/"
 
-declare -a BUNDLES=(
-  "VST3/Blue Channel.vst3|/Library/Audio/Plug-Ins/VST3|vst3"
-  "AU/Blue Channel.component|/Library/Audio/Plug-Ins/Components|au"
-  "CLAP/Blue Channel.clap|/Library/Audio/Plug-Ins/CLAP|clap"
-  "LV2/Blue Channel.lv2|/Library/Audio/Plug-Ins/LV2|lv2"
-  "Standalone/Blue Channel.app|/Applications|app"
-)
-if [ -d "$ART/AAX/Blue Channel.aaxplugin" ]; then
-  BUNDLES+=("AAX/Blue Channel.aaxplugin|/Library/Application Support/Avid/Audio/Plug-Ins|aax")
-fi
-for entry in "${BUNDLES[@]}"; do
-  IFS='|' read -r rel dest id <<<"$entry"
-  name=$(basename "$rel")
-  mkdir -p "$OUT/stage/$id"
-  # ditto without extended attributes or resource forks: keeps AppleDouble entries out of the payload.
-  ditto --norsrc --noextattr --noacl "$ART/$rel" "$OUT/stage/$id/$name"
-  xattr -cr "$OUT/stage/$id/$name" 2>/dev/null || true
-  find "$OUT/stage/$id" -name '._*' -delete
-  if [ "$id" = "lv2" ]; then
-    LICENSE_DEST="$OUT/stage/$id/$name/Licenses"
-  else
-    LICENSE_DEST="$OUT/stage/$id/$name/Contents/Resources/Licenses"
-  fi
-  ditto "$RES/Licenses" "$LICENSE_DEST"
-  lipo -info "$(find "$OUT/stage/$id/$name" -type f -perm -111 \( -path '*/MacOS/*' -o -name '*.so' \) | head -n 1)"
-  if [ "${SIGN:-0}" = "1" ]; then
-    if [ "$id" = "lv2" ]; then
-      find "$OUT/stage/$id/$name" -type f \( -name '*.dylib' -o -name '*.so' \) -print0 | while IFS= read -r -d '' f; do
-        codesign --force --timestamp --options runtime --sign "$APP_ID" "$f"
-        codesign --verify --strict --verbose=2 "$f"
-      done
-    else
-      find "$OUT/stage/$id/$name/Contents" -type f -name '*.dylib' -print0 | while IFS= read -r -d '' f; do
-        codesign --force --timestamp --options runtime --sign "$APP_ID" "$f"
-      done
-      if [ "$id" = "app" ]; then
-        codesign --force --deep --timestamp --options runtime --entitlements "$BUILD/BlueChannel_artefacts/JuceLibraryCode/BlueChannel_Standalone.entitlements" --sign "$APP_ID" "$OUT/stage/$id/$name"
-      else
-        codesign --force --deep --timestamp --options runtime --sign "$APP_ID" "$OUT/stage/$id/$name"
-      fi
-      codesign --verify --deep --strict --verbose=2 "$OUT/stage/$id/$name"
-    fi
-    if [ "$id" = "aax" ]; then
-      PACE_WRAPTOOL=${BLUE_WRAPTOOL:-/Applications/PACEAntiPiracy/Eden/Fusion/Current/bin/wraptool}
-      PACE_ACCOUNT=${BLUE_PACE_ACCOUNT:-"mistamin"}
-      AAX_WCGUID=${BLUE_AAX_WCGUID:-"8692A2A0-CF31-11F1-898A-00505692C25A"}
-      if [ -z "$AAX_WCGUID" ] || [ -z "$PACE_ACCOUNT" ]; then
-        echo "Error: BLUE_AAX_WCGUID and BLUE_PACE_ACCOUNT must be set in the environment when signing AAX." >&2
-        exit 1
-      fi
-      "$PACE_WRAPTOOL" sign --verbose --account "$PACE_ACCOUNT" \
-        --wcguid "$AAX_WCGUID" --signid "$APP_ID" \
-        --in "$OUT/stage/$id/$name" --out "$OUT/stage/$id/$name" --autoinstall on
-      "$PACE_WRAPTOOL" verify --verbose --in "$OUT/stage/$id/$name"
-    fi
-  fi
-  pkgbuild --root "$OUT/stage/$id" --install-location "$dest" --identifier "com.opengrid.bluechannel.$id" \
-           --version "$VERSION" "$OUT/pkgs/BlueChannel-$id.pkg" >/dev/null
-done
-pkgbuild --root "$OUT/stage/resources" --install-location "/Library/Application Support" \
-         --identifier "com.opengrid.bluechannel.resources" --version "$VERSION" "$OUT/pkgs/BlueChannel-resources.pkg" >/dev/null
-
-mkdir -p "$OUT/installer-resources"
-python3 - "$OUT/installer-resources/license.html" <<'PYHTML'
-import html,sys
-from pathlib import Path
-body='<h1>Blue Channel — licence terms</h1><p>Project source: MIT. Official binaries: freeware, built under the publisher’s commercial JUCE licence. JUCE 9 alternatively offers AGPLv3 terms for independent builders. Component licence rights remain intact.</p>'
-for name,title in [('BINARY_LICENSE.txt','Official binary freeware licence'),('LICENSE','Project source licence')]:
-    body+='<h2>'+title+'</h2><pre>'+html.escape(Path(name).read_text())+'</pre>'
-Path(sys.argv[1]).write_text('<!doctype html><html><meta charset="utf-8"><style>body{font:13px -apple-system,sans-serif;color:#202737;padding:16px}pre{font:12px -apple-system,sans-serif;white-space:pre-wrap}</style>'+body+'</html>')
-PYHTML
-
-HAS_AAX=0
-[ -f "$OUT/pkgs/BlueChannel-aax.pkg" ] && HAS_AAX=1
-
-cat > "$OUT/distribution.xml" <<XML
-<?xml version="1.0" encoding="utf-8"?>
-<installer-gui-script minSpecVersion="1">
-  <title>Blue Channel $VERSION</title>
-  <license file="license.html" mime-type="text/html"/>
-  <options customize="always" require-scripts="false" hostArchitectures="arm64,x86_64"/>
-  <choices-outline>
-    <line choice="vst3"/><line choice="au"/><line choice="clap"/><line choice="lv2"/>$([ $HAS_AAX -eq 1 ] && echo '
-    <line choice="aax"/>')
-    <line choice="app"/><line choice="resources"/>
-  </choices-outline>
-  <choice id="vst3" title="VST3"><pkg-ref id="com.opengrid.bluechannel.vst3"/></choice>
-  <choice id="au" title="Audio Unit"><pkg-ref id="com.opengrid.bluechannel.au"/></choice>
-  <choice id="clap" title="CLAP"><pkg-ref id="com.opengrid.bluechannel.clap"/></choice>
-  <choice id="lv2" title="LV2"><pkg-ref id="com.opengrid.bluechannel.lv2"/></choice>$([ $HAS_AAX -eq 1 ] && echo '
-  <choice id="aax" title="AAX"><pkg-ref id="com.opengrid.bluechannel.aax"/></choice>')
-  <choice id="app" title="Standalone application"><pkg-ref id="com.opengrid.bluechannel.app"/></choice>
-  <choice id="resources" title="User guide and license texts" selected="true" visible="false"><pkg-ref id="com.opengrid.bluechannel.resources"/></choice>
-  <pkg-ref id="com.opengrid.bluechannel.vst3">BlueChannel-vst3.pkg</pkg-ref>
-  <pkg-ref id="com.opengrid.bluechannel.au">BlueChannel-au.pkg</pkg-ref>
-  <pkg-ref id="com.opengrid.bluechannel.clap">BlueChannel-clap.pkg</pkg-ref>
-  <pkg-ref id="com.opengrid.bluechannel.lv2">BlueChannel-lv2.pkg</pkg-ref>$([ $HAS_AAX -eq 1 ] && echo '
-  <pkg-ref id="com.opengrid.bluechannel.aax">BlueChannel-aax.pkg</pkg-ref>')
-  <pkg-ref id="com.opengrid.bluechannel.app">BlueChannel-app.pkg</pkg-ref>
-  <pkg-ref id="com.opengrid.bluechannel.resources">BlueChannel-resources.pkg</pkg-ref>
-</installer-gui-script>
-XML
-PKG="$OUT/BlueChannel-$VERSION-macos-unsigned.pkg"
-productbuild --distribution "$OUT/distribution.xml" --package-path "$OUT/pkgs" --resources "$OUT/installer-resources" "$PKG" >/dev/null
-FINAL="$PKG"
 if [ "${SIGN:-0}" = "1" ]; then
-  FINAL="$OUT/BlueChannel-$VERSION-macos.pkg"
-  productsign --sign "$INST_ID" --timestamp "$PKG" "$FINAL"
-  pkgutil --check-signature "$FINAL"
-  rm -f "$PKG"
-  if [ "${NOTARIZE:-1}" = "1" ]; then
-    xcrun notarytool submit "$FINAL" --keychain-profile "$NOTARY_PROFILE" --wait
-    xcrun stapler staple "$FINAL"
-    xcrun stapler validate "$FINAL"
-    spctl --assess --type install --verbose=2 "$FINAL"
-    # The accepted installer submission also supplies the standalone app's ticket.
-    xcrun stapler staple "$OUT/stage/app/Blue Channel.app"
-    xcrun stapler validate "$OUT/stage/app/Blue Channel.app" || true
+  # Nested libraries first, then each bundle. AAX is PACE-signed after the Developer ID signature.
+  for b in "$ART/VST3/Blue Channel.vst3" "$ART/AU/Blue Channel.component" "$ART/CLAP/Blue Channel.clap"; do
+    find "$b/Contents" -type f -name '*.dylib' -print0 | while IFS= read -r -d '' f; do
+      codesign --force --timestamp --options runtime --sign "$APP_ID" "$f"
+    done
+    codesign --force --deep --timestamp --options runtime --sign "$APP_ID" "$b"
+    codesign --verify --deep --strict --verbose=2 "$b"
+  done
+  find "$ART/LV2/Blue Channel.lv2" -type f \( -name '*.dylib' -o -name '*.so' \) -print0 | while IFS= read -r -d '' f; do
+    codesign --force --timestamp --options runtime --sign "$APP_ID" "$f"
+    codesign --verify --strict --verbose=2 "$f"
+  done
+  if [ -d "$ART/AAX/Blue Channel.aaxplugin" ]; then
+    codesign --force --deep --timestamp --options runtime --sign "$APP_ID" "$ART/AAX/Blue Channel.aaxplugin"
+    [ -n "$AAX_WCGUID" ] && [ -n "$PACE_ACCOUNT" ] || { echo "BLUE_AAX_WCGUID and BLUE_PACE_ACCOUNT must be set for AAX" >&2; exit 1; }
+    "$PACE_WRAPTOOL" sign --verbose --account "$PACE_ACCOUNT" --wcguid "$AAX_WCGUID" --signid "$APP_ID" \
+      --in "$ART/AAX/Blue Channel.aaxplugin" --out "$ART/AAX/Blue Channel.aaxplugin" --autoinstall on
+    "$PACE_WRAPTOOL" verify --verbose --in "$ART/AAX/Blue Channel.aaxplugin"
   fi
 fi
 
-# Portable zip of the bundles (for users who install by hand).
-ZIP="$OUT/BlueChannel-$VERSION-macos-bundles.zip"
-ZIP_BUNDLES=(vst3 au clap lv2 app resources)
-[ $HAS_AAX -eq 1 ] && ZIP_BUNDLES+=(aax)
-(cd "$OUT/stage" && zip -qry "../$(basename "$ZIP")" "${ZIP_BUNDLES[@]}")
-
-# Distribution checks: real AppleDouble files and expected AAX presence.
-if find "$OUT/stage" -name '._*' | grep . >/dev/null; then echo "AppleDouble files in the stage" >&2; exit 1; fi
-if [ $HAS_AAX -eq 1 ]; then
-  if [ ! -f "$OUT/pkgs/BlueChannel-aax.pkg" ]; then echo "AAX package missing" >&2; exit 1; fi
-  if ! unzip -l "$ZIP" | grep -i '\.aaxplugin' >/dev/null; then echo "AAX missing from zip" >&2; exit 1; fi
+MIN_OS=11.0 RESOURCES_DIR="$RES" tools/make_bundle_zip.sh "Blue Channel" "$VERSION" "$ART" "$OUT"
+ZIP="$OUT/Blue-Channel-$VERSION-macos-bundles.zip"
+if [ "${SIGN:-0}" = "1" ] && [ "${NOTARIZE:-1}" = "1" ]; then
+  xcrun notarytool submit "$ZIP" --keychain-profile "$NOTARY_PROFILE" --wait
 fi
-
-# Checksums last: stapling changes bytes.
-(cd "$OUT" && shasum -a 256 "$(basename "$FINAL")" "$(basename "$ZIP")" > "BlueChannel-$VERSION-macos.sha256")
-cat "$OUT/BlueChannel-$VERSION-macos.sha256"
-echo "done: $FINAL"
-
-if [ "${SIGN:-0}" = "1" ]; then
-  echo "==> Building and notarizing DMG"
-  tools/build_dmg.sh
-fi
+(cd "$OUT" && shasum -a 256 "$(basename "$ZIP")" > "Blue-Channel-$VERSION-macos.sha256")
+cat "$OUT/Blue-Channel-$VERSION-macos.sha256"
+echo "done: $ZIP"

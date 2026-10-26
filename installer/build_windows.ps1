@@ -1,8 +1,9 @@
 # SPDX-License-Identifier: MIT
-# Build, test and package Blue Channel for Windows x64: VST3, CLAP, LV2 and Standalone.
+# Build, test and package Blue Channel for Windows x64 as a bundle archive for the OpenGrid Plugin
+# Manager: VST3, CLAP and LV2 under Common Files, and the licences and manuals under OpenGrid.
 #   powershell -ExecutionPolicy Bypass -File installer\build_windows.ps1
-# Requires Visual Studio 2022 (C++), CMake 3.22+, Python 3 and Git. Inno Setup 6 (ISCC.exe on PATH) is
-# optional: without it only the zip is produced. AAX is disabled and never packaged.
+# Requires Visual Studio 2022 (C++), CMake 3.22+, Python 3 and Git. AAX is disabled and never packaged.
+# No installer or Standalone executable is made any more.
 # Optional environment: JUCE_SOURCE, CLAP_EXT_SOURCE (local checkouts), SIGN_CERT_THUMBPRINT (Authenticode).
 $ErrorActionPreference = 'Stop'
 Set-Location (Split-Path $PSScriptRoot -Parent)
@@ -80,13 +81,11 @@ foreach ($required in @("$Art\VST3\Blue Channel.vst3", "$Art\CLAP\Blue Channel.c
 }
 
 if (Test-Path $Out) { Remove-Item -Recurse -Force $Out }
-$Name = "BlueChannel-$Version-windows-x64"
-$Stage = "$Out\$Name"
-New-Item -ItemType Directory -Force -Path $Stage | Out-Null
-Copy-Item -Recurse "$Art\VST3\Blue Channel.vst3", "$Art\CLAP\Blue Channel.clap", "$Art\LV2\Blue Channel.lv2" $Stage
-Copy-Item "$Art\Standalone\Blue Channel.exe" $Stage
+$Name = "Blue-Channel-$Version-windows-x64"
+$Res = "$Out\resources"
+New-Item -ItemType Directory -Force -Path $Res | Out-Null
 
-$LicenseRoot = "$Stage\Licenses\third-party"
+$LicenseRoot = "$Res\Licenses\third-party"
 foreach ($d in @("$LicenseRoot\Blue Channel", "$LicenseRoot\GoodLookinUI", "$LicenseRoot\JUCE", "$LicenseRoot\CLAP", "$LicenseRoot\VST3-SDK", "$LicenseRoot\LV2-SDK")) {
     New-Item -ItemType Directory -Force -Path $d | Out-Null
 }
@@ -132,21 +131,21 @@ Get-ChildItem -Recurse -File $LicenseRoot |
     ForEach-Object { $_.FullName.Substring((Resolve-Path $LicenseRoot).Path.Length + 1).Replace('\', '/') } |
     Sort-Object | Set-Content "$LicenseRoot\INDEX.txt"
 
-Copy-Item LICENSE, BINARY_LICENSE.txt, THIRD_PARTY_LICENSES.md, NGSPICE_SOURCE_NOTICE.txt, docs\USER_MANUAL.md, docs\HQ_MODE.md, docs\PARAMETERS.md, docs\RELEASE_1.0.0.md, "$Build\release-manifest.json" $Stage
-
-Copy-Item -Recurse docs\images "$Stage\images"
+New-Item -ItemType Directory -Force -Path "$Res\Manual\images" | Out-Null
+Copy-Item LICENSE, BINARY_LICENSE.txt, THIRD_PARTY_LICENSES.md, NGSPICE_SOURCE_NOTICE.txt "$Res\Licenses\"
+Copy-Item docs\USER_MANUAL.md, docs\HQ_MODE.md, docs\PARAMETERS.md, docs\RELEASE_1.0.0.md, "$Build\release-manifest.json" "$Res\Manual\"
+Copy-Item -Recurse docs\images\* "$Res\Manual\images\"
 
 if ($env:SIGN_CERT_THUMBPRINT) {
-    Get-ChildItem -Recurse $Stage -Include *.vst3, *.clap, *.dll, *.exe | Where-Object { -not $_.PSIsContainer } | ForEach-Object {
+    Get-ChildItem -Recurse "$Art\VST3\Blue Channel.vst3", "$Art\CLAP\Blue Channel.clap", "$Art\LV2\Blue Channel.lv2" -Include *.vst3, *.clap, *.dll |
+        Where-Object { -not $_.PSIsContainer } | ForEach-Object {
         signtool sign /sha1 $env:SIGN_CERT_THUMBPRINT /fd sha256 /tr http://timestamp.digicert.com /td sha256 $_.FullName
     }
 }
-if (Get-ChildItem -Recurse $Stage -Filter *.aaxplugin) { throw "AAX found in package" }
+if (Test-Path "$Art\AAX") { throw "AAX found in the Windows archive" }
 
-Compress-Archive -Path $Stage -DestinationPath "$Out\$Name.zip" -Force
-if (Get-Command ISCC.exe -ErrorAction SilentlyContinue) {
-    ISCC.exe /DMyAppVersion=$Version /DStageDir="$((Resolve-Path $Stage).Path)" installer\BlueChannel.iss
-}
+& "tools\make_bundle_zip.ps1" -Plugin "Blue Channel" -Version $Version -Artefacts $Art -Out $Out -ResourcesDir $Res -MinOs "10.0"
+Remove-Item -Recurse -Force $Res
 Get-ChildItem $Out -File | ForEach-Object { "{0}  {1}" -f (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLower(), $_.Name } |
     Set-Content "$Out\$Name.sha256"
 Get-Content "$Out\$Name.sha256"
