@@ -1,0 +1,8 @@
+# Exceptions for the REAPER suite and GUI coverage (see plugin-qa / plugin-daw-test skills).
+
+# Line Gain acts only while the input source is Line. It is wired to the line-input stage
+# (Source/Circuit/HQAudioCircuit.h routes v(linegain) only while source is in [0.5, 1.5), and
+# Source/Model/Controls.h maps Source { Mic=0, Line=1, Instrument=2 }). The random-state retry never
+# lands the source on Line, so it reads DEAD; test it with the source held on Line instead.
+# Host normalized values: Mic=0.0, Line=0.5, Inst=1.0.
+Line Gain @ Input=0.5
