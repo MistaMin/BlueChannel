@@ -6,3 +6,8 @@
 # lands the source on Line, so it reads DEAD; test it with the source held on Line instead.
 # Host normalized values: Mic=0.0, Line=0.5, Inst=1.0.
 Line Gain @ Input=0.5
+
+# Program is a factory-preset selector (a JUCE "program", not a sound parameter). REAPER does not
+# persist the selected preset across save/reopen, so it resets to "Init" while the sound parameters
+# themselves ARE saved. Excused from the state round-trip check for that reason.
+state:Program
