@@ -55,6 +55,8 @@ if (Test-Path (Join-Path $stage "OpenGrid")) { $roots += Join-Path $stage "OpenG
 Compress-Archive -Path $roots -DestinationPath $zip
 Remove-Item -Recurse -Force $stage
 
-@{ os = "windows"; arch = "x64"; min_os = $MinOs; installs = $installs } |
-    ConvertTo-Json -Depth 4 | Set-Content -Encoding UTF8 "$zip.installs.json"
+$json = @{ os = "windows"; arch = "x64"; min_os = $MinOs; installs = $installs } |
+    ConvertTo-Json -Depth 4
+# UTF-8 without a BOM, so the manifest writer (and PowerShell 5.1) reads the sidecar cleanly.
+[System.IO.File]::WriteAllText("$zip.installs.json", $json, (New-Object System.Text.UTF8Encoding($false)))
 Write-Host "wrote $zip"
