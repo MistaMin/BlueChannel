@@ -172,4 +172,4 @@ live input; DAW plug-ins use the host's audio devices and permissions.
 
 - **Supported formats:** VST3, Audio Unit (macOS), CLAP, LV2, AAX (macOS), and Standalone.
 - **Licensing:** Blue Channel source code is MIT licensed. All official plugin binaries, including the macOS AAX plugin, are distributed as **freeware** under the publisher's commercial JUCE licence, free of charge for personal or commercial audio production.
-- **Third-party attribution:** The AAX plugin is digitally signed with PACE Eden for Pro Tools compatibility. Official installers and disk image packages include all applicable third-party license notices in the `Licenses` directory. See [BINARY_LICENSE.txt](../BINARY_LICENSE.txt) and [THIRD_PARTY_LICENSES.md](../THIRD_PARTY_LICENSES.md).
+- **Third-party attribution:** The AAX plugin is digitally signed with PACE Eden for Pro Tools compatibility. The official plugin-manager bundle archives include all applicable third-party license notices in the `Licenses` directory. See [BINARY_LICENSE.txt](../BINARY_LICENSE.txt) and [THIRD_PARTY_LICENSES.md](../THIRD_PARTY_LICENSES.md).
