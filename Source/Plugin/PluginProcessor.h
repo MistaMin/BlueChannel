@@ -79,6 +79,13 @@ private:
     int currentProgram = 0;
     double sampleRate_ = 48000.0;
     int maxBlock_ = 512;
+    std::atomic<bool> prepared{false};
+    std::atomic<bool> preparePending{false};
+    double pendingSampleRate = 48000.0;
+    int pendingBlockSize = 512;
+
+    // Runs the whole prepare on the audio thread (see prepareToPlay).
+    void applyPendingPrepare();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BlueChannelProcessor)
 };

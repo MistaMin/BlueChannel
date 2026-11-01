@@ -73,8 +73,11 @@ bool BlueChannelProcessor::isBusesLayoutSupported(const BusesLayout& layouts) co
     return true;
 }
 
-void BlueChannelProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
+void BlueChannelProcessor::applyPendingPrepare()
 {
+    const double sampleRate = pendingSampleRate;
+    const int samplesPerBlock = pendingBlockSize;
+
     sampleRate_ = sampleRate;
     spectrumRate.store(sampleRate, std::memory_order_relaxed);
     for (auto& sample : spectrum) sample.store(0.0f, std::memory_order_relaxed);
@@ -89,6 +92,16 @@ void BlueChannelProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
     for (auto& b : hqKey) b.assign(size_t(maxBlock_), 0);
     previousHQ = previousOffline = false;
     setLatencySamples(engine.latencySamples());
+}
+
+void BlueChannelProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
+{
+    pendingSampleRate = sampleRate;
+    pendingBlockSize = samplesPerBlock;
+    if (prepared.exchange(true))
+        preparePending.store(true, std::memory_order_release); // defer: the callback may be running
+    else
+        applyPendingPrepare(); // first activation: no callback is running yet
 }
 
 void BlueChannelProcessor::reset() { engine.reset(); hqRenderer.restart(); }
@@ -109,6 +122,8 @@ juce::String BlueChannelProcessor::hqStatusText() const
 template <typename Sample>
 void BlueChannelProcessor::process(juce::AudioBuffer<Sample>& buffer)
 {
+    if (preparePending.exchange(false, std::memory_order_acquire))
+        applyPendingPrepare();
     juce::ScopedNoDenormals noDenormals;
     const int n = buffer.getNumSamples();
     auto main = getBusBuffer(buffer, true, 0);
