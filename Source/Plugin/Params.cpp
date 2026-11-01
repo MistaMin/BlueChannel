@@ -138,7 +138,9 @@ juce::AudioProcessorValueTreeState::ParameterLayout createLayout()
                               Attr().withStringFromValueFunction([](float v, int) { return juce::String(v, 1) + ":1"; })));
     add(std::make_unique<APF>(pid(id::threshold), "Comp Threshold", juce::NormalisableRange<float>(-28.0f, 12.0f, 0.01f), 0.0f, dbAttr()));
     add(std::make_unique<APF>(pid(id::attack), "Attack", logRange(0.1, 100.0), 10.0f,
-                              Attr().withLabel("ms").withStringFromValueFunction([](float v, int) { return juce::String(v, v < 1 ? 2 : 1) + " ms"; })));
+                              Attr().withLabel("ms").withStringFromValueFunction([](float v, int) {
+                                  return juce::String(v, v < 1.0 ? 2 : (v < 100.0 ? 1 : 0)) + " ms";
+                              })));
     add(std::make_unique<APF>(pid(id::release), "Release", logRange(0.1, 7.0), 0.3f,
                               Attr().withLabel("s").withStringFromValueFunction([](float v, int) { return juce::String(v, 2) + " s"; })));
     add(std::make_unique<APB>(pid(id::autoRelease), "Auto Release", false));
