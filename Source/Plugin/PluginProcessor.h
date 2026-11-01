@@ -81,6 +81,7 @@ private:
     int maxBlock_ = 512;
     std::atomic<bool> prepared{false};
     std::atomic<bool> preparePending{false};
+    std::atomic<int> announcedLatency{-1};
     double pendingSampleRate = 48000.0;
     int pendingBlockSize = 512;
 

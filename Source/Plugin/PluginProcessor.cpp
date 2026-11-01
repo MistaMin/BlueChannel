@@ -91,7 +91,10 @@ void BlueChannelProcessor::applyPendingPrepare()
     for (auto& b : hqAudio) b.assign(size_t(maxBlock_), 0);
     for (auto& b : hqKey) b.assign(size_t(maxBlock_), 0);
     previousHQ = previousOffline = false;
-    setLatencySamples(engine.latencySamples());
+    // Runs on the audio thread when deferred (re-activation): host calls are only made when the
+    // latency actually changed, so a plain re-activation with unchanged settings is silent here.
+    if (engine.latencySamples() != announcedLatency.exchange(engine.latencySamples()))
+        setLatencySamples(engine.latencySamples());
 }
 
 void BlueChannelProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
