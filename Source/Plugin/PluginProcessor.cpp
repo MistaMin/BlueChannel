@@ -231,6 +231,10 @@ void BlueChannelProcessor::setStateInformation(const void* data, int size)
             }
         }
     apvts.replaceState(incoming);
+    // Loading a state changes parameter values, so tell the host to re-read them (as a preset load
+    // does; the CLAP wrapper sends paramsRescan(VALUES) on programChanged, which the
+    // state-reproducibility tests require).
+    updateHostDisplay(juce::AudioProcessor::ChangeDetails().withProgramChanged(true));
 }
 
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter() { return new BlueChannelProcessor(); }

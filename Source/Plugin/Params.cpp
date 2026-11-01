@@ -77,7 +77,19 @@ juce::AudioProcessorValueTreeState::ParameterLayout createLayout()
     auto dbAttr = [](int decimals = 1) {
         return Attr().withLabel("dB").withStringFromValueFunction([decimals](float v, int) { return dbText(v, decimals); });
     };
-    auto hzAttr = Attr().withLabel("Hz").withStringFromValueFunction([](float v, int) { return hzText(v); });
+    // Frequency attributes parse their own display ("1.00 kHz" or "209 Hz") back to the same value
+    // (clap-validator param-conversions: value -> text -> value -> text must be consistent).
+    auto hzAttrFor = [](double lo, double hi) {
+        // The valueFromString function returns the DENORMALISED value in Hz:
+        // getValueForText applies convertTo0to1 over the log range.
+        return Attr().withLabel("Hz")
+            .withStringFromValueFunction([](float v, int) { return hzText(v); })
+            .withValueFromStringFunction([lo, hi](const juce::String& s) {
+                double v = s.trim().getDoubleValue();
+                if (s.trim().endsWithIgnoreCase("kHz")) v *= 1000.0;
+                return float(juce::jlimit(lo, hi, v));
+            });
+    };
     auto add = [&](auto p) { layout.add(std::move(p)); };
     const juce::StringArray routes { "Out", "In", "Comp key", "Gate key" };
 
@@ -97,8 +109,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout createLayout()
     // Equaliser
     add(std::make_unique<APB>(pid(id::allEq), "All EQ", true));
     add(std::make_unique<APC>(pid(id::filterRoute), "Filters", routes, 0));
-    add(std::make_unique<APF>(pid(id::hpf), "High Pass", logRange(cm::highPassMinHz(), cm::highPassMaxHz()), float(cm::highPassMinHz()), hzAttr));
-    add(std::make_unique<APF>(pid(id::lpf), "Low Pass", logRange(cm::lowPassMinHz(), cm::lowPassMaxHz()), float(cm::lowPassMaxHz()), hzAttr));
+    add(std::make_unique<APF>(pid(id::hpf), "High Pass", logRange(cm::highPassMinHz(), cm::highPassMaxHz()), float(cm::highPassMinHz()), hzAttrFor(cm::highPassMinHz(), cm::highPassMaxHz())));
+    add(std::make_unique<APF>(pid(id::lpf), "Low Pass", logRange(cm::lowPassMinHz(), cm::lowPassMaxHz()), float(cm::lowPassMaxHz()), hzAttrFor(cm::lowPassMinHz(), cm::lowPassMaxHz())));
     add(std::make_unique<APC>(pid(id::shelfRoute), "Shelving EQ", routes, 0));
     add(std::make_unique<APF>(pid(id::lfGain), "LF Gain", juce::NormalisableRange<float>(-17.5f, 17.5f, 0.01f), 0.0f, dbAttr()));
     add(std::make_unique<APC>(pid(id::lfFreq), "LF Frequency", juce::StringArray { "20/33 Hz", "56/95 Hz", "160/270 Hz", "460/655 Hz" }, 1));
@@ -109,12 +121,12 @@ juce::AudioProcessorValueTreeState::ParameterLayout createLayout()
     add(std::make_unique<APC>(pid(id::paramRoute), "Parametric EQ", routes, 0));
     const float pg = float(std::floor(10.0 * std::min(kLmfGainDb[0], -kLmfGainDb[kPotSteps - 1])) / 10.0);
     add(std::make_unique<APF>(pid(id::lmfGain), "LMF Gain", juce::NormalisableRange<float>(-pg, pg, 0.01f), 0.0f, dbAttr()));
-    add(std::make_unique<APF>(pid(id::lmfFreq), "LMF Frequency", logRange(cm::minOf(kLmfFreqHz), cm::maxOf(kLmfFreqHz)), 120.0f, hzAttr));
+    add(std::make_unique<APF>(pid(id::lmfFreq), "LMF Frequency", logRange(cm::minOf(kLmfFreqHz), cm::maxOf(kLmfFreqHz)), 120.0f, hzAttrFor(cm::minOf(kLmfFreqHz), cm::maxOf(kLmfFreqHz))));
     add(std::make_unique<APF>(pid(id::lmfQ), "LMF Q", logRange(cm::minOf(kLmfQ), cm::maxOf(kLmfQ)), 1.2f,
                               Attr().withStringFromValueFunction([](float v, int) { return juce::String(v, 2); })));
     add(std::make_unique<APB>(pid(id::lmfX3), "LMF x3", false));
     add(std::make_unique<APF>(pid(id::hmfGain), "HMF Gain", juce::NormalisableRange<float>(-pg, pg, 0.01f), 0.0f, dbAttr()));
-    add(std::make_unique<APF>(pid(id::hmfFreq), "HMF Frequency", logRange(cm::minOf(kHmfFreqHz), cm::maxOf(kHmfFreqHz)), 1800.0f, hzAttr));
+    add(std::make_unique<APF>(pid(id::hmfFreq), "HMF Frequency", logRange(cm::minOf(kHmfFreqHz), cm::maxOf(kHmfFreqHz)), 1800.0f, hzAttrFor(cm::minOf(kHmfFreqHz), cm::maxOf(kHmfFreqHz))));
     add(std::make_unique<APF>(pid(id::hmfQ), "HMF Q", logRange(cm::minOf(kHmfQ), cm::maxOf(kHmfQ)), 1.2f,
                               Attr().withStringFromValueFunction([](float v, int) { return juce::String(v, 2); })));
     add(std::make_unique<APB>(pid(id::hmfX3), "HMF x3", false));
@@ -134,7 +146,10 @@ juce::AudioProcessorValueTreeState::ParameterLayout createLayout()
     add(std::make_unique<APB>(pid(id::compKey), "Comp Ext Key", false));
     add(std::make_unique<APB>(pid(id::blend), "Blend", false));
     add(std::make_unique<APF>(pid(id::mix), "Mix", juce::NormalisableRange<float>(0.0f, 100.0f, 0.1f), 100.0f,
-                              Attr().withLabel("%").withStringFromValueFunction([](float v, int) { return juce::String(juce::roundToInt(v)) + " %"; })));
+                              Attr().withLabel("%").withStringFromValueFunction([](float v, int) { return juce::String(juce::roundToInt(v)) + " %"; })
+                                   .withValueFromStringFunction([](const juce::String& s) {
+                                       return juce::jlimit(0.0f, 100.0f, s.trim().getFloatValue());
+                                   })));
     add(std::make_unique<APB>(pid(id::compListen), "Comp Listen", false));
 
     // Gate
@@ -143,7 +158,14 @@ juce::AudioProcessorValueTreeState::ParameterLayout createLayout()
     add(std::make_unique<APF>(pid(id::gateThreshold), "Gate Threshold", juce::NormalisableRange<float>(-40.0f, 10.0f, 0.01f), -40.0f, dbAttr()));
     add(std::make_unique<APF>(pid(id::range), "Range", juce::NormalisableRange<float>(0.0f, 80.0f, 0.1f), 20.0f, dbAttr(0)));
     add(std::make_unique<APF>(pid(id::hold), "Hold", logRange(0.02, 4.0), 0.1f,
-                              Attr().withLabel("s").withStringFromValueFunction([](float v, int) { return v < 1 ? juce::String(juce::roundToInt(v * 1000)) + " ms" : juce::String(v, 2) + " s"; })));
+                              Attr().withLabel("s").withStringFromValueFunction([](float v, int) { return v < 1 ? juce::String(juce::roundToInt(v * 1000)) + " ms" : juce::String(v, 2) + " s"; })
+                                   .withValueFromStringFunction([](const juce::String& s) {
+                                       const juce::String t = s.trim();
+                                       const double v = t.endsWithIgnoreCase("ms")
+                                           ? t.upToLastOccurrenceOf("ms", false, false).getDoubleValue() * 1e-3
+                                           : t.getDoubleValue();
+                                       return float(juce::jlimit(0.02, 4.0, v));
+                                   })));
     add(std::make_unique<APF>(pid(id::gateRelease), "Gate Release", logRange(0.1, 5.0), 0.5f,
                               Attr().withLabel("s").withStringFromValueFunction([](float v, int) { return juce::String(v, 2) + " s"; })));
     add(std::make_unique<APB>(pid(id::fastAttack), "Fast Attack", false));
@@ -154,7 +176,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout createLayout()
     // De-esser
     add(std::make_unique<APB>(pid(id::deessIn), "De-Ess In", false));
     add(std::make_unique<APF>(pid(id::deessThreshold), "De-Ess Threshold", juce::NormalisableRange<float>(-30.0f, 10.0f, 0.01f), 0.0f, dbAttr()));
-    add(std::make_unique<APF>(pid(id::deessFreq), "De-Ess Frequency", logRange(cm::minOf(kDeessFreqHz), cm::maxOf(kDeessFreqHz)), 5000.0f, hzAttr));
+    add(std::make_unique<APF>(pid(id::deessFreq), "De-Ess Frequency", logRange(cm::minOf(kDeessFreqHz), cm::maxOf(kDeessFreqHz)), 5000.0f, hzAttrFor(cm::minOf(kDeessFreqHz), cm::maxOf(kDeessFreqHz))));
     add(std::make_unique<APB>(pid(id::deessListen), "De-Ess Listen", false));
 
     // Routing and output
