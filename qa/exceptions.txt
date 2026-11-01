@@ -11,3 +11,7 @@ Line Gain @ Input=0.5
 # persist the selected preset across save/reopen, so it resets to "Init" while the sound parameters
 # themselves ARE saved. Excused from the state round-trip check for that reason.
 state:Program
+
+# Bypass is REAPER's own FX-chain parameter (added to every FX's host parameter list), not a
+# plugin parameter: Blue Channel has no Bypass parameter and no control for it by design.
+visual:Bypass
