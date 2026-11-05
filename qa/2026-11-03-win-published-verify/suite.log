@@ -1,0 +1,122 @@
+PASS     loads VST3: Blue Channel (OpenGrid), 67 parameters
+PASS     finite output peak -4.0 dBFS
+PASS     not silent rms -15.0 dBFS
+PASS     deterministic render repeat differs by -240.0 dB
+PASS     editor opens 1263x423, 0.0% animates by itself
+  Input                            audio=ok       visual=ok
+  Mic Gain                         audio=ok       visual=ok
+  Line Gain                        audio=ok       visual=ok
+  Trim                             audio=ok       visual=ok
+  Phase                            audio=ok       visual=ok
+  Impedance                        audio=ok       visual=ok
+  Mic Air                          audio=ok       visual=ok
+  All EQ                           audio=DEAD     visual=ok
+  Filters                          audio=DEAD     visual=ok
+  High Pass                        audio=DEAD     visual=ok
+  Low Pass                         audio=DEAD     visual=ok
+  Shelving EQ                      audio=DEAD     visual=NOT SHOWN
+  LF Gain                          audio=DEAD     visual=ok
+  LF Frequency                     audio=DEAD     visual=ok
+  LF Hi Range                      audio=DEAD     visual=ok
+  HF Gain                          audio=DEAD     visual=ok
+  HF Frequency                     audio=DEAD     visual=NOT SHOWN
+  HF Hi Range                      audio=DEAD     visual=ok
+  Parametric EQ                    audio=DEAD     visual=ok
+  LMF Gain                         audio=DEAD     visual=ok
+  LMF Frequency                    audio=DEAD     visual=ok
+  LMF Q                            audio=DEAD     visual=ok
+  LMF x3                           audio=DEAD     visual=ok
+  HMF Gain                         audio=DEAD     visual=ok
+  HMF Frequency                    audio=DEAD     visual=ok
+  HMF Q                            audio=DEAD     visual=ok
+  HMF x3                           audio=DEAD     visual=ok
+  Comp In                          audio=ok       visual=ok
+  Comp Type                        audio=DEAD     visual=ok
+  Ratio                            audio=DEAD     visual=ok
+  Comp Threshold                   audio=DEAD     visual=ok
+  Attack                           audio=DEAD     visual=ok
+  Release                          audio=DEAD     visual=ok
+  Auto Release                     audio=DEAD     visual=ok
+  Makeup                           audio=DEAD     visual=ok
+  Comp Ext Key                     audio=DEAD     visual=ok
+  Blend                            audio=DEAD     visual=ok
+  Mix                              audio=DEAD     visual=ok
+  Comp Listen                      audio=DEAD     visual=ok
+  Gate In                          audio=ok       visual=ok
+  Expand                           audio=DEAD     visual=ok
+  Gate Threshold                   audio=DEAD     visual=ok
+  Range                            audio=DEAD     visual=ok
+  Hold                             audio=DEAD     visual=NOT SHOWN
+  Gate Release                     audio=DEAD     visual=ok
+  Fast Attack                      audio=DEAD     visual=ok
+  Hysteresis                       audio=DEAD     visual=ok
+  Gate Ext Key                     audio=DEAD     visual=ok
+  Gate Listen                      audio=DEAD     visual=ok
+  De-Ess In                        audio=ok       visual=ok
+  De-Ess Threshold                 audio=DEAD     visual=ok
+  De-Ess Frequency                 audio=DEAD     visual=NOT SHOWN
+  De-Ess Listen                    audio=ok       visual=NOT SHOWN
+  Dynamics Position                audio=DEAD     visual=ok
+  Bypass                           audio=DEAD     visual=excused
+  Output                           audio=ok       visual=ok
+  Soft Limiter                     audio=ok       visual=ok
+  Mute                             audio=ok       visual=NOT SHOWN
+  Stereo Link                      audio=DEAD     visual=NOT SHOWN
+  Oversampling                     audio=ok       visual=NOT SHOWN
+  Offline Oversampling             audio=ok       visual=NOT SHOWN
+  HQ Mode (Offline)                audio=ok       visual=NOT SHOWN
+  Bypass                           audio=ok       visual=excused
+  Program                          audio=ok       visual=ok
+  Bypass                           audio=ok       visual=excused
+  Wet                              audio=ok       visual=NOT SHOWN
+  Delta                            audio=ok       visual=NOT SHOWN
+  Filters                          audio=CONDITIONAL (acts in random state 1)
+  High Pass                        audio=CONDITIONAL (acts in random state 1)
+  Low Pass                         audio=CONDITIONAL (acts in random state 1)
+  Shelving EQ                      audio=CONDITIONAL (acts in random state 1)
+  LF Gain                          audio=CONDITIONAL (acts in random state 1)
+  LF Frequency                     audio=CONDITIONAL (acts in random state 1)
+  LF Hi Range                      audio=CONDITIONAL (acts in random state 1)
+  HF Gain                          audio=CONDITIONAL (acts in random state 1)
+  HF Frequency                     audio=CONDITIONAL (acts in random state 1)
+  HF Hi Range                      audio=CONDITIONAL (acts in random state 1)
+  Parametric EQ                    audio=CONDITIONAL (acts in random state 1)
+  LMF Gain                         audio=CONDITIONAL (acts in random state 1)
+  LMF Frequency                    audio=CONDITIONAL (acts in random state 1)
+  LMF Q                            audio=CONDITIONAL (acts in random state 1)
+  LMF x3                           audio=CONDITIONAL (acts in random state 1)
+  HMF Gain                         audio=CONDITIONAL (acts in random state 1)
+  HMF Frequency                    audio=CONDITIONAL (acts in random state 1)
+  HMF Q                            audio=CONDITIONAL (acts in random state 1)
+  HMF x3                           audio=CONDITIONAL (acts in random state 1)
+  Comp Type                        audio=CONDITIONAL (acts in random state 1)
+  Ratio                            audio=CONDITIONAL (acts in random state 1)
+  Comp Threshold                   audio=CONDITIONAL (acts in random state 1)
+  Attack                           audio=CONDITIONAL (acts in random state 1)
+  Release                          audio=CONDITIONAL (acts in random state 1)
+  Auto Release                     audio=CONDITIONAL (acts in random state 1)
+  Makeup                           audio=CONDITIONAL (acts in random state 1)
+  Comp Ext Key                     audio=CONDITIONAL (acts in random state 1)
+  Blend                            audio=CONDITIONAL (acts in random state 1)
+  Mix                              audio=CONDITIONAL (acts in random state 1)
+  Comp Listen                      audio=CONDITIONAL (acts in random state 1)
+  Expand                           audio=CONDITIONAL (acts in random state 1)
+  Gate Threshold                   audio=CONDITIONAL (acts in random state 1)
+  Range                            audio=CONDITIONAL (acts in random state 1)
+  Hold                             audio=CONDITIONAL (acts in random state 1)
+  Gate Release                     audio=CONDITIONAL (acts in random state 1)
+  Fast Attack                      audio=CONDITIONAL (acts in random state 1)
+  Hysteresis                       audio=CONDITIONAL (acts in random state 1)
+  Gate Ext Key                     audio=CONDITIONAL (acts in random state 1)
+  Gate Listen                      audio=CONDITIONAL (acts in random state 1)
+  De-Ess Threshold                 audio=CONDITIONAL (acts in random state 1)
+  De-Ess Frequency                 audio=CONDITIONAL (acts in random state 1)
+  Dynamics Position                audio=CONDITIONAL (acts in random state 1)
+  Bypass                           audio=CONDITIONAL (acts in random state 1)
+  Stereo Link                      audio=CONDITIONAL (acts in random state 1)
+  All EQ                           audio=CONDITIONAL (acts in random state 2)
+PASS     every parameter changes the sound 
+FAIL     every parameter is shown in the GUI Shelving EQ, HF Frequency, Hold, De-Ess Frequency, De-Ess Listen, Mute, Stereo Link, Oversampling, Offline Oversampling, HQ Mode (Offline), Wet, Delta
+PASS     state survives save and reopen 
+PASS     editor reopens 5 close/open cycles
+report: C:\Users\marco\Developer\BlueChannel\qa\2026-11-03-win-published-verify\report.md
