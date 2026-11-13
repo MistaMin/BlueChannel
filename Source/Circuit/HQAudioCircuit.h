@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-// Copyright (c) 2026 OpenGrid
+// Copyright (c) 2026 Marcos Quirino Deida
 // Parameterised component audio model. Original reference documents are not distributed.
 #pragma once
 namespace bluechannel::hq {

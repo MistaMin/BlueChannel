@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-// Copyright (c) 2026 OpenGrid
+// Copyright (c) 2026 Marcos Quirino Deida
 #pragma once
 
 // Linear stage netlists, transcribed from the reference circuit model (see docs/CIRCUIT_MODEL.md).

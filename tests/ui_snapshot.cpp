@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-// Copyright (c) 2026 OpenGrid
+// Copyright (c) 2026 Marcos Quirino Deida
 //
 // Renders the editor panel offscreen to PNG (both skins), for layout checks and documentation images.
 // These are component renders: they do not exercise native windows, menus or host scaling.

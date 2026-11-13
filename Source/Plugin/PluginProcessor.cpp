@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-// Copyright (c) 2026 OpenGrid
+// Copyright (c) 2026 Marcos Quirino Deida
 
 #include "PluginProcessor.h"
 

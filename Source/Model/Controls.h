@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-// Copyright (c) 2026 OpenGrid
+// Copyright (c) 2026 Marcos Quirino Deida
 #pragma once
 
 // Front-panel state in panel units. The plugin wrapper fills this from host parameters once per block; the

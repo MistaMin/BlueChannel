@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-// Copyright (c) 2026 OpenGrid
+// Copyright (c) 2026 Marcos Quirino Deida
 #pragma once
 
 // Linear circuit stage discretised with the nodal DK method (trapezoidal companion models).

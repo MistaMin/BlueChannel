@@ -1,9 +1,9 @@
 Blue Channel Binary Freeware License
-Copyright (c) 2026 Marcos Deida
+Copyright (c) 2026 Marcos Quirino Deida
 
 Scope
 This license applies to the official compiled Blue Channel plug-ins, standalone
-application, and installers distributed by Marcos Deida / OpenGrid.
+application, and installers distributed by Marcos Quirino Deida.
 Blue Channel source code is separately available under the MIT License.
 
 Permission to use

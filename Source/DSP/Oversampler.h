@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-// Copyright (c) 2026 OpenGrid
+// Copyright (c) 2026 Marcos Quirino Deida
 #pragma once
 
 // Explicit-factor oversampler (1x, 2x, 4x, 8x, 16x) built from minimum-phase IIR half-band stages, so the
