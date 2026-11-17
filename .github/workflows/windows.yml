@@ -66,13 +66,15 @@ jobs:
         working-directory: BlueChannel/plugin
         run: cargo test --release --lib --test conformance --test state --test offline
 
+      # From plugin/, where Cargo finds .cargo/config.toml.
       - name: Build the plug-ins
         shell: pwsh
+        working-directory: BlueChannel/plugin
         run: |
           $ErrorActionPreference = 'Stop'
-          $version = (Get-Content BlueChannel/VERSION -Raw).Trim()
-          powershell -NoProfile -ExecutionPolicy Bypass -File OpenPluginSDK\scripts\windows\build_plugin.ps1 `
-            -ManifestPath BlueChannel\plugin\Cargo.toml -Name "Blue Channel" -Version $version `
+          $version = (Get-Content ..\VERSION -Raw).Trim()
+          powershell -NoProfile -ExecutionPolicy Bypass -File "$env:GITHUB_WORKSPACE\OpenPluginSDK\scripts\windows\build_plugin.ps1" `
+            -ManifestPath Cargo.toml -Name "Blue Channel" -Version $version `
             -Manufacturer OpenGrid -BundleId com.opengrid.bluechannel -Formats clap,vst3 -Editor -Tail `
             -Vst3Sdk "$env:GITHUB_WORKSPACE\vst3sdk" -Out "$env:GITHUB_WORKSPACE\dist" `
             -WorkDir "$env:GITHUB_WORKSPACE\build-plugins"
