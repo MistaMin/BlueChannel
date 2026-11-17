@@ -47,9 +47,10 @@ Not in this version: a standalone application, LV2 on Windows, AAX on Windows, a
 - macOS, Apple Silicon: the plugin's own tests (parameters, state, the SDK's conformance kit, offline
   rendering, HQ Mode) and a null test of the VST3, Audio Unit and CLAP against the installed 1.0.0.
 - Apple's `auval` passes for the Audio Unit.
-- A scripted host suite in REAPER on macOS: load, every parameter audible and visible in the editor,
-  save and reopen, and the editor opening and closing.
-- Avid's AAX Validator on the unsigned AAX.
+- A scripted host suite in REAPER on macOS with the VST3: load, every parameter changes the sound, save
+  and reopen, and the editor opening and closing. Its check that every control is visible ran on a
+  screen narrower than the editor, which cut the right-hand controls off; see the limits below.
+- Avid's AAX Validator on the unsigned AAX: every test that runs without HDX hardware passes.
 - Windows: the plugin's tests and the build's own checks (64-bit, no Visual C++ runtime dependency,
   format entry points) on a hosted Windows machine.
 
@@ -57,6 +58,8 @@ Not in this version: a standalone application, LV2 on Windows, AAX on Windows, a
 
 - Not checked by a person in a host: Pro Tools, Logic, and every Windows host. The Windows build has
   been built and tested by machine only; nobody has opened its editor.
+- The editor opens no larger than the main screen has room for. A host that opens it on a second,
+  narrower screen can still cut it off; drag the window's corner to make it smaller.
 - The Intel half of the macOS build was built and not run.
 - In an Audio Unit host a switch set to a value between its positions by automation can be saved as that
   in-between value; it reads back as the nearer position.

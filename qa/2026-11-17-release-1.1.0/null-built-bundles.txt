@@ -1,0 +1,45 @@
+== vst3 sweep:1
+  first differing sample (within tolerance): 1 original 1.8553913e-9 port 1.8553916e-9
+channel 1: max |diff| 8.940696716308594e-8 at sample 5, RMS diff -152.06 dB, 0 samples over tolerance
+  first differing sample (within tolerance): 0 original 5.9631407e-7 port 5.963142e-7
+PASS
+== vst3 noise:1
+  first differing sample (within tolerance): 0 original 2.549705e-7 port 2.5497053e-7
+channel 1: max |diff| 5.960464477539063e-8 at sample 9, RMS diff -157.41 dB, 0 samples over tolerance
+  first differing sample (within tolerance): 0 original 5.6098266e-8 port 5.6098273e-8
+PASS
+== vst3 impulses:1
+  first differing sample (within tolerance): 0 original 1.4173814e-6 port 1.4173817e-6
+channel 1: max |diff| 8.940696716308594e-8 at sample 32906, RMS diff -172.94 dB, 0 samples over tolerance
+  first differing sample (within tolerance): 0 original 1.1339052e-6 port 1.1339054e-6
+PASS
+== au sweep:1
+  first differing sample (within tolerance): 1 original 1.8553913e-9 port 1.8553916e-9
+channel 1: max |diff| 8.940696716308594e-8 at sample 5, RMS diff -151.55 dB, 0 samples over tolerance
+  first differing sample (within tolerance): 0 original 5.9631407e-7 port 5.963142e-7
+PASS
+== au noise:1
+  first differing sample (within tolerance): 0 original 2.549705e-7 port 2.5497053e-7
+channel 1: max |diff| 5.960464477539063e-8 at sample 9, RMS diff -157.43 dB, 0 samples over tolerance
+  first differing sample (within tolerance): 0 original 5.6098266e-8 port 5.6098273e-8
+PASS
+== au impulses:1
+  first differing sample (within tolerance): 0 original 1.4173814e-6 port 1.4173817e-6
+channel 1: max |diff| 8.940696716308594e-8 at sample 32906, RMS diff -173.63 dB, 0 samples over tolerance
+  first differing sample (within tolerance): 0 original 1.1339052e-6 port 1.1339054e-6
+PASS
+== clap sweep:1
+  first differing sample (within tolerance): 1 original 1.8553913e-9 port 1.8553916e-9
+channel 1: max |diff| 8.940696716308594e-8 at sample 5, RMS diff -151.55 dB, 0 samples over tolerance
+  first differing sample (within tolerance): 0 original 5.9631407e-7 port 5.963142e-7
+PASS
+== clap noise:1
+  first differing sample (within tolerance): 0 original 2.549705e-7 port 2.5497053e-7
+channel 1: max |diff| 5.960464477539063e-8 at sample 9, RMS diff -157.43 dB, 0 samples over tolerance
+  first differing sample (within tolerance): 0 original 5.6098266e-8 port 5.6098273e-8
+PASS
+== clap impulses:1
+  first differing sample (within tolerance): 0 original 1.4173814e-6 port 1.4173817e-6
+channel 1: max |diff| 8.940696716308594e-8 at sample 32906, RMS diff -173.63 dB, 0 samples over tolerance
+  first differing sample (within tolerance): 0 original 1.1339052e-6 port 1.1339054e-6
+PASS
