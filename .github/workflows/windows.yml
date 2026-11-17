@@ -12,7 +12,7 @@ on:
 
 env:
   # The SDK revisions the release was built and tested with on macOS.
-  OPENPLUGIN_SDK_REF: ded6d8d
+  OPENPLUGIN_SDK_REF: ded6d8dac0cb0a01720963d6aea554c2273ee596
   GOODLOOKINDRI_REF: v0.2.1
   VST3_SDK_REF: v3.8.1_build_84
 
