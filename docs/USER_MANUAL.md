@@ -1,4 +1,4 @@
-# Blue Channel 1.0 user guide
+# Blue Channel 1.1 user guide
 
 Blue Channel is an analogue-modelled channel strip: a transformer microphone preamp with line and instrument
 inputs, high- and low-pass filters, shelving and parametric EQ, a VCA compressor with two optical "vintage"
@@ -7,7 +7,7 @@ the circuit at all times; there is no clean digital mode.
 
 ![Analogue skin](images/blue-channel-analogue.png)
 
-*Editor, analogue skin (component render). The Digital skin key opens a dedicated digital layout with a draggable compressor curve, EQ graph over a live output-left FFT spectrum, and an All Controls page for the full parameter set; it changes
+*Editor, analogue skin. The Digital skin key opens a dedicated digital layout with a draggable compressor curve, EQ graph over a live output-left FFT spectrum, and an All Controls page for the full parameter set; it changes
 nothing in the sound.*
 
 ![Digital overview](images/blue-channel-digital.png)
@@ -18,12 +18,21 @@ nothing in the sound.*
 
 *All Controls: the complete parameter set. The Overview and All Controls tabs stay visible on both pages.*
 
+## The editor
+
+The analogue skin opens at 1560 x 450 and the Digital skin at 1250 x 900, or smaller where the main
+screen has no room for that. Each skin keeps its own shape:
+drag the window's corner to make it smaller or larger, and the size is saved with the project. Turn a
+knob by dragging it up or down, hold Shift for fine steps, and double-click it for its default. While
+the pointer is over a knob a small plate shows its value.
+
+In the Digital skin a choice is a row of keys, one lit, and a continuous control is a slider with its
+value beside it. The numbers for input, output and gain reduction change every 1.5 seconds and show the
+highest reading of that time, so they can be read; the bars and the VU needle move continuously.
+
 ## Signal flow
 
-```text
-Mic / Line / Inst -> Trim, Phase -> Filters -> Shelving -> Parametric -> Compressor/Gate -> De-esser
-                  -> Output level -> Soft limiter -> Output transformer
-```
+`Mic / Line / Inst -> Trim, Phase -> Filters -> Shelving -> Parametric -> Compressor/Gate -> De-esser -> Output level -> Soft limiter -> Output transformer`
 
 **Dynamics** moves the compressor, gate and de-esser before the EQ (Pre-EQ). **Bypass** takes the EQ,
 dynamics and limiter out; the input stage and output stage stay in, as on hardware.
@@ -121,13 +130,15 @@ host is sending a sidechain.
 
 ## Oversampling
 
-**Oversample** sets the internal rate: 1x, 2x (default), 4x, 8x or `\( ᐖ)/ - Derp mode` (16x, for when the
-computer is fast and nobody is watching). **Offline** chooses a separate factor used only when the host
+**Oversample** sets the internal rate: 1x, 2x (default), 4x, 8x or 16x (a host's own parameter list
+calls it "16x Derp mode", for when the computer is fast and nobody is watching). **Offline** chooses a separate factor used only when the host
 renders offline; *Same* uses the playback setting. Blue Channel reports no latency at any setting.
 
 ## Programs
 
-Init, Vocal, Drum Bus, Bass DI, Gated Toms, Mix Polish. Programs set the sound controls only.
+Init, Vocal, Drum Bus, Bass DI, Gated Toms, Mix Polish. Programs set the sound controls only. In 1.1
+they are offered to the host through the plugin's preset interface; a host that showed them as a
+"Program" parameter in 1.0 no longer has that parameter.
 
 ### Digital graph controls
 
@@ -146,13 +157,15 @@ contribute to the white audio curve. Range switches and routing remain independe
 Use **All Controls** for all parameters, including gate, de-esser, blend, listening and oversampling,
 and **Overview** to return to the graphs. **Analogue** returns to the main panel.
 
-## HQ mode (development builds)
+## HQ mode (macOS)
 
-Select the final **\( ᐖ)/ HQ** lamp in the analogue **Offline** selector to arm the full component solver
-for non-realtime export. Digital has the same HQ choice in its Offline menu on All Controls, with a
+Select the final **HQ** lamp in the analogue **Offline** selector to arm the full component solver
+for non-realtime export. Digital has the same HQ key in its Offline row on All Controls, with a
 header indicator lamp. Selecting a normal Offline factor disarms HQ. Playback
 uses Standard. Full HQ can be vastly slower than real time; try a short selection first. A failed solve
-mutes export and marks it failed. See [HQ mode](HQ_MODE.md) for scope and limits.
+mutes export and marks it failed. HQ solves mono instances: on a stereo track the solve fails and the
+export is muted with "HQ failed". The Windows build has no HQ mode. See [HQ mode](HQ_MODE.md) for scope
+and limits.
 
 New instances and Init select the Mic preamp at **0 dB**, with trim and output at zero. This is nominal
 unity at 1 kHz with the default Classic input impedance and assumed 150-ohm source. The old near-unity
@@ -161,15 +174,26 @@ The output transformer is included in both processing paths. Standard uses an id
 Offline HQ solves the nonlinear core with the finite driver and feedback. Feedback can suppress core
 colour, so the model does not promise obvious transformer distortion on line input.
 
-## Standalone audio setup
+## Projects made with 1.0
 
-Use **Options → Audio/MIDI Settings** to select the input/output device. The standalone wrapper may
-mute its input to avoid speaker feedback; enable input only when your monitoring setup is ready.
-macOS asks for audio-input permission when needed. The permission is for the standalone application's
-live input; DAW plug-ins use the host's audio devices and permissions.
+Version 1.1 is the same plugin to a host: the same plugin ids and the same 62 parameters with the same
+ids, in the same order. What differs:
+
+- Parameters are shown to the host in their own units (dB, Hz, positions); 1.0 showed every one as 0 to 1.
+  Automation of switches plays back as before. Automation of continuous controls that a CLAP host recorded
+  with 1.0 plays back at other values and has to be redrawn.
+- A project saved with 1.0 opens with its settings in a CLAP host. **In VST3, Audio Unit and AAX hosts the
+  settings saved by 1.0 are not read: the plugin opens at its defaults.** Keep 1.0 for those projects, or
+  note the settings before updating.
+- A change of a parameter inside an audio block takes effect at its exact position, where 1.0 applied it
+  from the start of the block.
+- A 5 second tail is reported to the host (1.0 reported none), so a host that stops processing silent
+  tracks waits for the model to ring out.
 
 ## Formats and licensing
 
-- **Supported formats:** VST3, Audio Unit (macOS), CLAP, LV2, AAX (macOS), and Standalone.
-- **Licensing:** Blue Channel source code is MIT licensed. All official plugin binaries, including the macOS AAX plugin, are distributed as **freeware** under the publisher's commercial JUCE licence, free of charge for personal or commercial audio production.
-- **Third-party attribution:** The AAX plugin is digitally signed with PACE Eden for Pro Tools compatibility. The official plugin-manager bundle archives include all applicable third-party license notices in the `Licenses` directory. See [BINARY_LICENSE.txt](../BINARY_LICENSE.txt) and [THIRD_PARTY_LICENSES.md](../THIRD_PARTY_LICENSES.md).
+- **macOS 11 or later (Apple Silicon and Intel):** VST3, Audio Unit, CLAP, LV2 and AAX.
+- **Windows 10 or later (x64):** VST3 and CLAP.
+- A standalone application is built from source and is not in the installers.
+- **Licensing:** Blue Channel source code is MIT licensed. The official plugin binaries, including the macOS AAX plugin, are distributed as **freeware**, free of charge for personal or commercial audio production.
+- **Third-party attribution:** The AAX plugin is digitally signed with PACE Eden for Pro Tools compatibility. See [BINARY_LICENSE.txt](../BINARY_LICENSE.txt) and [THIRD_PARTY_LICENSES.md](../THIRD_PARTY_LICENSES.md).

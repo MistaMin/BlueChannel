@@ -1,6 +1,6 @@
 # Blue Channel on OpenPluginSDK
 
-Blue Channel ported from JUCE to [OpenPluginSDK](https://github.com/MistaMin/OpenPluginSDK), with its editor drawn by GoodLookin DRI. The JUCE build in the repository root stays the release until this one has been accepted.
+Blue Channel on [OpenPluginSDK](https://github.com/MistaMin/OpenPluginSDK), with its editor drawn by GoodLookin DRI: the build that version 1.1 is made from. The JUCE build in the repository root is what 1.0.0 was made from.
 
 | File | What it holds |
 |---|---|
@@ -11,7 +11,7 @@ Blue Channel ported from JUCE to [OpenPluginSDK](https://github.com/MistaMin/Ope
 | `src/state_import.rs` | Reads the state the JUCE release saved, the editor's settings included. |
 | `src/programs.rs` | The six factory programs. |
 | `src/shared.rs` | What the engine shares with the editor: meters, the analyser ring, the editor's saved settings. |
-| `src/editor/` | The editor: the analogue panel and the Digital skin with its graphs. Knob placement comes from `../Designs/knobs.csv`. |
+| `src/editor/` | The editor: the analogue panel (1560 × 450, the layout of the JUCE build, knobs placed from `../Designs/knobs.csv`) and the Digital skin with its graphs (1250 × 900). Each skin resizes in its own shape. `lettering.rs` draws the legends with the system font on macOS and the toolkit's face elsewhere. |
 | `src/bin/standalone.rs` | The standalone app (feature `standalone`). |
 | `tests/` | The SDK's conformance kit, the release's captured states, the offline render policy, HQ Mode, and the null test against the installed release. |
 
@@ -23,6 +23,7 @@ The SDK is used from a local checkout, with GoodLookinDri beside it. `scripts/bu
 [patch.crates-io]
 openplugin = { path = "<OpenPluginSDK>/crates/openplugin" }
 openplugin-testing = { path = "<OpenPluginSDK>/crates/openplugin-testing" }
+goodlookindri-shell = { path = "<GoodLookinDri>/shell" }
 
 [env]
 OPENPLUGIN_PORT = "<path to the openplugin-port executable>"   # for tests/null.rs
@@ -33,6 +34,8 @@ cargo test                                   # tests/null.rs needs the 1.0.0 VST
 cargo test --release --features hq --test hq # HQ Mode with the solver; needs a shared ngspice library
 scripts/build.sh --hq                        # universal CLAP, LV2, VST3, AU, AAX and the app, in dist/
 ```
+
+Run Cargo and the script from this folder: Cargo reads `.cargo/config.toml` from where it is started. Version 1.1.0 was built with OpenPluginSDK `ded6d8d` and GoodLookin DRI 0.2.1. The Windows plug-ins (CLAP and VST3, no HQ Mode) and their installer are built by `../.github/workflows/windows.yml` with the SDK's `scripts/windows/build_plugin.ps1`.
 
 `scripts/build.sh --help` lists the options and the variables that say where the VST3, Audio Unit and AAX SDKs and ngspice are. Nothing is installed and nothing is signed beyond ad hoc. The bundles carry the release's ids: installing them replaces the JUCE release in every host.
 
@@ -57,4 +60,4 @@ For host tests beside the installed release, feature `qa-identity` builds the sa
 - HQ Mode solves mono instances. A stereo solve fails to find its operating point ("timestep too small") and the render is muted with "HQ failed", as documented for a failed solve. The JUCE build's renderer fails the same way: it is the same source.
 - Sessions saved by the JUCE build open in the port through CLAP. The SDK's VST3, Audio Unit and AAX shells do not yet hand a plugin state they did not write.
 - The SDK's shell build cannot ask a library that also holds C++ for its Audio Unit codes, so `scripts/build.sh` passes them.
-- macOS only so far. The Windows and Linux builds of the SDK have not been tried with this plugin.
+- Windows is built and tested by machine only: nobody has opened the editor there. Linux has not been tried.

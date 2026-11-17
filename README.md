@@ -13,29 +13,37 @@ transformer in one plugin.
 Both interfaces control the same audio model. Digital adds a draggable compressor curve and EQ controls
 with an output FFT. HP/LP filters stay editable when routed to a sidechain and dim when switched out.
 
-## Version 1.0
+## Version 1.1.0
 
-- New instances select **Mic at 0 dB**, calibrated to nominal input-to-output unity with default settings.
-- Standard playback has selectable 1x–16x oversampling and a separate offline setting.
-- The final **`\( ᐖ)/ HQ`** lamp in **Offline** arms the full component solver. Digital has the same choice
-  in its Offline menu on All Controls, with a header indicator. There is no realtime HQ mode.
-- Mono/stereo operation, external key inputs, stereo-linked detectors, routing and listen controls.
-- The editor starts at 1248 × 360 and remembers resizing. The source build offers optional layout editing.
+- Rebuilt on OpenPluginSDK with the editor drawn by GoodLookin DRI. The circuit model is that of 1.0,
+  unchanged, and hosts see the same plugin and the same 62 parameters.
+- New Digital layout at 1250 × 900 with keys and sliders; the analogue panel keeps its 1.0 layout at
+  1560 × 450 with lit knobs and sharper lettering. Each skin resizes in its own shape.
+- Digital's level and gain-reduction numbers hold for 1.5 seconds so they can be read.
+- Hosts see parameters in their own units (dB, Hz, positions).
+- **Projects saved with 1.0 in VST3, Audio Unit or AAX hosts open at the default settings** (CLAP projects
+  keep theirs). Read the [1.1 release notes](docs/RELEASE_1.1.0.md) before updating.
 
 ## Download
 
-- **macOS 11 or later (Apple Silicon and Intel):** [BlueChannel-1.0.0-macos.dmg](https://github.com/MistaMin/BlueChannel/releases/download/v1.0.0/BlueChannel-1.0.0-macos.dmg) · [BlueChannel-1.0.0-macos.pkg](https://github.com/MistaMin/BlueChannel/releases/download/v1.0.0/BlueChannel-1.0.0-macos.pkg)
-- **Windows 10 or later (x64 & ARM64):** [BlueChannel-1.0.0-windows-x64-setup.exe](https://github.com/MistaMin/BlueChannel/releases/download/v1.0.0/BlueChannel-1.0.0-windows-x64-setup.exe) · [x64 zip](https://github.com/MistaMin/BlueChannel/releases/download/v1.0.0/BlueChannel-1.0.0-windows-x64.zip) · [ARM64 zip](https://github.com/MistaMin/BlueChannel/releases/download/v1.0.0/BlueChannel-1.0.0-windows-arm64.zip) ([ARM64 SHA-256](https://github.com/MistaMin/BlueChannel/releases/download/v1.0.0/BlueChannel-1.0.0-windows-arm64.sha256))
-- **Linux (x86_64 & aarch64):** [BlueChannel-1.0.0-linux-x86_64.tar.gz](https://github.com/MistaMin/BlueChannel/releases/download/v1.0.0/BlueChannel-1.0.0-linux-x86_64.tar.gz) ([x86_64 SHA-256](https://github.com/MistaMin/BlueChannel/releases/download/v1.0.0/BlueChannel-1.0.0-linux-x86_64.sha256)) · [BlueChannel-1.0.0-linux-aarch64.tar.gz](https://github.com/MistaMin/BlueChannel/releases/download/v1.0.0/BlueChannel-1.0.0-linux-aarch64.tar.gz) ([aarch64 SHA-256](https://github.com/MistaMin/BlueChannel/releases/download/v1.0.0/BlueChannel-1.0.0-linux-aarch64.sha256)) (extract and copy `VST3/`, `CLAP/` and `LV2/` into `~/.vst3`, `~/.clap` and `~/.lv2`)
+- **macOS 11 or later (Apple Silicon and Intel):** [Blue-Channel-1.1.0-macos.pkg](https://github.com/MistaMin/BlueChannel/releases/download/v1.1.0/Blue-Channel-1.1.0-macos.pkg)
+- **Windows 10 or later (x64):** [Blue-Channel-1.1.0-windows-x64-setup.exe](https://github.com/MistaMin/BlueChannel/releases/download/v1.1.0/Blue-Channel-1.1.0-windows-x64-setup.exe)
 
-The macOS disk image contains the installer, full documentation, images, and licence texts. The packages offer **VST3, Audio Unit (macOS), CLAP, LV2, AAX (macOS) and Standalone**, all included as freeware. AAX is digitally signed with PACE Eden for Pro Tools compatibility. Portable bundles, checksums, build manifests and simulator source are on the
-[release page](https://github.com/MistaMin/BlueChannel/releases/tag/v1.0.0). Signing and notarisation results
-are recorded there. Windows and Linux CI packages ship with Standard processing (`HQ=OFF` by default).
+The macOS installer offers **VST3, Audio Unit, CLAP, LV2 and AAX**, all freeware. It is signed with a
+Developer ID and notarised by Apple, and the AAX plug-in is signed with PACE Eden for Pro Tools. The
+Windows installer offers **VST3 and CLAP** and is not code signed. Checksums, the manual as a PDF and the
+manifest are on the [release page](https://github.com/MistaMin/BlueChannel/releases/tag/v1.1.0).
+
+Not in 1.1: a standalone application, LV2 and AAX on Windows, and Linux. HQ mode is macOS only. The
+Windows build was built and tested by machine and has not been opened in a host by a person. For the
+missing platforms and formats, [1.0.0](https://github.com/MistaMin/BlueChannel/releases/tag/v1.0.0)
+stays available.
 
 ## User guide
 
-See the [User Guide](docs/USER_MANUAL.md), [HQ mode](docs/HQ_MODE.md) and
-[1.0 release notes](docs/RELEASE_1.0.0.md).
+See the [User Guide](docs/USER_MANUAL.md), [HQ mode](docs/HQ_MODE.md), the
+[changelog](CHANGELOG.md) and the [1.1 release notes](docs/RELEASE_1.1.0.md)
+([1.0 release notes](docs/RELEASE_1.0.0.md)).
 
 **Offline HQ is experimental and can be extremely slow.** Begin with a millisecond-scale selection.
 A failure mutes export and displays its status; playback remains Standard. Long solves retain probe
@@ -43,27 +51,34 @@ history and grow in memory. Full-solve estimates do not turn estimated parts int
 Listening acceptance, multi-instance DAW checks and long-render validation remain open. See
 [measurements and limits](docs/MEASUREMENTS.md).
 
-## Build
+## Build from source
+
+Version 1.1 is the Rust crate in [`plugin/`](plugin/README.md). It needs Rust, a C++20 compiler, and
+checkouts of OpenPluginSDK and GoodLookin DRI side by side; the VST3, Audio Unit and AAX formats also
+need their SDKs.
 
 ```sh
 git clone https://github.com/MistaMin/BlueChannel.git
-cd BlueChannel
-cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DBLUECHANNEL_BUILD_AAX=OFF
-cmake --build build
-ctest --test-dir build --output-on-failure
+cd BlueChannel/plugin
+OPENPLUGIN_SDK=/path/to/OpenPluginSDK scripts/build.sh --formats clap,lv2   # bundles in plugin/dist
+cargo test
 ```
 
-This builds Standard processing without the optional simulator. For full HQ, install a shared ngspice
-library/header and use `-DBLUECHANNEL_HQ=ON`. All authored numerical model code is included; no private
-hardware source documents are needed. Universal macOS HQ builds use
-[the simulator build script](tools/build_hq_simulator_macos.sh). See [Building](docs/BUILDING.md) and
-[Release process](docs/RELEASE.md).
+`plugin/README.md` describes the layout, the tests and the options, including HQ mode (`--hq`, which
+needs a shared ngspice library; see [the simulator build script](tools/build_hq_simulator_macos.sh)).
+All authored numerical model code is included; no private hardware source documents are needed.
+
+The repository root still holds the JUCE build that 1.0 was made from (`Source/`, `CMakeLists.txt`,
+[Building](docs/BUILDING.md)). Both builds compile the same model in `Source/Model`, `Source/Circuit`,
+`Source/DSP` and `Source/Dynamics`.
 
 ## Licence
 
-Blue Channel source code is [MIT licensed](LICENSE); copyright (c) 2026 Marcos Quirino Deida. The official complete binaries are distributed as **freeware** under the publisher's commercial JUCE licence, free of charge for personal or commercial audio production. End users do not need a JUCE developer licence to install or use these downloads. See [official binary terms](BINARY_LICENSE.txt).
+Blue Channel source code is [MIT licensed](LICENSE); copyright (c) 2026 Marcos Quirino Deida. The official binaries are distributed as **freeware**, free of charge for personal or commercial audio production. See [official binary terms](BINARY_LICENSE.txt).
 
-**Licensing disclaimer:** JUCE is available under open-source terms (GPLv3 / AGPLv3) or a commercial JUCE licence; it is NOT covered by this project's MIT licence. If you build or redistribute binaries from this source code, you must comply with your own JUCE licence terms (GPL/AGPL or commercial) — the publisher's commercial licence does not transfer to third-party builds. The vendored [GoodLookinUI](third_party/GoodLookinUI) runtime headers retain their MIT licence. Other components retain their respective terms, including the shared simulator's BSD, MIT and LGPL rights. See [Third-party licences](THIRD_PARTY_LICENSES.md) and the included texts.
+Version 1.1 binaries are built with OpenPluginSDK and GoodLookin DRI and contain no JUCE code. The JUCE build in the repository root is not covered by this project's MIT licence where it uses JUCE: JUCE is available under AGPLv3 or a commercial JUCE licence, and anyone building or redistributing that build must comply with their own JUCE licence terms. The vendored [GoodLookinUI](third_party/GoodLookinUI) runtime headers retain their MIT licence. Other components retain their respective terms, including the shared simulator's BSD, MIT and LGPL rights. See [Third-party licences](THIRD_PARTY_LICENSES.md) and the included texts.
+
+VST is a trademark of Steinberg Media Technologies GmbH. Audio Units is a trademark of Apple Inc. AAX and Pro Tools are trademarks of Avid Technology, Inc.
 
 Original third-party hardware documents, drawings, OCR and research renders are not distributed.
 [Source provenance](SOURCE_PROVENANCE.md) records the separation between private inputs and public code.

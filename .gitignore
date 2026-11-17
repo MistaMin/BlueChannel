@@ -8,3 +8,6 @@ __pycache__/
 
 # Private engineering inputs and original reference documents must never be published.
 /.private/
+
+# Built documents (tools/build_user_manual.py).
+/output/
