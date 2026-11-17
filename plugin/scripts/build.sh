@@ -94,6 +94,7 @@ cd "$here"
 # The standalone app's icon, the one the 1.0.0 app had.
 app="$out/Blue Channel.app"
 if [ -d "$app" ]; then
+  mkdir -p "$app/Contents/Resources"
   cp "$root/Resources/BlueChannel.icns" "$app/Contents/Resources/BlueChannel.icns"
   /usr/libexec/PlistBuddy -c "Delete :CFBundleIconFile" "$app/Contents/Info.plist" 2>/dev/null || true
   /usr/libexec/PlistBuddy -c "Add :CFBundleIconFile string BlueChannel" "$app/Contents/Info.plist"

@@ -86,6 +86,36 @@ fn size_for(page: Page, scale: f32) -> (u32, u32) {
     ((width * scale).round() as u32, (height * scale).round() as u32)
 }
 
+/// `scale`, lowered where the page would not fit on the main screen at it (a 1560-point strip
+/// on a 1440-point laptop screen): a window that opens larger than the screen is cut off by
+/// the host. Room is left for the host's own frame around the editor.
+fn fitting(page: Page, scale: f32) -> f32 {
+    let Some((screen_w, screen_h)) = screen::size() else { return scale };
+    let (width, height) = page.size();
+    scale.min(screen_w * 0.96 / width).min((screen_h - 140.0) / height).max(0.5)
+}
+
+/// The main screen's size in points, where it can be asked.
+mod screen {
+    #[cfg(all(target_os = "macos", not(test)))]
+    pub fn size() -> Option<(f32, f32)> {
+        #[link(name = "CoreGraphics", kind = "framework")]
+        extern "C" {
+            fn CGMainDisplayID() -> u32;
+            fn CGDisplayPixelsWide(display: u32) -> usize;
+            fn CGDisplayPixelsHigh(display: u32) -> usize;
+        }
+        // SAFETY: plain C calls with no pointers; Quartz Display Services may be called from any thread.
+        let (w, h) = unsafe { (CGDisplayPixelsWide(CGMainDisplayID()), CGDisplayPixelsHigh(CGMainDisplayID())) };
+        (w >= 640 && h >= 480).then_some((w as f32, h as f32))
+    }
+
+    #[cfg(not(all(target_os = "macos", not(test))))]
+    pub fn size() -> Option<(f32, f32)> {
+        None
+    }
+}
+
 /// The sizes the window of a page can take: half to twice its panel, in its shape.
 fn range(page: Page) -> SizeRange {
     let (width, height) = page.size();
@@ -156,7 +186,7 @@ impl BlueEditor {
             details: false,
             page: Page::Analogue,
             source: 0,
-            size: size_for(Page::Analogue, local.ui_scale),
+            size: size_for(Page::Analogue, fitting(Page::Analogue, local.ui_scale)),
             widgets: Vec::new(),
             ctl: Vec::new(),
             controls: ControlSet::new(host),
@@ -205,9 +235,9 @@ impl BlueEditor {
         DamageRect::new(r.0 * k + left, r.1 * k + top, r.2 * k, r.3 * k)
     }
 
-    /// Ask the host for the window of the page shown, at the saved scale.
+    /// Ask the host for the window of the page shown, at the saved scale or the largest that fits the screen.
     fn ask_for_size(&self) {
-        let wanted = size_for(self.page, self.settings().ui_scale);
+        let wanted = size_for(self.page, fitting(self.page, self.settings().ui_scale));
         if wanted != self.size {
             self.host.request_resize(&range(self.page), wanted.0, wanted.1);
         }
