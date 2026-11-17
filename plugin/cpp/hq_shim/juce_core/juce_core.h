@@ -20,6 +20,12 @@
  #define JUCE_LINUX 1
 #endif
 #if defined(_WIN32)
+ #ifndef NOMINMAX
+  #define NOMINMAX // or <windows.h> turns std::max into a macro call
+ #endif
+ #ifndef WIN32_LEAN_AND_MEAN
+  #define WIN32_LEAN_AND_MEAN
+ #endif
  #include <windows.h>
 #else
  #include <dlfcn.h>
