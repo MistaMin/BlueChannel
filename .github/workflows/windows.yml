@@ -97,7 +97,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           $setup = Join-Path $env:GITHUB_WORKSPACE "Blue-Channel-$version-windows-x64-setup.exe"
           $hash = (Get-FileHash -Algorithm SHA256 -LiteralPath $setup).Hash.ToLowerInvariant()
-          "$hash  Blue-Channel-$version-windows-x64-setup.exe" | Set-Content -LiteralPath "$setup.sha256" -Encoding ascii
+          # A line feed only: shasum -c on macOS and Linux does not accept CRLF.
+          [IO.File]::WriteAllText("$setup.sha256", "$hash  Blue-Channel-$version-windows-x64-setup.exe`n")
           Get-Item $setup | Format-List Name, Length
           Get-Content "$setup.sha256"
 
