@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-// Copyright (c) 2026 OpenGrid
+// Copyright (c) 2026 Marcos Quirino Deida
 #include "HQRenderer.h"
 #include "Model/Stages.h"
 #include <juce_core/juce_core.h>

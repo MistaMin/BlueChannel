@@ -46,7 +46,7 @@ fi
 # 4. Root README / INSTALL instructions
 cat > "$STAGE/INSTALL.txt" <<'EOF'
 Blue Channel 1.0.0 — macOS Universal (Apple Silicon & Intel)
-OpenGrid / Marcos Deida
+OpenGrid / Marcos Quirino Deida
 
 INSTALLATION:
 1. Double-click "BlueChannel-1.0.0-macos.pkg" to launch the installer.

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: MIT
-# Copyright (c) 2026 OpenGrid
+# Copyright (c) 2026 Marcos Quirino Deida
 """Run ngspice on one subcircuit of the reference circuit model and write its AC response as CSV.
 
 The reference model (a SPICE deck) is not part of this repository. Pass its path with --cir or the

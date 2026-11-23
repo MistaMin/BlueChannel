@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: MIT
-# Copyright (c) 2026 OpenGrid
+# Copyright (c) 2026 Marcos Quirino Deida
 """Write <build>/release-manifest.json: version, configuration, architectures, dependency revisions, compiler
 and SHA-256 of every runtime source file and generated table. Usage: release_manifest.py <build dir>"""
 import hashlib

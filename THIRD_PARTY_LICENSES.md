@@ -1,11 +1,37 @@
 # Third-party licenses
 
-Blue Channel's own source code is MIT licensed (see `LICENSE`). Official complete binaries are
-proprietary freeware under the publisher's commercial JUCE licence (see `BINARY_LICENSE.txt`), not a
-relicensing of JUCE or other dependencies under MIT. End users need no JUCE developer licence to use
-these official downloads. Independent builders must satisfy the JUCE licence applicable to their builds. Installers and archives include the license
-and notice texts below, copied from the exact dependency revisions of each build by
-`tools/collect_licenses.py` (with an `INDEX.txt` listing every file).
+Blue Channel's own source code is MIT licensed (see `LICENSE`). The official binaries are proprietary
+freeware (see `BINARY_LICENSE.txt`). That is not a relicensing of the components below, which keep
+their own terms. Installers include the license and notice texts.
+
+## Version 1.1 (the build in `plugin/`)
+
+| Component | Used for | License |
+|---|---|---|
+| OpenPluginSDK | plugin framework and the VST3, Audio Unit and AAX shells | MIT or Apache License 2.0 |
+| GoodLookin DRI | the editor's drawing and window code (Rust, linked statically) | MIT |
+| Rust standard library | plugin and editor code | MIT or Apache License 2.0 |
+| cc (build time only) | compiles the C++ model | MIT or Apache License 2.0 |
+| fontdue, ttf-parser | lettering | MIT or Apache License 2.0 (fontdue also Zlib) |
+| rustfft, num-complex, num-integer, num-traits, primal-check, strength_reduce, transpose | the spectrum in the Digital skin | MIT or Apache License 2.0 |
+| hashbrown, ahash, allocator-api2, once_cell, cfg-if, libc, log, bitflags, itoa, memchr, serde, serde_json, zerocopy, zmij | support libraries | MIT or Apache License 2.0 (zerocopy also BSD 2-Clause) |
+| CLAP | CLAP format | MIT |
+| LV2 | LV2 format: the interface is written from the specification, and no LV2 code is linked | ISC |
+| VST3 SDK (Steinberg) | VST3 format | MIT |
+| AudioUnitSDK (Apple, macOS only) | Audio Unit format | Apache License 2.0 |
+| AAX SDK (Avid, macOS only) | AAX format | Avid AAX Developer Agreement / SDK License |
+| ngspice 47 (macOS only, loaded at run time) | HQ Mode's offline solver | BSD, MIT and LGPL parts; see below |
+
+The standalone application, which is built from source and not part of the release, also links cpal
+(Apache License 2.0), coreaudio-rs, coreaudio-sys, core-foundation-sys, dasp_sample and mach2 (MIT or
+Apache License 2.0). Version 1.1 binaries contain no JUCE code.
+
+## Version 1.0 and the JUCE build in the repository root
+
+The 1.0 binaries were built with JUCE under the publisher's commercial JUCE licence. End users need no
+JUCE developer licence to use them. Anyone building the JUCE build from source must satisfy the JUCE
+licence applicable to their build. `tools/collect_licenses.py` copies the texts below from the exact
+dependency revisions of such a build (with an `INDEX.txt` listing every file).
 
 | Component | Used for | License |
 |---|---|---|

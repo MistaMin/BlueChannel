@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: MIT
-# Copyright (c) 2026 OpenGrid
+# Copyright (c) 2026 Marcos Quirino Deida
 """Nonlinear characterisation of reference subcircuits with ngspice (transient + Fourier analysis).
 
 Measures what the reduced model is fitted to:

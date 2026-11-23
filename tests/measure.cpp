@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-// Copyright (c) 2026 OpenGrid
+// Copyright (c) 2026 Marcos Quirino Deida
 //
 // Measurement fixtures for docs/MEASUREMENTS.md: stepped-sine magnitude response of the whole engine for
 // named settings, and THD versus level for the three inputs. Writes CSV to stdout.

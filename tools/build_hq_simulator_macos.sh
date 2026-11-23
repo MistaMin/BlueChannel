@@ -1,6 +1,6 @@
 #!/bin/bash
 # SPDX-License-Identifier: MIT
-# Copyright (c) 2026 OpenGrid
+# Copyright (c) 2026 Marcos Quirino Deida
 # Reproducible universal shared simulator. No project research inputs are used.
 set -euo pipefail
 cd "$(dirname "$0")/.."

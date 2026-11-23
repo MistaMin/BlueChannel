@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-// Copyright (c) 2026 OpenGrid
+// Copyright (c) 2026 Marcos Quirino Deida
 //
 // Engine timing: equal audio duration per case, warm-up excluded, callback wall time per block.
 // Usage: BlueChannelBench [seconds=10]

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-// Copyright (c) 2026 OpenGrid
+// Copyright (c) 2026 Marcos Quirino Deida
 //
 // Host-level checks of the real plugin processor: bus layouts, state round trip and migration rules,
 // malformed state, programs, editor lifetime, offline rendering and odd block sizes.

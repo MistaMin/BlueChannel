@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: MIT
-# Copyright (c) 2026 OpenGrid
+# Copyright (c) 2026 Marcos Quirino Deida
 """Audit public source/history or an unpacked payload. Restricted terms are supplied privately."""
 import argparse
 import json

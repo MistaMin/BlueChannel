@@ -1,5 +1,27 @@
 # Changelog
 
+## 1.1.0
+
+The plugin is rebuilt on OpenPluginSDK, with its editor drawn by GoodLookin DRI. The signal path is the
+same C++ model as 1.0.0, unchanged, and the plugin ids, the 62 parameters, their ids and their order are
+those of 1.0.0. See docs/RELEASE_1.1.0.md for what was checked and what was not.
+
+- The Digital skin has a new layout at 1250 × 900: rows of keys for choices, sliders with their values,
+  and the graphs of 1.0.0. The analogue skin keeps the panel of 1.0.0 at 1560 × 450, with lit knobs and
+  sharper lettering. Each skin resizes in its own shape and opens no larger than the main screen has
+  room for.
+- The Digital skin's numbers for input, output and gain reduction change every 1.5 seconds and show the
+  highest reading of that time.
+- Parameters are shown to hosts in their own units (dB, Hz, positions), where 1.0.0 showed 0 to 1.
+- A parameter change inside an audio block applies at its position in the block.
+- A 5 second tail is reported to the host.
+- Non-finite input is treated as silence.
+- The factory programs are offered through the plugin's preset interface; the "Program" parameter is gone.
+- The macOS installer has VST3, Audio Unit, CLAP, LV2 and AAX. Windows has VST3 and CLAP. No standalone
+  application, no Windows LV2 and no Linux build in this version.
+- Known limit: in VST3, Audio Unit and AAX hosts a project saved with 1.0.0 opens at the default
+  settings. CLAP projects open with their settings.
+
 ## 1.0.0
 
 First public release. Adds the graphical Digital interface, full control page, compressor/EQ editing,
