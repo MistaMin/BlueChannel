@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- Built against OpenPluginSDK `19fac89`. A project saved with 1.0.0 now opens with its settings in VST3,
+  Audio Unit and AAX hosts too (1.1.0 read them in CLAP hosts only).
+- From the SDK: an Audio Unit host that sets a switch between two steps gets the nearest step, edits made
+  in a VST3 host while the plugin is not processing are kept in the project, and a VST3 host that
+  restarts processing during a render no longer gets one unprocessed block.
+
 ## 1.1.0
 
 The plugin is rebuilt on OpenPluginSDK, with its editor drawn by GoodLookin DRI. The signal path is the

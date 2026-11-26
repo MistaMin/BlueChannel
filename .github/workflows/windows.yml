@@ -11,9 +11,8 @@ on:
   workflow_dispatch:
 
 env:
-  # The SDK revisions the release was built and tested with on macOS.
-  OPENPLUGIN_SDK_REF: ded6d8dac0cb0a01720963d6aea554c2273ee596
-  GOODLOOKINDRI_REF: v0.2.1
+  # The SDK revisions the source is built and tested with on macOS.
+  OPENPLUGIN_SDK_REF: 19fac892df45210d0967229cf3799181a0489464
   VST3_SDK_REF: v3.8.1_build_84
 
 jobs:
@@ -32,12 +31,6 @@ jobs:
           repository: MistaMin/OpenPluginSDK
           ref: ${{ env.OPENPLUGIN_SDK_REF }}
           path: OpenPluginSDK
-      - name: Check out GoodLookinDri beside it
-        uses: actions/checkout@v4
-        with:
-          repository: MistaMin/GoodLookinDri
-          ref: ${{ env.GOODLOOKINDRI_REF }}
-          path: GoodLookinDri
       - name: Check out the VST3 SDK
         uses: actions/checkout@v4
         with:
@@ -58,7 +51,7 @@ jobs:
           [patch.crates-io]
           openplugin = { path = "$ws/OpenPluginSDK/crates/openplugin" }
           openplugin-testing = { path = "$ws/OpenPluginSDK/crates/openplugin-testing" }
-          goodlookindri-shell = { path = "$ws/GoodLookinDri/shell" }
+          goodlookindri-shell = { path = "$ws/OpenPluginSDK/crates/goodlookindri/shell" }
           "@ | Set-Content -LiteralPath BlueChannel/plugin/.cargo/config.toml -Encoding utf8
 
       # tests/null.rs compares against an installed 1.0.0 and is run on the release machine.
@@ -66,8 +59,7 @@ jobs:
         working-directory: BlueChannel/plugin
         run: cargo test --release --lib --test conformance --test state --test offline
 
-      # From plugin/, where Cargo finds .cargo/config.toml. UIAutomationCore.DLL is the Windows
-      # accessibility library the SDK's editor window uses; it is part of Windows.
+      # From plugin/, where Cargo finds .cargo/config.toml.
       - name: Build the plug-ins
         shell: pwsh
         working-directory: BlueChannel/plugin
@@ -76,7 +68,7 @@ jobs:
           $version = (Get-Content ..\VERSION -Raw).Trim()
           powershell -NoProfile -ExecutionPolicy Bypass -File "$env:GITHUB_WORKSPACE\OpenPluginSDK\scripts\windows\build_plugin.ps1" `
             -ManifestPath Cargo.toml -Name "Blue Channel" -Version $version `
-            -Manufacturer OpenGrid -BundleId com.opengrid.bluechannel -Formats clap,vst3 -Editor -Tail -AllowLib UIAutomationCore.DLL `
+            -Manufacturer OpenGrid -BundleId com.opengrid.bluechannel -Formats clap,vst3 -Editor -Tail `
             -Vst3Sdk "$env:GITHUB_WORKSPACE\vst3sdk" -Out "$env:GITHUB_WORKSPACE\dist" `
             -WorkDir "$env:GITHUB_WORKSPACE\build-plugins"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

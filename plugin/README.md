@@ -8,7 +8,7 @@ Blue Channel on [OpenPluginSDK](https://github.com/MistaMin/OpenPluginSDK), with
 | `src/lib.rs` | The plugin: values, buses (mono or stereo, optional key input), state, the release's VST3, Audio Unit, AAX and LV2 identity. |
 | `cpp/bridge.cpp`, `src/engine.rs` | The signal path: the C++ model in `../Source` (Model, Circuit, DSP, Dynamics; no JUCE), unchanged, behind a C ABI. |
 | `cpp/hq_shim/` | A stand-in for the few `juce_core` calls `../Source/Plugin/HQRenderer.cpp` makes, so HQ Mode's solver is the same source as the JUCE build's. |
-| `src/state_import.rs` | Reads the state the JUCE release saved, the editor's settings included. |
+| `src/state_import.rs` | Reads the state the JUCE release saved, the editor's settings included. `lib.rs` takes it out of the VST3, Audio Unit and AAX containers. |
 | `src/programs.rs` | The six factory programs. |
 | `src/shared.rs` | What the engine shares with the editor: meters, the analyser ring, the editor's saved settings. |
 | `src/editor/` | The editor: the analogue panel (1560 × 450, the layout of the JUCE build, knobs placed from `../Designs/knobs.csv`) and the Digital skin with its graphs (1250 × 900). Each skin resizes in its own shape. `lettering.rs` draws the legends with the system font on macOS and the toolkit's face elsewhere. |
@@ -17,13 +17,13 @@ Blue Channel on [OpenPluginSDK](https://github.com/MistaMin/OpenPluginSDK), with
 
 ## Building and testing
 
-The SDK is used from a local checkout, with GoodLookinDri beside it. `scripts/build.sh` finds it (or set `OPENPLUGIN_SDK`) and writes `.cargo/config.toml`, which is not in Git:
+The SDK is used from a local checkout; GoodLookin DRI is in its `crates/`. `scripts/build.sh` finds it (or set `OPENPLUGIN_SDK`) and writes `.cargo/config.toml`, which is not in Git:
 
 ```toml
 [patch.crates-io]
 openplugin = { path = "<OpenPluginSDK>/crates/openplugin" }
 openplugin-testing = { path = "<OpenPluginSDK>/crates/openplugin-testing" }
-goodlookindri-shell = { path = "<GoodLookinDri>/shell" }
+goodlookindri-shell = { path = "<OpenPluginSDK>/crates/goodlookindri/shell" }
 
 [env]
 OPENPLUGIN_PORT = "<path to the openplugin-port executable>"   # for tests/null.rs
@@ -35,7 +35,7 @@ cargo test --release --features hq --test hq # HQ Mode with the solver; needs a 
 scripts/build.sh --hq                        # universal CLAP, LV2, VST3, AU, AAX and the app, in dist/
 ```
 
-Run Cargo and the script from this folder: Cargo reads `.cargo/config.toml` from where it is started. Version 1.1.0 was built with OpenPluginSDK `ded6d8d` and GoodLookin DRI 0.2.1. The Windows plug-ins (CLAP and VST3, no HQ Mode) and their installer are built by `../.github/workflows/windows.yml` with the SDK's `scripts/windows/build_plugin.ps1`.
+Run Cargo and the script from this folder: Cargo reads `.cargo/config.toml` from where it is started. Version 1.1.0 was built with OpenPluginSDK `ded6d8d` and GoodLookin DRI 0.2.1; the source now builds against OpenPluginSDK `19fac89`, which has GoodLookin DRI in its tree. The Windows plug-ins (CLAP and VST3, no HQ Mode) and their installer are built by `../.github/workflows/windows.yml` with the SDK's `scripts/windows/build_plugin.ps1`.
 
 `scripts/build.sh --help` lists the options and the variables that say where the VST3, Audio Unit and AAX SDKs and ngspice are. Nothing is installed and nothing is signed beyond ad hoc. The bundles carry the release's ids: installing them replaces the JUCE release in every host.
 
@@ -58,6 +58,6 @@ For host tests beside the installed release, feature `qa-identity` builds the sa
 ## Known limits
 
 - HQ Mode solves mono instances. A stereo solve fails to find its operating point ("timestep too small") and the render is muted with "HQ failed", as documented for a failed solve. The JUCE build's renderer fails the same way: it is the same source.
-- Sessions saved by the JUCE build open in the port through CLAP. The SDK's VST3, Audio Unit and AAX shells do not yet hand a plugin state they did not write.
+- Sessions saved by the JUCE build open in the port in every format (`load_foreign_state`; tests load states captured from the 1.0.0 VST3 and Audio Unit). The released 1.1.0 reads them in CLAP only. The AAX path is tested with the release's state under the chunk id `juce`, not with a chunk a Pro Tools session saved.
 - The SDK's shell build cannot ask a library that also holds C++ for its Audio Unit codes, so `scripts/build.sh` passes them.
 - Windows is built and tested by machine only: nobody has opened the editor there. Linux has not been tried.

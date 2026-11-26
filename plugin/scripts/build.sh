@@ -9,7 +9,7 @@
 #
 # Where things are found (set the variable, or keep the checkout in a Dependencies or SDKs folder
 # beside or above this repository):
-#   OPENPLUGIN_SDK   OpenPluginSDK checkout (GoodLookinDri beside it)
+#   OPENPLUGIN_SDK   OpenPluginSDK checkout (GoodLookin DRI is in its crates/)
 #   VST3_SDK, AU_SDK, AAX_SDK
 #   BLUECHANNEL_NGSPICE_INCLUDE, BLUECHANNEL_NGSPICE_LIBRARY, BLUECHANNEL_HQ_NOTICES   for --hq;
 #     default: ../build/deps/ngspice-universal, as built for the JUCE release
@@ -60,7 +60,7 @@ if [ ! -f "$here/.cargo/config.toml" ]; then
 [patch.crates-io]
 openplugin = { path = "$SDK/crates/openplugin" }
 openplugin-testing = { path = "$SDK/crates/openplugin-testing" }
-goodlookindri-shell = { path = "$SDK/../GoodLookinDri/shell" }
+goodlookindri-shell = { path = "$SDK/crates/goodlookindri/shell" }
 EOF
 fi
 

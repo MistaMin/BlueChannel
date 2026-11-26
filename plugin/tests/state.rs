@@ -2,6 +2,7 @@
 //! (tests/fixtures) load into the port with the values the capture read back.
 
 use blue_channel::{BlueChannel, PARAMS};
+use openplugin::core::foreign_state::ForeignStateKind;
 use openplugin::prelude::*;
 
 const DEFAULT: &[u8] = include_bytes!("fixtures/000-default.clap-state.bin");
@@ -49,5 +50,42 @@ fn a_damaged_state_of_the_release_is_refused_and_changes_nothing() {
     let at = bad.windows(7).position(|w| w == b"value=\"").unwrap() + 7;
     bad[at] = b'x';
     assert!(!plugin.load_state(&bad));
+    assert_eq!(plugin.values(), &before[..]);
+}
+
+/// The Vocal program as the release saved it through a VST3 host and through an
+/// Audio Unit host, and its own state as an AAX host hands it over.
+#[test]
+fn the_release_states_of_vst3_audio_unit_and_aax_hosts_load() {
+    let vocal = BlueChannel::default().preset_values(1).unwrap().to_vec();
+    let aax = [b"juce".as_slice(), SET].concat();
+    for (kind, blob, want) in [
+        (ForeignStateKind::Vst3Component, include_bytes!("fixtures/002-vocal.vst3-component.bin").as_slice(), &vocal),
+        (ForeignStateKind::AuClassInfo, include_bytes!("fixtures/002-vocal.au-classinfo.bin").as_slice(), &vocal),
+        (ForeignStateKind::AaxChunk, aax.as_slice(), &loaded(SET).values().to_vec()),
+    ] {
+        let mut plugin = BlueChannel::default();
+        for p in PARAMS.iter() {
+            plugin.set_param(p.id, p.max);
+        }
+        assert!(plugin.load_foreign_state(kind, blob), "{kind:?}");
+        for (p, (got, want)) in PARAMS.iter().zip(plugin.values().iter().zip(want.iter())) {
+            assert!((got - want).abs() <= 1e-4 * (1.0 + want.abs()), "{kind:?} {}: {got} for {want}", p.id);
+        }
+    }
+}
+
+#[test]
+fn a_foreign_state_that_is_not_the_release_s_is_refused_and_changes_nothing() {
+    let mut plugin = BlueChannel::default();
+    plugin.set_param("mix", 40.0);
+    let before = plugin.values().to_vec();
+    let own = plugin.save_state().unwrap();
+    let vst3 = include_bytes!("fixtures/002-vocal.vst3-component.bin");
+    for kind in [ForeignStateKind::Vst3Component, ForeignStateKind::Vst3Controller, ForeignStateKind::AuClassInfo, ForeignStateKind::AaxChunk] {
+        for blob in [&b""[..], b"juce", b"elck1234", &own, &vst3[..40], SET.get(..SET.len() / 2).unwrap()] {
+            assert!(!plugin.load_foreign_state(kind, blob), "{kind:?} took {} bytes", blob.len());
+        }
+    }
     assert_eq!(plugin.values(), &before[..]);
 }

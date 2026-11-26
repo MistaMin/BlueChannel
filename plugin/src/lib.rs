@@ -13,6 +13,7 @@ pub mod state_import;
 
 use std::sync::Arc;
 
+use openplugin::core::foreign_state::{plist, ForeignStateKind};
 use openplugin::core::{decode_params, encode_params, AaxIds, AuIds, Vst3Ids};
 use openplugin::prelude::*;
 
@@ -243,6 +244,30 @@ impl Plugin for BlueChannel {
                 None => return false,
             },
         };
+        self.values = values;
+        self.shared.set_settings(settings);
+        true
+    }
+
+    fn foreign_state_kinds(&self) -> &'static [ForeignStateKind] {
+        &[ForeignStateKind::Vst3Component, ForeignStateKind::AuClassInfo, ForeignStateKind::AaxChunk]
+    }
+
+    /// What the JUCE release saved through VST3, Audio Unit and AAX hosts: its
+    /// own state inside each format's container. A refused state changes nothing.
+    fn load_foreign_state(&mut self, kind: ForeignStateKind, data: &[u8]) -> bool {
+        let class_info;
+        let chunk = match kind {
+            // The release's state first; the bypass record after it is not read.
+            ForeignStateKind::Vst3Component => Some(data),
+            ForeignStateKind::AuClassInfo => {
+                class_info = plist::parse(data).ok();
+                class_info.as_ref().and_then(|v| v.get("jucePluginState")).and_then(|v| v.as_data())
+            }
+            ForeignStateKind::AaxChunk => data.strip_prefix(b"juce"),
+            _ => None,
+        };
+        let Some(Some(Ok((values, settings)))) = chunk.map(state_import::import_original) else { return false };
         self.values = values;
         self.shared.set_settings(settings);
         true
