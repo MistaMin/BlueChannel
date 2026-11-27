@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Built against OpenPluginSDK `19fac89`. A project saved with 1.0.0 now opens with its settings in VST3,
+- Built against OpenPluginSDK `1f608fe`. A project saved with 1.0.0 now opens with its settings in VST3,
   Audio Unit and AAX hosts too (1.1.0 read them in CLAP hosts only).
 - Fixed: with the Mic input, a loud tone below about 100 Hz (from -20 dBFS at 16x oversampling, from
   -12 dBFS at the default 2x) made the output overflow after one to three seconds, and the instance stayed

@@ -13,8 +13,8 @@ crate-type = ["cdylib", "staticlib", "rlib"]
 # OpenPluginSDK at one pinned revision. scripts/build.sh and the Windows workflow read the revision
 # from here and build the format shells from a checkout of the same one. See README.md.
 [dependencies]
-openplugin = { git = "https://github.com/MistaMin/OpenPluginSDK", rev = "19fac892df45210d0967229cf3799181a0489464" }
-goodlookindri-shell = { git = "https://github.com/MistaMin/OpenPluginSDK", rev = "19fac892df45210d0967229cf3799181a0489464" }
+openplugin = { git = "https://github.com/MistaMin/OpenPluginSDK", rev = "1f608fefe1a0ebc0215ffd67591a79c82f950686" }
+goodlookindri-shell = { git = "https://github.com/MistaMin/OpenPluginSDK", rev = "1f608fefe1a0ebc0215ffd67591a79c82f950686" }
 cpal = { version = "0.15", optional = true }
 
 [features]
@@ -30,8 +30,8 @@ standalone = ["dep:cpal"]
 qa-identity = []
 
 [dev-dependencies]
-openplugin = { git = "https://github.com/MistaMin/OpenPluginSDK", rev = "19fac892df45210d0967229cf3799181a0489464", features = ["testing"] }
-openplugin-testing = { git = "https://github.com/MistaMin/OpenPluginSDK", rev = "19fac892df45210d0967229cf3799181a0489464" }
+openplugin = { git = "https://github.com/MistaMin/OpenPluginSDK", rev = "1f608fefe1a0ebc0215ffd67591a79c82f950686", features = ["testing"] }
+openplugin-testing = { git = "https://github.com/MistaMin/OpenPluginSDK", rev = "1f608fefe1a0ebc0215ffd67591a79c82f950686" }
 
 [[bin]]
 name = "lv2_ttl"

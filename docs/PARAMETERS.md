@@ -3,10 +3,9 @@
 Schema version 1 (Blue Channel 0.1.0). Parameter IDs, order, ranges and choice lists are part of saved
 sessions and automation. Rules for later versions:
 
-- Never change the meaning, range, skew or choice order of an existing ID. Append new parameters, with a
-  higher JUCE version hint.
+- Never change the meaning, range, skew or choice order of an existing ID. Append new parameters.
 - A state that lacks a parameter restores that parameter to its **default**, so restoring into a modified
-  instance gives the same result as restoring into a fresh one (`setStateInformation`). If a future default
+  instance gives the same result as restoring into a fresh one (`load_state` in `plugin/src/lib.rs`). If a future default
   would change the sound of old sessions, add an explicit migration for the missing field instead.
 - Malformed or foreign state is ignored and the current state kept.
 - The state stores `schema` and `version` attributes, plus editor-only properties: `skin`, `vusource`,
