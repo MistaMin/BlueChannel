@@ -1,0 +1,9 @@
+vst3 sweep:1 exit 0 max |diff| 4.172325134277344e-7
+vst3 noise:1 exit 0 max |diff| 3.6954879760742188e-6
+vst3 impulses:1 exit 0 max |diff| 2.384185791015625e-7
+clap sweep:1 exit 0 max |diff| 4.172325134277344e-7
+clap noise:1 exit 0 max |diff| 3.6954879760742188e-6
+clap impulses:1 exit 0 max |diff| 2.384185791015625e-7
+au sweep:1 exit 0 max |diff| 4.172325134277344e-7
+au noise:1 exit 0 max |diff| 3.6954879760742188e-6
+au impulses:1 exit 0 max |diff| 2.384185791015625e-7
