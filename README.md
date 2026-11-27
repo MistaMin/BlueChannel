@@ -68,15 +68,15 @@ cargo test
 needs a shared ngspice library; see [the simulator build script](tools/build_hq_simulator_macos.sh)).
 All authored numerical model code is included; no private hardware source documents are needed.
 
-The repository root still holds the JUCE build that 1.0 was made from (`Source/`, `CMakeLists.txt`,
-[Building](docs/BUILDING.md)). Both builds compile the same model in `Source/Model`, `Source/Circuit`,
-`Source/DSP` and `Source/Dynamics`.
+The JUCE build that 1.0 was made from is at tag `v1.0.0`. The model it shares with 1.1 stays in
+`Source/Model`, `Source/Circuit`, `Source/DSP` and `Source/Dynamics`, with its own tests
+([Building](docs/BUILDING.md)).
 
 ## Licence
 
 Blue Channel source code is [MIT licensed](LICENSE); copyright (c) 2026 Marcos Quirino Deida. The official binaries are distributed as **freeware**, free of charge for personal or commercial audio production. See [official binary terms](BINARY_LICENSE.txt).
 
-Version 1.1 binaries are built with OpenPluginSDK and GoodLookin DRI and contain no JUCE code. The JUCE build in the repository root is not covered by this project's MIT licence where it uses JUCE: JUCE is available under AGPLv3 or a commercial JUCE licence, and anyone building or redistributing that build must comply with their own JUCE licence terms. The vendored [GoodLookinUI](third_party/GoodLookinUI) runtime headers retain their MIT licence. Other components retain their respective terms, including the shared simulator's BSD, MIT and LGPL rights. See [Third-party licences](THIRD_PARTY_LICENSES.md) and the included texts.
+Version 1.1 binaries are built with OpenPluginSDK and GoodLookin DRI and contain no JUCE code. The 1.0 source at tag `v1.0.0` uses JUCE, which is available under AGPLv3 or a commercial JUCE licence; anyone building or redistributing it must comply with their own JUCE licence terms. Other components retain their respective terms, including the shared simulator's BSD, MIT and LGPL rights. See [Third-party licences](THIRD_PARTY_LICENSES.md) and the included texts.
 
 VST is a trademark of Steinberg Media Technologies GmbH. Audio Units is a trademark of Apple Inc. AAX and Pro Tools are trademarks of Avid Technology, Inc.
 

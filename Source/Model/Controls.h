@@ -4,7 +4,7 @@
 
 // Front-panel state in panel units. The plugin wrapper fills this from host parameters once per block; the
 // engine never reads host parameter objects. Ranges are documented with the parameter registry
-// (Source/Plugin/Params.cpp, docs/PARAMETERS.md).
+// (Source/Plugin/Params.cpp at tag v1.0.0, docs/PARAMETERS.md).
 
 #include "ControlMap.h"
 

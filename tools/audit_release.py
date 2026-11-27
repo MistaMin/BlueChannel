@@ -40,11 +40,6 @@ else:
     for name in sorted(set(raw.decode().split('\0'))- {''}):
         file=root/name
         if file.is_file():inspect(name,file.read_bytes())
-    # The linked toolkit is licensed source, not hardware reference material.
-    toolkit=root/'third_party/GoodLookinUI'
-    if (toolkit/'.git').exists():
-        for name in subprocess.check_output(['git','ls-files','-z'],cwd=toolkit).decode().split('\0'):
-            if name and (toolkit/name).is_file():inspect('third_party/GoodLookinUI/'+name,(toolkit/name).read_bytes())
 if a.history:
     commit_messages=subprocess.check_output(['git','log','HEAD','--format=%B'],cwd=root)
     if pattern and pattern.search(commit_messages):issues.append({'file':'Git commit messages','issue':'restricted name'})

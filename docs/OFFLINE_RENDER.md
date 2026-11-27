@@ -29,7 +29,7 @@ offline rendering.
 
 Only the host's non-realtime flag selects the render bank. The render bank is a complete second engine:
 entering an offline render resets it, so repeated bounces start from the same state and are bit-identical
-(`tests/processor_test.cpp`); the live bank keeps its history meanwhile. Latency is zero in both, so
+(`plugin/tests/offline.rs`); the live bank keeps its history meanwhile. Latency is zero in both, so
 switching banks never changes host compensation.
 
 Not verified: that every host sets the non-realtime flag correctly. In a host that does not, offline exports

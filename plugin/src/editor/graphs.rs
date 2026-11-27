@@ -1,6 +1,6 @@
 //! The Digital skin's two graphs: the equaliser's response over the output
 //! spectrum, and the compressor's detector target. Geometry and editing rules
-//! are those of the 1.0 release (Source/UI/DigitalGraphs.h).
+//! are those of the 1.0 release (Source/UI/DigitalGraphs.h at tag v1.0.0).
 
 use openplugin::dri::goodlookindri::spectrum::{RealFft, SampleRing};
 

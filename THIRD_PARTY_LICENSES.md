@@ -26,17 +26,17 @@ The standalone application, which is built from source and not part of the relea
 (Apache License 2.0), coreaudio-rs, coreaudio-sys, core-foundation-sys, dasp_sample and mach2 (MIT or
 Apache License 2.0). Version 1.1 binaries contain no JUCE code.
 
-## Version 1.0 and the JUCE build in the repository root
+## Version 1.0 (the JUCE build, tag `v1.0.0`)
 
 The 1.0 binaries were built with JUCE under the publisher's commercial JUCE licence. End users need no
-JUCE developer licence to use them. Anyone building the JUCE build from source must satisfy the JUCE
-licence applicable to their build. `tools/collect_licenses.py` copies the texts below from the exact
-dependency revisions of such a build (with an `INDEX.txt` listing every file).
+JUCE developer licence to use them. Anyone building that source must satisfy the JUCE
+licence applicable to their build. The texts shipped with 1.0 are in `Licenses/third-party` (with an
+`INDEX.txt` listing every file).
 
 | Component | Used for | License |
 |---|---|---|
 | JUCE 9.0.3 | plugin framework, user interface, plugin formats | AGPLv3 or the commercial JUCE licence. OpenGrid builds its released binaries under its own JUCE licence. Anyone building from source needs a JUCE licence that covers their use and distribution. |
-| GoodLookinUI (`third_party/GoodLookinUI`) | knobs, keys, lamps, meters | MIT |
+| GoodLookinUI (vendored at that tag) | knobs, keys, lamps, meters | MIT |
 | CLAP, clap-helpers, clap-juce-extensions | CLAP format | MIT |
 | VST3 SDK (bundled with JUCE) | VST3 format | MIT |
 | LV2, serd, sord, sratom, lilv, zix (bundled with JUCE) | LV2 format | ISC |

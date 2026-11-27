@@ -1,4 +1,4 @@
-//! Value text, as the 1.0 release printed it (Source/Plugin/Params.cpp).
+//! Value text, as the 1.0 release printed it (Source/Plugin/Params.cpp at tag v1.0.0).
 
 use openplugin::prelude::*;
 

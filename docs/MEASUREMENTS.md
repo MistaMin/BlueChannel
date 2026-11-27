@@ -118,7 +118,7 @@ Source: working tree 0.1.0 / tests/stage_test.cpp / tests/reference (ngspice 47)
 Result: pass (see table) / limits: reference is a circuit model / decision: accepted 2026-10-17
 
 Claim: real-time safety and determinism / owner: host integration / threshold: 0 allocations, exact output
-Source: tests/model_test.cpp, tests/processor_test.cpp / result: pass / limits: tested scenarios only
+Source: tests/model_test.cpp, plugin/tests/offline.rs / result: pass / limits: tested scenarios only
 
 Claim: sound acceptance / owner: sound / status: open - needs level-matched program-material listening
 Claim: DAW behaviour / owner: host integration / status: open - instance count, automation, offline flag

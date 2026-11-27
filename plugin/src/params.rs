@@ -1,5 +1,5 @@
 //! The parameter table: ids, order, ranges and choice lists of Blue Channel 1.0
-//! (Source/Plugin/Params.cpp, docs/PARAMETERS.md). They are part of saved
+//! (Source/Plugin/Params.cpp at tag v1.0.0, docs/PARAMETERS.md). They are part of saved
 //! sessions and automation: never change the meaning of an existing id, append.
 //!
 //! Each parameter is pinned to the id the JUCE build showed hosts, read by

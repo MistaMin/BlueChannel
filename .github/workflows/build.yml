@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: MIT
-# Builds and tests Blue Channel on macOS (universal), Windows (x64) and Linux (x64), and uploads unsigned
-# packages. AAX is not built in CI (the AAX SDK is not public); official macOS releases include PACE-signed AAX freeware binaries.
+# Builds the model tests (Source/, tests/) with AddressSanitizer and runs them. The plugin is built and
+# tested by windows.yml and on the release machine (plugin/README.md).
 name: build
 
 on:
@@ -17,69 +17,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Build engine tests with AddressSanitizer
         run: |
-          cmake -S . -B build/asan -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBLUECHANNEL_BUILD_PLUGIN=OFF \
+          cmake -S . -B build/asan -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo \
             -DCMAKE_CXX_FLAGS="-fsanitize=address -fno-omit-frame-pointer"
           cmake --build build/asan --target BlueChannelStageTest BlueChannelModelTest --parallel 2
       - name: Run engine tests with AddressSanitizer
         run: ctest --test-dir build/asan --output-on-failure
-
-  build:
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: macos-14
-            name: macos
-          - os: windows-2022
-            name: windows
-          - os: ubuntu-22.04
-            name: linux
-    runs-on: ${{ matrix.os }}
-    env:
-      CMAKE_BUILD_PARALLEL_LEVEL: 2
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Linux dependencies
-        if: matrix.name == 'linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y ninja-build libasound2-dev libjack-jackd2-dev libx11-dev libxcomposite-dev \
-            libxi-dev libxcursor-dev libxext-dev libxinerama-dev libxrandr-dev libxrender-dev libfreetype6-dev \
-            libfontconfig1-dev libgl1-mesa-dev xvfb
-
-      - name: macOS dependencies
-        if: matrix.name == 'macos'
-        run: brew install ninja bison flex
-
-      - name: Build, test and package (macOS)
-        if: matrix.name == 'macos'
-        run: installer/build_macos.sh
-
-      - name: Build, test and package (Linux)
-        if: matrix.name == 'linux'
-        run: xvfb-run -a installer/build_linux.sh
-
-      - name: Build, test and package (Windows)
-        if: matrix.name == 'windows'
-        shell: pwsh
-        run: powershell -ExecutionPolicy Bypass -File installer\build_windows.ps1
-
-      - name: Validate VST3 with pluginval
-        if: matrix.name != 'windows'
-        continue-on-error: true
-        shell: bash
-        run: |
-          case "${{ matrix.name }}" in
-            macos) asset=pluginval_macOS.zip; bin="pluginval.app/Contents/MacOS/pluginval"; vst="build/release-macos/BlueChannel_artefacts/Release/VST3/Blue Channel.vst3" ;;
-            linux) asset=pluginval_Linux.zip; bin="./pluginval"; vst="build/release-linux/BlueChannel_artefacts/Release/VST3/Blue Channel.vst3" ;;
-          esac
-          curl -sSL -o pv.zip "https://github.com/Tracktion/pluginval/releases/latest/download/$asset"
-          unzip -q pv.zip
-          ${{ matrix.name == 'linux' && 'xvfb-run -a' || '' }} $bin --strictness-level 7 --validate-in-process --skip-gui-tests "$vst"
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: blue-channel-${{ matrix.name }}
-          path: dist/**
-          if-no-files-found: error

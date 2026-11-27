@@ -17,7 +17,7 @@ using namespace bluechannel::model;
 
 namespace
 {
-// Table positions, in the order of src/params.rs (which is the order of Source/Plugin/Params.cpp).
+// Table positions, in the order of src/params.rs (which is the order of Source/Plugin/Params.cpp at tag v1.0.0).
 enum P
 {
     source, micGain, lineGain, trim, phase, impedance, air,
@@ -31,7 +31,7 @@ enum P
     kCount
 };
 
-// The same mapping as params::Reader::read in the JUCE build.
+// The same mapping as params::Reader::read in the JUCE build (tag v1.0.0).
 void read(const float* v, Controls& c)
 {
     auto f = [&](P p) { return double(v[p]); };
@@ -99,7 +99,7 @@ void read(const float* v, Controls& c)
 }
 } // namespace
 
-// The same computation as DigitalEqGraph::refresh in the JUCE build.
+// The same computation as DigitalEqGraph::refresh in the JUCE build (tag v1.0.0).
 struct BcEqView
 {
     EqStage filters, shelves, lmf, hmf;

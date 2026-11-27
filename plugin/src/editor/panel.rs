@@ -2,7 +2,7 @@
 //!
 //! The analogue page is the front panel of the hardware the plugin models, 1560 x 450
 //! units, with every control, lamp, meter and field where the 1.0 release has it
-//! (Source/Plugin/PluginEditor.cpp; knob placement and caps from Designs/knobs.csv).
+//! (Source/Plugin/PluginEditor.cpp at tag v1.0.0; knob placement and caps from Designs/knobs.csv).
 //! Nothing on it may move: legibility there comes from type, ink and crisp drawing.
 //!
 //! The Digital skin's two pages are laid out for reading, 1250 x 900 units, with no

@@ -147,7 +147,7 @@ analogue detectors (replaced by the digital side-chains in `docs/DYNAMICS.md`).
 | 47 netlist responses vs ngspice, 20 Hz to 20 kHz | `tests/stage_test.cpp`, `tests/reference` |
 | DK discretisation vs analogue response at 96 kHz | same test (max 0.31 dB, 31.5 Hz to 10 kHz, outside stop bands) |
 | Transformer fit, unity path, EQ, compressor curve, de-esser, limiter, block-size independence, no allocation, overload recovery, deterministic offline renders, locale | `tests/model_test.cpp` |
-| Bus layouts, state, programs, editor lifetime, offline factor | `tests/processor_test.cpp` |
+| Bus layouts, state, programs, editor lifetime, offline factor | `plugin/tests/state.rs`, `plugin/tests/offline.rs`, `plugin/src/editor/tests.rs` |
 
 Regenerate the references with `BLUE_REFERENCE_CIR=<deck> tools/make_references.sh`; regenerate the
 calibration tables with `BlueChannelCalibrate > Source/Model/Calibration.h`.
