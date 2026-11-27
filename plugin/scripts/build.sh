@@ -96,6 +96,20 @@ if [ -d "$app" ]; then
   codesign --force --sign - "$app"
 fi
 
+# The licences of the typefaces inside the binaries: the toolkit's built-in face in all of them, and the
+# SDK's other bundled faces in the VST3, Audio Unit and AAX shells, which link the whole Rust library.
+fonts="$SDK/crates/goodlookindri/shell/fonts"
+for bundle in "$out"/*.clap "$out"/*.vst3 "$out"/*.component "$out"/*.aaxplugin "$out"/*.app "$out"/*.lv2; do
+  [ -d "$bundle" ] || continue
+  if [ -d "$bundle/Contents" ]; then notices="$bundle/Contents/Resources/ThirdParty"; else notices="$bundle/ThirdParty"; fi
+  mkdir -p "$notices"
+  cp "$fonts/OFL.txt" "$notices/SourceSansPro-OFL.txt"
+  case "$bundle" in *.vst3|*.component|*.aaxplugin)
+    for licence in "$fonts"/*/OFL.*; do cp "$licence" "$notices/$(basename "$(dirname "$licence")")-OFL.txt"; done ;;
+  esac
+  if [ -d "$bundle/Contents" ]; then codesign --force --sign - "$bundle"; fi
+done
+
 if [ "$hq" = 1 ]; then
   # The solver beside each plugin binary, where it is looked for first, with its notices.
   library="$BLUECHANNEL_NGSPICE_LIBRARY"
