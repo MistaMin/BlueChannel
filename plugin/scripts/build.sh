@@ -52,17 +52,12 @@ while [ $# -gt 0 ]; do
   esac
 done
 
-# Cargo takes the SDK from this checkout. The file holds machine paths and is not in Git.
-if [ ! -f "$here/.cargo/config.toml" ]; then
-  mkdir -p "$here/.cargo"
-  cat > "$here/.cargo/config.toml" <<EOF
-# Written by scripts/build.sh: where this machine keeps OpenPluginSDK.
-[patch.crates-io]
-openplugin = { path = "$SDK/crates/openplugin" }
-openplugin-testing = { path = "$SDK/crates/openplugin-testing" }
-goodlookindri-shell = { path = "$SDK/crates/goodlookindri/shell" }
-EOF
-fi
+# Cargo takes the SDK's crates from Git at the revision in Cargo.toml; the format shells are built
+# from this checkout. The two must be the same revision.
+rev="$(sed -n 's/^openplugin = .*rev = "\([0-9a-f]*\)".*/\1/p' "$here/Cargo.toml" | head -n 1)"
+[ -n "$rev" ] || { echo "no OpenPluginSDK revision in $here/Cargo.toml" >&2; exit 1; }
+have="$(git -C "$SDK" rev-parse HEAD)"
+[ "$have" = "$rev" ] || { echo "$SDK is at $have, but Cargo.toml pins $rev; check out that revision" >&2; exit 1; }
 
 features=standalone
 if [ "$hq" = 1 ]; then

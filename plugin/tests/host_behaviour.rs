@@ -1,0 +1,67 @@
+//! ST-9: host behaviour the conformance kit does not drive.
+
+use blue_channel::BlueChannel;
+use openplugin::prelude::*;
+
+fn stereo(frames: usize, value: f32) -> Vec<Vec<f32>> {
+    vec![vec![value; frames]; 2]
+}
+
+fn run(plugin: &mut BlueChannel, buffers: &mut [Vec<f32>], frames: usize) {
+    let mut io: Vec<&mut [f32]> = buffers.iter_mut().map(|c| c.as_mut_slice()).collect();
+    plugin.process(&mut io, frames);
+}
+
+fn finite(buffers: &[Vec<f32>]) -> bool {
+    buffers.iter().flatten().all(|s| s.is_finite())
+}
+
+#[test]
+fn process_before_prepare_is_defined() {
+    let mut plugin = BlueChannel::default();
+    let mut buffers = stereo(64, 0.5);
+    run(&mut plugin, &mut buffers, 64);
+    assert!(finite(&buffers));
+}
+
+#[test]
+fn a_rate_change_without_a_reset_keeps_working() {
+    let mut plugin = BlueChannel::default();
+    plugin.prepare(44100.0, 512, 2);
+    run(&mut plugin, &mut stereo(512, 0.25), 512);
+    plugin.prepare(96000.0, 512, 2); // a device switch: no reset in between
+    for _ in 0..200 {
+        let mut buffers = stereo(512, 0.25);
+        run(&mut plugin, &mut buffers, 512);
+        assert!(finite(&buffers));
+    }
+}
+
+#[test]
+fn every_frame_count_up_to_the_buffer_length_works() {
+    let mut plugin = BlueChannel::default();
+    plugin.prepare(48000.0, 512, 2);
+    for frames in [1usize, 2, 3, 7, 64, 333, 511, 512] {
+        let mut buffers = stereo(512, 0.1);
+        run(&mut plugin, &mut buffers, frames);
+        assert!(finite(&buffers), "frames = {frames}");
+    }
+}
+
+/// 1.0.0 and 1.1.0 overflowed here: the default Mic input, a loud low tone, after one to three seconds.
+#[test]
+fn a_loud_low_tone_into_the_mic_input_stays_finite() {
+    for (oversampling, hz) in [(1.0, 20.0), (4.0, 20.0), (4.0, 100.0)] {
+        let mut plugin = BlueChannel::default();
+        plugin.prepare(48000.0, 512, 2);
+        plugin.set_param("oversampling", oversampling);
+        let mut n = 0usize;
+        for _ in 0..(48000 * 4 / 512) {
+            let tone: Vec<f32> = (n..n + 512).map(|k| (std::f64::consts::TAU * hz * k as f64 / 48000.0).sin() as f32).collect();
+            n += 512;
+            let mut buffers = vec![tone.clone(), tone];
+            run(&mut plugin, &mut buffers, 512);
+            assert!(finite(&buffers), "oversampling {oversampling}, {hz} Hz, sample {n}");
+        }
+    }
+}

@@ -13,7 +13,8 @@
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-/// The installed 1.0.0 JUCE release.
+/// The 1.0.0 JUCE release. Once a later version is installed there, name a 1.0.0 with
+/// `OPENPLUGIN_PORT_ORIGINAL`.
 /// (Its VST3: the CLAP build crashes in the tool's host.)
 const ORIGINAL: &str = "/Library/Audio/Plug-Ins/VST3/Blue Channel.vst3";
 const ORIGINAL_FORMAT: &str = "vst3";
@@ -22,7 +23,10 @@ const LIB: &str = "blue_channel";
 /// Built-in signals, each rendered and compared (`sweep`, `noise`, `impulses`, `burst`, `silence`, `:seconds`).
 const INPUTS: &[&str] = &["sweep:1", "noise:1", "impulses:1"];
 /// Largest sample difference allowed.
-const TOLERANCE: &str = "1e-6";
+/// 1.0.0 and 1.1.0 agree to 1e-6. Since the mic transformer's core current is injected without its
+/// content at half the sample rate (Source/Model/Stages.h: 1.0.0 overflows on a loud tone below
+/// 100 Hz), the largest difference measured is 3.7e-6.
+const TOLERANCE: &str = "1e-5";
 /// Parameter moves for both plugins, as `frame:param=value`; one set per run.
 /// Every frame is a multiple of the 512-frame block: the JUCE build applies a
 /// change from the start of its block, the port at the frame itself.

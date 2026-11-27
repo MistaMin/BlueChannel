@@ -311,10 +311,12 @@ checksum = "e4eba85ea1d0a966a983acd07deee566e67395d2d96b6fb39e62b5a833f1eb0b"
 [[package]]
 name = "goodlookindri"
 version = "0.2.1"
+source = "git+https://github.com/MistaMin/OpenPluginSDK?rev=19fac892df45210d0967229cf3799181a0489464#19fac892df45210d0967229cf3799181a0489464"
 
 [[package]]
 name = "goodlookindri-shell"
 version = "0.2.1"
+source = "git+https://github.com/MistaMin/OpenPluginSDK?rev=19fac892df45210d0967229cf3799181a0489464#19fac892df45210d0967229cf3799181a0489464"
 dependencies = [
  "fontdue",
  "goodlookindri",
@@ -606,17 +608,20 @@ checksum = "9f7c3e4beb33f85d45ae3e3a1792185706c8e16d043238c593331cc7cd313b50"
 [[package]]
 name = "openplugin"
 version = "1.0.0-beta"
+source = "git+https://github.com/MistaMin/OpenPluginSDK?rev=19fac892df45210d0967229cf3799181a0489464#19fac892df45210d0967229cf3799181a0489464"
 dependencies = [
  "openplugin-core",
  "openplugin-dri",
  "openplugin-dsp",
  "openplugin-host",
  "openplugin-targets",
+ "openplugin-testing",
 ]
 
 [[package]]
 name = "openplugin-core"
 version = "1.0.0-beta"
+source = "git+https://github.com/MistaMin/OpenPluginSDK?rev=19fac892df45210d0967229cf3799181a0489464#19fac892df45210d0967229cf3799181a0489464"
 dependencies = [
  "serde",
 ]
@@ -624,6 +629,7 @@ dependencies = [
 [[package]]
 name = "openplugin-dri"
 version = "1.0.0-beta"
+source = "git+https://github.com/MistaMin/OpenPluginSDK?rev=19fac892df45210d0967229cf3799181a0489464#19fac892df45210d0967229cf3799181a0489464"
 dependencies = [
  "goodlookindri",
  "goodlookindri-shell",
@@ -636,6 +642,7 @@ dependencies = [
 [[package]]
 name = "openplugin-dsp"
 version = "1.0.0-beta"
+source = "git+https://github.com/MistaMin/OpenPluginSDK?rev=19fac892df45210d0967229cf3799181a0489464#19fac892df45210d0967229cf3799181a0489464"
 dependencies = [
  "openplugin-core",
  "rustfft",
@@ -645,6 +652,7 @@ dependencies = [
 [[package]]
 name = "openplugin-host"
 version = "1.0.0-beta"
+source = "git+https://github.com/MistaMin/OpenPluginSDK?rev=19fac892df45210d0967229cf3799181a0489464#19fac892df45210d0967229cf3799181a0489464"
 dependencies = [
  "openplugin-core",
 ]
@@ -652,6 +660,7 @@ dependencies = [
 [[package]]
 name = "openplugin-targets"
 version = "1.0.0-beta"
+source = "git+https://github.com/MistaMin/OpenPluginSDK?rev=19fac892df45210d0967229cf3799181a0489464#19fac892df45210d0967229cf3799181a0489464"
 dependencies = [
  "openplugin-core",
  "openplugin-dri",
@@ -661,6 +670,7 @@ dependencies = [
 [[package]]
 name = "openplugin-testing"
 version = "1.0.0-beta"
+source = "git+https://github.com/MistaMin/OpenPluginSDK?rev=19fac892df45210d0967229cf3799181a0489464#19fac892df45210d0967229cf3799181a0489464"
 dependencies = [
  "openplugin-core",
 ]

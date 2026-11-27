@@ -11,7 +11,9 @@ openplugin_testing::install_allocator!();
 
 #[test]
 fn passes_the_conformance_kit() {
-    let report = conformance(BlueChannel::default, Options::quick());
+    // The standard: the quick run in a debug build, the whole kit in a release build.
+    let options = if cfg!(debug_assertions) { Options::quick() } else { Options::default() };
+    let report = conformance(BlueChannel::default, options);
     report.assert_pass();
     assert_eq!(report.status(Check::NoAlloc), Status::Pass, "{report}");
 }

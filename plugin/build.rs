@@ -34,6 +34,9 @@ fn main() {
     } else {
         build.define("BLUECHANNEL_HQ", "0");
     }
+    if env::var_os("CARGO_FEATURE_COUNT_CPP_NEW").is_some() {
+        build.file("cpp/count_new.cpp");
+    }
     build.flag_if_supported("-fvisibility=hidden");
     // HQRenderer.cpp keeps a helper that only the solver build uses.
     build.flag_if_supported("-Wno-unused-function");

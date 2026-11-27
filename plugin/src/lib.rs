@@ -145,10 +145,11 @@ impl Plugin for BlueChannel {
     fn process_buses(&mut self, io: &mut [&mut [f32]], sidechain: Option<&[&[f32]]>, frames: usize) {
         let Some(engine) = &mut self.engine else { return };
         // One NaN would stay in the model's state for good: non-finite input is silence,
-        // and a key that carries one is left out of the block.
+        // and a key that carries one is left out of the block. So is input too small to
+        // hear (under -600 dBFS), which would leave the model as denormal numbers.
         for channel in io.iter_mut().take(2) {
             for sample in channel.iter_mut().take(frames) {
-                if !sample.is_finite() {
+                if !(sample.abs() >= 1.0e-30 && sample.is_finite()) {
                     *sample = 0.0;
                 }
             }
@@ -287,6 +288,36 @@ fn decode_own(data: &[u8]) -> Option<([f32; COUNT], EditorSettings)> {
     Some((values, EditorSettings { skin: head[0], vu_source: head[1], vu_high_cal: head[2] == 1, ui_scale }))
 }
 
+/// Feature `count-cpp-new`: what cpp/count_new.cpp sends C++ `new` and `delete` to.
+#[cfg(feature = "count-cpp-new")]
+mod counted_new {
+    use std::alloc::{alloc, dealloc, Layout};
+    const HEADER: usize = 16;
+
+    /// # Safety
+    /// Called from C++ `operator new`.
+    #[no_mangle]
+    pub unsafe extern "C" fn bc_rust_alloc(size: usize) -> *mut u8 {
+        let Ok(layout) = Layout::from_size_align(size + HEADER, HEADER) else { return std::ptr::null_mut() };
+        let base = alloc(layout);
+        if base.is_null() {
+            return base;
+        }
+        (base as *mut usize).write(size + HEADER);
+        base.add(HEADER)
+    }
+
+    /// # Safety
+    /// `p` came from `bc_rust_alloc` or is null.
+    #[no_mangle]
+    pub unsafe extern "C" fn bc_rust_free(p: *mut u8) {
+        if !p.is_null() {
+            let base = p.sub(HEADER);
+            dealloc(base, Layout::from_size_align_unchecked((base as *const usize).read(), HEADER));
+        }
+    }
+}
+
 openplugin::targets::export_clap!(BlueChannel, editor = make_editor);
 openplugin::targets::export_lv2!(BlueChannel, editor = make_editor);
 openplugin::targets::export_shell!(BlueChannel, editor = make_editor);
@@ -294,6 +325,11 @@ openplugin::targets::export_shell!(BlueChannel, editor = make_editor);
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn the_crate_and_the_bundles_have_one_version() {
+        assert_eq!(include_str!("../../VERSION").trim(), env!("CARGO_PKG_VERSION"));
+    }
 
     #[test]
     fn own_state_round_trips() {

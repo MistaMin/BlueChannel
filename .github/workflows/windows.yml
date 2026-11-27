@@ -11,8 +11,7 @@ on:
   workflow_dispatch:
 
 env:
-  # The SDK revisions the source is built and tested with on macOS.
-  OPENPLUGIN_SDK_REF: 19fac892df45210d0967229cf3799181a0489464
+  # The VST3 SDK revision the source is built and tested with on macOS.
   VST3_SDK_REF: v3.8.1_build_84
 
 jobs:
@@ -25,11 +24,20 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: BlueChannel
+      # Cargo takes the SDK's crates at the revision in plugin/Cargo.toml; the shells are built from
+      # a checkout of the same one.
+      - name: Read the OpenPluginSDK revision
+        id: sdk
+        shell: bash
+        run: |
+          rev="$(sed -n 's/^openplugin = .*rev = "\([0-9a-f]*\)".*/\1/p' BlueChannel/plugin/Cargo.toml | head -n 1)"
+          [ -n "$rev" ] || { echo "no OpenPluginSDK revision in plugin/Cargo.toml" >&2; exit 1; }
+          echo "rev=$rev" >> "$GITHUB_OUTPUT"
       - name: Check out OpenPluginSDK
         uses: actions/checkout@v4
         with:
           repository: MistaMin/OpenPluginSDK
-          ref: ${{ env.OPENPLUGIN_SDK_REF }}
+          ref: ${{ steps.sdk.outputs.rev }}
           path: OpenPluginSDK
       - name: Check out the VST3 SDK
         uses: actions/checkout@v4
@@ -41,25 +49,11 @@ jobs:
       - name: Install stable Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Point Cargo at the SDK checkouts
-        shell: pwsh
-        run: |
-          $ErrorActionPreference = 'Stop'
-          $ws = $env:GITHUB_WORKSPACE -replace '\\', '/'
-          New-Item -ItemType Directory -Force -Path BlueChannel/plugin/.cargo | Out-Null
-          @"
-          [patch.crates-io]
-          openplugin = { path = "$ws/OpenPluginSDK/crates/openplugin" }
-          openplugin-testing = { path = "$ws/OpenPluginSDK/crates/openplugin-testing" }
-          goodlookindri-shell = { path = "$ws/OpenPluginSDK/crates/goodlookindri/shell" }
-          "@ | Set-Content -LiteralPath BlueChannel/plugin/.cargo/config.toml -Encoding utf8
-
       # tests/null.rs compares against an installed 1.0.0 and is run on the release machine.
       - name: Tests
         working-directory: BlueChannel/plugin
-        run: cargo test --release --lib --test conformance --test state --test offline
+        run: cargo test --release --lib --test conformance --test host_behaviour --test state --test offline
 
-      # From plugin/, where Cargo finds .cargo/config.toml.
       - name: Build the plug-ins
         shell: pwsh
         working-directory: BlueChannel/plugin

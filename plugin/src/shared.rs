@@ -157,10 +157,6 @@ impl Shared {
         }
     }
 
-    pub fn set_hq_status(&self, status: HqStatus) {
-        self.hq_status.store(status as u32, Relaxed);
-    }
-
     pub fn settings(&self) -> EditorSettings {
         EditorSettings {
             skin: self.skin.load(Relaxed).min(1) as u8,

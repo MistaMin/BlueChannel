@@ -13,14 +13,15 @@ Blue Channel on [OpenPluginSDK](https://github.com/MistaMin/OpenPluginSDK), with
 | `src/shared.rs` | What the engine shares with the editor: meters, the analyser ring, the editor's saved settings. |
 | `src/editor/` | The editor: the analogue panel (1560 × 450, the layout of the JUCE build, knobs placed from `../Designs/knobs.csv`) and the Digital skin with its graphs (1250 × 900). Each skin resizes in its own shape. `lettering.rs` draws the legends with the system font on macOS and the toolkit's face elsewhere. |
 | `src/bin/standalone.rs` | The standalone app (feature `standalone`). |
-| `tests/` | The SDK's conformance kit, the release's captured states, the offline render policy, HQ Mode, and the null test against the installed release. |
+| `tests/` | The SDK's conformance kit, the standard host-behaviour, soak and strict fuzz tests, the release's captured states, the offline render policy, HQ Mode, and the null test against the 1.0.0 release. |
+| `examples/bench.rs`, `bench/baseline.json` | The standard benchmark and its stored baseline. |
 
 ## Building and testing
 
-The SDK is used from a local checkout; GoodLookin DRI is in its `crates/`. `scripts/build.sh` finds it (or set `OPENPLUGIN_SDK`) and writes `.cargo/config.toml`, which is not in Git:
+Cargo takes OpenPluginSDK (GoodLookin DRI is in its `crates/`) from Git at the revision pinned in `Cargo.toml`, so `cargo test` works in a fresh clone. `scripts/build.sh` builds the format shells from a local checkout (it finds one, or set `OPENPLUGIN_SDK`) and stops if that checkout is at another revision. To work against a local SDK, put this in `.cargo/config.toml`, which is not in Git:
 
 ```toml
-[patch.crates-io]
+[patch."https://github.com/MistaMin/OpenPluginSDK"]
 openplugin = { path = "<OpenPluginSDK>/crates/openplugin" }
 openplugin-testing = { path = "<OpenPluginSDK>/crates/openplugin-testing" }
 goodlookindri-shell = { path = "<OpenPluginSDK>/crates/goodlookindri/shell" }
@@ -30,12 +31,14 @@ OPENPLUGIN_PORT = "<path to the openplugin-port executable>"   # for tests/null.
 ```
 
 ```bash
-cargo test                                   # tests/null.rs needs the 1.0.0 VST3 installed
+cargo test                                   # tests/null.rs needs the 1.0.0 VST3: OPENPLUGIN_PORT_ORIGINAL names it
+cargo test --release --test soak -- --ignored   # 24 seeds and the strict fuzz, about ten minutes
+cargo test --release --features count-cpp-new --test conformance   # the allocation check with the C++ model counted too
 cargo test --release --features hq --test hq # HQ Mode with the solver; needs a shared ngspice library
 scripts/build.sh --hq                        # universal CLAP, LV2, VST3, AU, AAX and the app, in dist/
 ```
 
-Run Cargo and the script from this folder: Cargo reads `.cargo/config.toml` from where it is started. Version 1.1.0 was built with OpenPluginSDK `ded6d8d` and GoodLookin DRI 0.2.1; the source now builds against OpenPluginSDK `19fac89`, which has GoodLookin DRI in its tree. The Windows plug-ins (CLAP and VST3, no HQ Mode) and their installer are built by `../.github/workflows/windows.yml` with the SDK's `scripts/windows/build_plugin.ps1`.
+Version 1.1.0 was built with OpenPluginSDK `ded6d8d` and GoodLookin DRI 0.2.1; the source now builds against OpenPluginSDK `19fac89`, which has GoodLookin DRI in its tree. The Windows plug-ins (CLAP and VST3, no HQ Mode) and their installer are built by `../.github/workflows/windows.yml` with the SDK's `scripts/windows/build_plugin.ps1`.
 
 `scripts/build.sh --help` lists the options and the variables that say where the VST3, Audio Unit and AAX SDKs and ngspice are. Nothing is installed and nothing is signed beyond ad hoc. The bundles carry the release's ids: installing them replaces the JUCE release in every host.
 

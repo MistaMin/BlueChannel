@@ -4,6 +4,15 @@
 
 - Built against OpenPluginSDK `19fac89`. A project saved with 1.0.0 now opens with its settings in VST3,
   Audio Unit and AAX hosts too (1.1.0 read them in CLAP hosts only).
+- Fixed: with the Mic input, a loud tone below about 100 Hz (from -20 dBFS at 16x oversampling, from
+  -12 dBFS at the default 2x) made the output overflow after one to three seconds, and the instance stayed
+  silent or broken until it was reset. 1.0.0 and 1.1.0 both do this. The mic transformer's core current
+  is now injected without its content at half the internal sample rate. The sound differs from 1.0.0 by
+  at most 3.7e-6 (about -130 dB) in the null test.
+- Input below -600 dBFS is treated as silence, so the model does not run on denormal numbers.
+- The JUCE build that 1.0 was made from is no longer in the repository; it is at tag `v1.0.0`. The model
+  and its tests stay. The SDK is taken from Git at a pinned revision, so `cargo test` works in a fresh
+  clone.
 - From the SDK: an Audio Unit host that sets a switch between two steps gets the nearest step, edits made
   in a VST3 host while the plugin is not processing are kept in the project, and a VST3 host that
   restarts processing during a render no longer gets one unprocessed block.

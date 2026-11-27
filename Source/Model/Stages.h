@@ -81,11 +81,18 @@ public:
         bandwidth.setLowPass(10e6 / ng, sampleRate);
         dk.update();
     }
-    void reset() { dk.reset(); core.flux = 0.0; bandwidth.reset(); }
+    void reset() { dk.reset(); core.flux = 0.0; current1 = current2 = 0.0; bandwidth.reset(); }
     void setCoreReference(double fluxRef) { core.fluxRef = fluxRef; }   // for fitting tools
     double process(double v)
     {
-        const double u[2] = { v, core.current() };
+        // The core current without its content at half the sample rate. Injected as it is, one sample
+        // late, it feeds the network's stiff modes there: with a loud tone below 100 Hz that oscillation
+        // grew for a second or two and then overflowed. This three-point form has a zero at half the
+        // sample rate and no delay at low frequencies, where the current is large.
+        const double current = core.current();
+        const double u[2] = { v, 0.75 * current + 0.5 * current1 - 0.25 * current2 };
+        current2 = current1;
+        current1 = current;
         double y[2];
         dk.process(u, y);
         core.advance(y[1]);
@@ -95,6 +102,7 @@ public:
 
 private:
     CoreFlux core;
+    double current1 = 0.0, current2 = 0.0;
     OnePole bandwidth;
     double unityScale = 1.0;
     double sampleRate = 96000.0;
