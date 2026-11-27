@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased
+## 1.1.1
+
+See docs/RELEASE_1.1.1.md for what was checked and what was not.
 
 - Built against OpenPluginSDK `1f608fe`. A project saved with 1.0.0 now opens with its settings in VST3,
   Audio Unit and AAX hosts too (1.1.0 read them in CLAP hosts only).

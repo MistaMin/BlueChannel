@@ -182,9 +182,10 @@ ids, in the same order. What differs:
 - Parameters are shown to the host in their own units (dB, Hz, positions); 1.0 showed every one as 0 to 1.
   Automation of switches plays back as before. Automation of continuous controls that a CLAP host recorded
   with 1.0 plays back at other values and has to be redrawn.
-- A project saved with 1.0 opens with its settings in a CLAP host. **In VST3, Audio Unit and AAX hosts the
-  settings saved by 1.0 are not read: the plugin opens at its defaults.** Keep 1.0 for those projects, or
-  note the settings before updating.
+- A project saved with 1.0 opens with its settings, from version 1.1.1 on. (1.1.0 read them in CLAP hosts
+  only and opened at its defaults in VST3, Audio Unit and AAX hosts.) The AAX path has been tested with a
+  state of 1.0 and not yet with a Pro Tools session: note the settings of a Pro Tools project before
+  updating.
 - A change of a parameter inside an audio block takes effect at its exact position, where 1.0 applied it
   from the start of the block.
 - A 5 second tail is reported to the host (1.0 reported none), so a host that stops processing silent

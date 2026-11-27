@@ -13,26 +13,26 @@ transformer in one plugin.
 Both interfaces control the same audio model. Digital adds a draggable compressor curve and EQ controls
 with an output FFT. HP/LP filters stay editable when routed to a sidechain and dim when switched out.
 
-## Version 1.1.0
+## Version 1.1.1
 
-- Rebuilt on OpenPluginSDK with the editor drawn by GoodLookin DRI. The circuit model is that of 1.0,
-  unchanged, and hosts see the same plugin and the same 62 parameters.
-- New Digital layout at 1250 × 900 with keys and sliders; the analogue panel keeps its 1.0 layout at
-  1560 × 450 with lit knobs and sharper lettering. Each skin resizes in its own shape.
-- Digital's level and gain-reduction numbers hold for 1.5 seconds so they can be read.
-- Hosts see parameters in their own units (dB, Hz, positions).
-- **Projects saved with 1.0 in VST3, Audio Unit or AAX hosts open at the default settings** (CLAP projects
-  keep theirs). Read the [1.1 release notes](docs/RELEASE_1.1.0.md) before updating.
+- **A project saved with 1.0 now opens with its settings in VST3, Audio Unit and AAX hosts too.** 1.1.0
+  read them in CLAP hosts only.
+- Fixed: with the Mic input, a loud tone below about 100 Hz could make the output overflow after a few
+  seconds and leave the instance silent until it was reset. 1.0.0 and 1.1.0 both did this.
+- From OpenPluginSDK: an Audio Unit host that sets a switch between two steps gets the nearest step, and
+  edits made in a VST3 host while the plugin is not processing are kept in the project.
+- Otherwise the plugin of 1.1.0: the circuit model of 1.0 on OpenPluginSDK, the editor drawn by
+  GoodLookin DRI, the same plugin ids and 62 parameters. See the [1.1.1 release notes](docs/RELEASE_1.1.1.md).
 
 ## Download
 
-- **macOS 11 or later (Apple Silicon and Intel):** [Blue-Channel-1.1.0-macos.pkg](https://github.com/MistaMin/BlueChannel/releases/download/v1.1.0/Blue-Channel-1.1.0-macos.pkg)
-- **Windows 10 or later (x64):** [Blue-Channel-1.1.0-windows-x64-setup.exe](https://github.com/MistaMin/BlueChannel/releases/download/v1.1.0/Blue-Channel-1.1.0-windows-x64-setup.exe)
+- **macOS 11 or later (Apple Silicon and Intel):** [Blue-Channel-1.1.1-macos.pkg](https://github.com/MistaMin/BlueChannel/releases/download/v1.1.1/Blue-Channel-1.1.1-macos.pkg)
+- **Windows 10 or later (x64):** [Blue-Channel-1.1.1-windows-x64-setup.exe](https://github.com/MistaMin/BlueChannel/releases/download/v1.1.1/Blue-Channel-1.1.1-windows-x64-setup.exe)
 
 The macOS installer offers **VST3, Audio Unit, CLAP, LV2 and AAX**, all freeware. It is signed with a
 Developer ID and notarised by Apple, and the AAX plug-in is signed with PACE Eden for Pro Tools. The
 Windows installer offers **VST3 and CLAP** and is not code signed. Checksums, the manual as a PDF and the
-manifest are on the [release page](https://github.com/MistaMin/BlueChannel/releases/tag/v1.1.0).
+manifest are on the [release page](https://github.com/MistaMin/BlueChannel/releases/tag/v1.1.1).
 
 Not in 1.1: a standalone application, LV2 and AAX on Windows, and Linux. HQ mode is macOS only. The
 Windows build was built and tested by machine and has not been opened in a host by a person. For the
@@ -42,8 +42,8 @@ stays available.
 ## User guide
 
 See the [User Guide](docs/USER_MANUAL.md), [HQ mode](docs/HQ_MODE.md), the
-[changelog](CHANGELOG.md) and the [1.1 release notes](docs/RELEASE_1.1.0.md)
-([1.0 release notes](docs/RELEASE_1.0.0.md)).
+[changelog](CHANGELOG.md) and the [1.1.1 release notes](docs/RELEASE_1.1.1.md)
+([1.1.0](docs/RELEASE_1.1.0.md), [1.0](docs/RELEASE_1.0.0.md)).
 
 **Offline HQ is experimental and can be extremely slow.** Begin with a millisecond-scale selection.
 A failure mutes export and displays its status; playback remains Standard. Long solves retain probe
@@ -53,9 +53,9 @@ Listening acceptance, multi-instance DAW checks and long-render validation remai
 
 ## Build from source
 
-Version 1.1 is the Rust crate in [`plugin/`](plugin/README.md). It needs Rust, a C++20 compiler, and
-checkouts of OpenPluginSDK and GoodLookin DRI side by side; the VST3, Audio Unit and AAX formats also
-need their SDKs.
+Version 1.1 is the Rust crate in [`plugin/`](plugin/README.md). It needs Rust and a C++20 compiler. Cargo
+fetches OpenPluginSDK at the revision the crate names; building the bundles needs a checkout of the same
+revision, and the VST3, Audio Unit and AAX formats also need their SDKs.
 
 ```sh
 git clone https://github.com/MistaMin/BlueChannel.git

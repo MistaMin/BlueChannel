@@ -13,6 +13,7 @@ their own terms. Installers include the license and notice texts.
 | Rust standard library | plugin and editor code | MIT or Apache License 2.0 |
 | cc (build time only) | compiles the C++ model | MIT or Apache License 2.0 |
 | fontdue, ttf-parser | lettering | MIT or Apache License 2.0 (fontdue also Zlib) |
+| Source Sans Pro Semibold (copyright 2010, 2012 Adobe Systems Incorporated, with Reserved Font Name 'Source') | the toolkit's built-in typeface, inside the binaries | SIL Open Font License 1.1 |
 | rustfft, num-complex, num-integer, num-traits, primal-check, strength_reduce, transpose | the spectrum in the Digital skin | MIT or Apache License 2.0 |
 | hashbrown, ahash, allocator-api2, once_cell, cfg-if, libc, log, bitflags, itoa, memchr, serde, serde_json, zerocopy, zmij | support libraries | MIT or Apache License 2.0 (zerocopy also BSD 2-Clause) |
 | CLAP | CLAP format | MIT |
