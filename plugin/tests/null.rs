@@ -13,10 +13,7 @@
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-/// The 1.0.0 JUCE release. Once a later version is installed there, name a 1.0.0 with
-/// `OPENPLUGIN_PORT_ORIGINAL`.
-/// (Its VST3: the CLAP build crashes in the tool's host.)
-const ORIGINAL: &str = "/Library/Audio/Plug-Ins/VST3/Blue Channel.vst3";
+/// The original is the 1.0.0 JUCE release's VST3 (its CLAP build crashes in the tool's host).
 const ORIGINAL_FORMAT: &str = "vst3";
 /// This crate's library, as Cargo names it.
 const LIB: &str = "blue_channel";
@@ -35,19 +32,6 @@ const AUTOMATION: &[&str] = &[
     "0:Comp In=1, 0:Gate In=1, 0:De-Ess In=1, 0:Soft Limiter=1, 12288:Phase=1, 24064:Mic Air=1, 30208:Comp In=0",
     "0:Comp In=1, 0:Blend=1, 0:Auto Release=1, 0:Expand=1, 0:Gate In=1, 0:Fast Attack=1, 9216:Stereo Link=0, 19968:Mute=1, 26112:Mute=0, 35840:Bypass=1",
 ];
-
-fn tool() -> PathBuf {
-    if let Some(t) = std::env::var_os("OPENPLUGIN_PORT") {
-        return PathBuf::from(t);
-    }
-    PathBuf::from("openplugin-port")
-}
-
-fn original() -> PathBuf {
-    let path = std::env::var_os("OPENPLUGIN_PORT_ORIGINAL").map_or_else(|| PathBuf::from(ORIGINAL), PathBuf::from);
-    assert!(path.exists(), "the original plugin {} is not there: set OPENPLUGIN_PORT_ORIGINAL", path.display());
-    path
-}
 
 /// Build this crate's library and return the file Cargo reports for it (Cargo decides the
 /// target folder and its layout, from CARGO_TARGET_DIR or its configuration).
@@ -95,7 +79,13 @@ fn json_strings(line: &str) -> Vec<String> {
 
 #[test]
 fn the_port_nulls_against_the_original() {
-    let (tool, original, port) = (tool(), original(), port());
+    // Both are files of this machine, so a checkout without them has nothing to compare with.
+    let (Some(tool), Some(original)) = (std::env::var_os("OPENPLUGIN_PORT"), std::env::var_os("OPENPLUGIN_PORT_ORIGINAL")) else {
+        eprintln!("skipped: set OPENPLUGIN_PORT (the openplugin-port tool) and OPENPLUGIN_PORT_ORIGINAL (the 1.0.0 VST3)");
+        return;
+    };
+    let (tool, original, port) = (PathBuf::from(tool), PathBuf::from(original), port());
+    assert!(original.exists(), "the original plugin {} is not there", original.display());
     for automation in AUTOMATION {
         for input in INPUTS {
             let mut null = Command::new(&tool);

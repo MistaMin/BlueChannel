@@ -27,11 +27,12 @@ openplugin-testing = { path = "<OpenPluginSDK>/crates/openplugin-testing" }
 goodlookindri-shell = { path = "<OpenPluginSDK>/crates/goodlookindri/shell" }
 
 [env]
-OPENPLUGIN_PORT = "<path to the openplugin-port executable>"   # for tests/null.rs
+OPENPLUGIN_PORT = "<path to the openplugin-port executable>"   # both for tests/null.rs,
+OPENPLUGIN_PORT_ORIGINAL = "<path to the 1.0.0 Blue Channel.vst3>"   # which is skipped without them
 ```
 
 ```bash
-cargo test                                   # tests/null.rs needs the 1.0.0 VST3: OPENPLUGIN_PORT_ORIGINAL names it
+cargo test
 cargo test --release --test soak -- --ignored   # 24 seeds and the strict fuzz, about ten minutes
 cargo test --release --features count-cpp-new --test conformance   # the allocation check with the C++ model counted too
 cargo test --release --features hq --test hq # HQ Mode with the solver; needs a shared ngspice library
