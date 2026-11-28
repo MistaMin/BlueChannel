@@ -4,8 +4,9 @@
 
 See docs/RELEASE_1.1.1.md for what was checked and what was not.
 
-- Built against OpenPluginSDK `1f608fe`. A project saved with 1.0.0 now opens with its settings in VST3,
-  Audio Unit and AAX hosts too (1.1.0 read them in CLAP hosts only).
+- Built against OpenPluginSDK `07f97e1`. A project saved with 1.0.0 now opens with its settings in VST3,
+  Audio Unit and AAX hosts too (1.1.0 read them in CLAP hosts only). The macOS VST3, Audio Unit and AAX
+  no longer carry the SDK's unused typefaces.
 - Fixed: with the Mic input, a loud tone below about 100 Hz (from -20 dBFS at 16x oversampling, from
   -12 dBFS at the default 2x) made the output overflow after one to three seconds, and the instance stayed
   silent or broken until it was reset. 1.0.0 and 1.1.0 both do this. The mic transformer's core current

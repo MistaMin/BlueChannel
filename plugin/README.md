@@ -39,7 +39,7 @@ cargo test --release --features hq --test hq # HQ Mode with the solver; needs a 
 scripts/build.sh --hq                        # universal CLAP, LV2, VST3, AU, AAX and the app, in dist/
 ```
 
-Version 1.1.0 was built with OpenPluginSDK `ded6d8d` and GoodLookin DRI 0.2.1; version 1.1.1 is built with OpenPluginSDK `1f608fe`, which has GoodLookin DRI in its tree. The Windows plug-ins (CLAP and VST3, no HQ Mode) and their installer are built by `../.github/workflows/windows.yml` with the SDK's `scripts/windows/build_plugin.ps1`.
+Version 1.1.0 was built with OpenPluginSDK `ded6d8d` and GoodLookin DRI 0.2.1; version 1.1.1 is built with OpenPluginSDK `07f97e1`, which has GoodLookin DRI in its tree. The Windows plug-ins (CLAP and VST3, no HQ Mode) and their installer are built by `../.github/workflows/windows.yml` with the SDK's `scripts/windows/build_plugin.ps1`.
 
 `scripts/build.sh --help` lists the options and the variables that say where the VST3, Audio Unit and AAX SDKs and ngspice are. Nothing is installed and nothing is signed beyond ad hoc. The bundles carry the release's ids: installing them replaces the JUCE release in every host.
 

@@ -14,7 +14,6 @@ their own terms. Installers include the license and notice texts.
 | cc (build time only) | compiles the C++ model | MIT or Apache License 2.0 |
 | fontdue, ttf-parser | lettering | MIT or Apache License 2.0 (fontdue also Zlib) |
 | Source Sans Pro Semibold (copyright 2010, 2012 Adobe Systems Incorporated, with Reserved Font Name 'Source') | the toolkit's built-in typeface, inside the binaries | SIL Open Font License 1.1 |
-| Inter, Source Sans 3, JetBrains Mono, Barlow Condensed, DSEG (macOS VST3, Audio Unit and AAX only) | typefaces the SDK bundles; they are inside these binaries and Blue Channel does not draw with them | SIL Open Font License 1.1, each text in the bundle's `ThirdParty` folder |
 | rustfft, num-complex, num-integer, num-traits, primal-check, strength_reduce, transpose | the spectrum in the Digital skin | MIT or Apache License 2.0 |
 | hashbrown, ahash, allocator-api2, once_cell, cfg-if, libc, log, bitflags, itoa, memchr, serde, serde_json, zerocopy, zmij | support libraries | MIT or Apache License 2.0 (zerocopy also BSD 2-Clause) |
 | CLAP | CLAP format | MIT |

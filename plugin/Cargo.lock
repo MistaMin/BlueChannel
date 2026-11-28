@@ -311,12 +311,12 @@ checksum = "e4eba85ea1d0a966a983acd07deee566e67395d2d96b6fb39e62b5a833f1eb0b"
 [[package]]
 name = "goodlookindri"
 version = "0.2.1"
-source = "git+https://github.com/MistaMin/OpenPluginSDK?rev=1f608fefe1a0ebc0215ffd67591a79c82f950686#1f608fefe1a0ebc0215ffd67591a79c82f950686"
+source = "git+https://github.com/MistaMin/OpenPluginSDK?rev=07f97e1f8fe6a2be3a3cfc2f390f81b01837f077#07f97e1f8fe6a2be3a3cfc2f390f81b01837f077"
 
 [[package]]
 name = "goodlookindri-shell"
 version = "0.2.1"
-source = "git+https://github.com/MistaMin/OpenPluginSDK?rev=1f608fefe1a0ebc0215ffd67591a79c82f950686#1f608fefe1a0ebc0215ffd67591a79c82f950686"
+source = "git+https://github.com/MistaMin/OpenPluginSDK?rev=07f97e1f8fe6a2be3a3cfc2f390f81b01837f077#07f97e1f8fe6a2be3a3cfc2f390f81b01837f077"
 dependencies = [
  "fontdue",
  "goodlookindri",
@@ -608,7 +608,7 @@ checksum = "9f7c3e4beb33f85d45ae3e3a1792185706c8e16d043238c593331cc7cd313b50"
 [[package]]
 name = "openplugin"
 version = "1.0.0-beta"
-source = "git+https://github.com/MistaMin/OpenPluginSDK?rev=1f608fefe1a0ebc0215ffd67591a79c82f950686#1f608fefe1a0ebc0215ffd67591a79c82f950686"
+source = "git+https://github.com/MistaMin/OpenPluginSDK?rev=07f97e1f8fe6a2be3a3cfc2f390f81b01837f077#07f97e1f8fe6a2be3a3cfc2f390f81b01837f077"
 dependencies = [
  "openplugin-core",
  "openplugin-dri",
@@ -621,7 +621,7 @@ dependencies = [
 [[package]]
 name = "openplugin-core"
 version = "1.0.0-beta"
-source = "git+https://github.com/MistaMin/OpenPluginSDK?rev=1f608fefe1a0ebc0215ffd67591a79c82f950686#1f608fefe1a0ebc0215ffd67591a79c82f950686"
+source = "git+https://github.com/MistaMin/OpenPluginSDK?rev=07f97e1f8fe6a2be3a3cfc2f390f81b01837f077#07f97e1f8fe6a2be3a3cfc2f390f81b01837f077"
 dependencies = [
  "serde",
 ]
@@ -629,7 +629,7 @@ dependencies = [
 [[package]]
 name = "openplugin-dri"
 version = "1.0.0-beta"
-source = "git+https://github.com/MistaMin/OpenPluginSDK?rev=1f608fefe1a0ebc0215ffd67591a79c82f950686#1f608fefe1a0ebc0215ffd67591a79c82f950686"
+source = "git+https://github.com/MistaMin/OpenPluginSDK?rev=07f97e1f8fe6a2be3a3cfc2f390f81b01837f077#07f97e1f8fe6a2be3a3cfc2f390f81b01837f077"
 dependencies = [
  "goodlookindri",
  "goodlookindri-shell",
@@ -642,7 +642,7 @@ dependencies = [
 [[package]]
 name = "openplugin-dsp"
 version = "1.0.0-beta"
-source = "git+https://github.com/MistaMin/OpenPluginSDK?rev=1f608fefe1a0ebc0215ffd67591a79c82f950686#1f608fefe1a0ebc0215ffd67591a79c82f950686"
+source = "git+https://github.com/MistaMin/OpenPluginSDK?rev=07f97e1f8fe6a2be3a3cfc2f390f81b01837f077#07f97e1f8fe6a2be3a3cfc2f390f81b01837f077"
 dependencies = [
  "openplugin-core",
  "rustfft",
@@ -652,7 +652,7 @@ dependencies = [
 [[package]]
 name = "openplugin-host"
 version = "1.0.0-beta"
-source = "git+https://github.com/MistaMin/OpenPluginSDK?rev=1f608fefe1a0ebc0215ffd67591a79c82f950686#1f608fefe1a0ebc0215ffd67591a79c82f950686"
+source = "git+https://github.com/MistaMin/OpenPluginSDK?rev=07f97e1f8fe6a2be3a3cfc2f390f81b01837f077#07f97e1f8fe6a2be3a3cfc2f390f81b01837f077"
 dependencies = [
  "openplugin-core",
 ]
@@ -660,7 +660,7 @@ dependencies = [
 [[package]]
 name = "openplugin-targets"
 version = "1.0.0-beta"
-source = "git+https://github.com/MistaMin/OpenPluginSDK?rev=1f608fefe1a0ebc0215ffd67591a79c82f950686#1f608fefe1a0ebc0215ffd67591a79c82f950686"
+source = "git+https://github.com/MistaMin/OpenPluginSDK?rev=07f97e1f8fe6a2be3a3cfc2f390f81b01837f077#07f97e1f8fe6a2be3a3cfc2f390f81b01837f077"
 dependencies = [
  "openplugin-core",
  "openplugin-dri",
@@ -670,7 +670,7 @@ dependencies = [
 [[package]]
 name = "openplugin-testing"
 version = "1.0.0-beta"
-source = "git+https://github.com/MistaMin/OpenPluginSDK?rev=1f608fefe1a0ebc0215ffd67591a79c82f950686#1f608fefe1a0ebc0215ffd67591a79c82f950686"
+source = "git+https://github.com/MistaMin/OpenPluginSDK?rev=07f97e1f8fe6a2be3a3cfc2f390f81b01837f077#07f97e1f8fe6a2be3a3cfc2f390f81b01837f077"
 dependencies = [
  "openplugin-core",
 ]

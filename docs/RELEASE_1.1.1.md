@@ -14,6 +14,7 @@ parameters.
   injected without its content at half the internal sample rate. Against 1.0.0 the sound differs by at
   most 3.7e-6 of full scale (about -109 dBFS) in the null test.
 - Input below -600 dBFS is treated as silence, so the model does not run on denormal numbers.
+- The macOS VST3, Audio Unit and AAX no longer carry the SDK's unused typefaces.
 - From OpenPluginSDK `1f608fe`: an Audio Unit host that sets a switch between two steps gets the nearest
   step, edits made in a VST3 host while the plugin is not processing are kept in the project, and a VST3
   host that restarts processing during a render no longer gets one unprocessed block.
@@ -65,8 +66,6 @@ Not in this version: a standalone application, LV2 on Windows, AAX on Windows, a
 - The editor opens no larger than the main screen has room for. A host that opens it on a second,
   narrower screen can still cut it off; drag the window's corner to make it smaller.
 - The Intel half of the macOS build was built and not run.
-- The macOS installer is 10 MB larger than that of 1.1.0: the VST3, Audio Unit and AAX binaries carry
-  typefaces that the SDK bundles and Blue Channel does not use.
 - Pro Tools shows two parameters named "Bypass": the plug-in's own and the host's.
 - HQ Mode (macOS only) solves mono instances. On a stereo track the solve fails and the export is muted
   with "HQ failed". 1.0 fails in the same way; it is the same solver.
